@@ -1,4 +1,4 @@
-package ch.so.agi.interlis.controllers;
+package com.ai.st.microservice.ilivalidator.controllers;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import ch.so.agi.interlis.services.IlivalidatorService;
-import ch.so.agi.interlis.swagger.api.transfers.ValidationModel;
+import com.ai.st.microservice.ilivalidator.services.IlivalidatorService;
+import com.ai.st.microservice.ilivalidator.swagger.api.transfers.ValidationModel;
 
 import java.util.ArrayList;
 import java.util.Enumeration;

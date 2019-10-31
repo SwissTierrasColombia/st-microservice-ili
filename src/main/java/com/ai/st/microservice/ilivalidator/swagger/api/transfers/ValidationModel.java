@@ -1,4 +1,4 @@
-package ch.so.agi.interlis.swagger.api.transfers;
+package com.ai.st.microservice.ilivalidator.swagger.api.transfers;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

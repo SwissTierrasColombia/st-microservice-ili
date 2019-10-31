@@ -1,4 +1,4 @@
-package ch.so.agi.interlis.swagger;
+package com.ai.st.microservice.ilivalidator.swagger;
 
 import com.google.common.base.Predicate;
 

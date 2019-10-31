@@ -1,4 +1,4 @@
-package ch.so.agi.interlis.config;
+package com.ai.st.microservice.ilivalidator.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

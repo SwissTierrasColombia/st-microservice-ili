@@ -1,4 +1,4 @@
-package ch.so.agi.interlis;
+package com.ai.st.microservice.ilivalidator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package ch.so.agi.interlis.services;
+package com.ai.st.microservice.ilivalidator.services;
 
 import org.springframework.stereotype.Service;
 

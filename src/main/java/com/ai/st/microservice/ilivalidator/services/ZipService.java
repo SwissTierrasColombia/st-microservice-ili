@@ -1,4 +1,4 @@
-package ch.so.agi.interlis.services;
+package com.ai.st.microservice.ilivalidator.services;
 
 import java.io.File;
 import java.io.IOException;
