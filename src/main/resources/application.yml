@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: st-microservice-ilivalidator
+  servlet:
+    multipart:
+      maxFileSize: 250MB
+      maxRequestSize: 250MB
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+server:
+  port: 9005
+  tomcat:
+    max-threads: 0
+
+logging:
+  level:
+    ch:
+      so: DEBUG
+      

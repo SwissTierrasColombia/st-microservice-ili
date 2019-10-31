@@ -1,0 +1,106 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.0.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+}
+
+apply plugin:'java'
+apply plugin:'eclipse'
+apply plugin:'org.springframework.boot'
+apply plugin: 'application'
+
+group = 'ch.so.agi.interlis'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
+repositories {
+	maven {
+		url "http://jars.interlis.ch"
+	}
+	
+	flatDir {
+		dirs "$rootProject.projectDir/lib"
+	}
+	
+	maven {
+		url "http://download.osgeo.org/webdav/geotools/"
+	}
+	
+	maven {
+		url "http://repo.boundlessgeo.com/main"
+	}
+	
+	mavenCentral()
+	
+	maven { 
+		url "https://repo.spring.io/milestone" 
+	}
+}
+
+ext {
+	set('springCloudVersion', "Hoxton.RC1")
+	geotoolsVersion = 16.1
+}
+
+dependencies {
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+	
+	implementation group: 'commons-io', name: 'commons-io', version: '2.5'	
+	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+	
+	implementation group: 'ch.interlis', name: 'ilivalidator', version: '1.8.1'
+	implementation group: 'ch.interlis', name: 'ili2pg', version: '3.11.2'
+	implementation group: 'ch.interlis', name: 'ili2gpkg', version: '3.10.5-ili2c-4.7.7'
+	
+	implementation group: 'org.postgresql', name: 'postgresql', version: '9.4.1208.jre6'
+	
+	implementation group: 'javax.xml.crypto', name: 'jsr105-api', version: '1.0.1'
+	
+	implementation group: 'org.geotools', name: 'gt-main', version: geotoolsVersion
+	implementation group: 'org.geotools', name: 'gt-epsg-hsql', version: geotoolsVersion
+	implementation group: 'org.geotools', name: 'gt-geopkg', version: geotoolsVersion
+	implementation group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
+	implementation group: 'org.geotools', name: 'gt-cql', version: geotoolsVersion
+
+	implementation group: 'org.webjars.bower', name: 'materialize', version: '0.98.0'
+	implementation group: 'org.webjars', name: 'jquery', version: '2.2.4'
+
+	implementation group: 'org.xerial', name: 'sqlite-jdbc'
+	
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+task encrypt(type:JavaExec) {
+   standardInput = System.in
+   main = 'ch.so.agi.interlis.services.EncryptService'
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+test {
+	useJUnitPlatform()
+}
