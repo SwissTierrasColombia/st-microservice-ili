@@ -25,9 +25,9 @@ repositories {
 		url "http://jars.interlis.ch"
 	}
 	
-	flatDir {
-		dirs "$rootProject.projectDir/lib"
-	}
+	//flatDir {
+	//	dirs "$rootProject.projectDir/lib"
+	//}
 	
 	maven {
 		url "http://download.osgeo.org/webdav/geotools/"
@@ -63,9 +63,18 @@ dependencies {
 	implementation group: 'commons-io', name: 'commons-io', version: '2.5'	
 	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
 	
-	implementation group: 'ch.interlis', name: 'ilivalidator', version: '1.8.1'
-	implementation group: 'ch.interlis', name: 'ili2pg', version: '3.11.2'
+	implementation group: 'ch.interlis', name: 'ilivalidator', version: '1.11.1'
+	implementation group: 'ch.interlis', name: 'ili2pg', version: '4.3.0'
 	implementation group: 'ch.interlis', name: 'ili2gpkg', version: '3.10.5-ili2c-4.7.7'
+	implementation group: 'ch.interlis', name: 'iox-ili', version: '1.20.13'
+  	implementation group: 'ch.interlis', name: 'ili2c-tool', version: '5.0.2'
+  	implementation group: 'ch.interlis', name: 'ili2c-core', version: '5.0.2'
+  	
+  	implementation group: 'ch.ehi', name: 'ehisqlgen', version: '1.13.8'
+  	
+  	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+  	
+  	implementation group: 'net.iharder', name: 'base64', version: '2.3.9'
 	
 	implementation group: 'org.postgresql', name: 'postgresql', version: '9.4.1208.jre6'
 	

@@ -47,14 +47,17 @@ public class MainController {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@Value("${ilivalidator.uploadedFiles}")
+	@Value("${iliProcesses.uploadedFiles}")
 	private String uploadedFiles;
 
-	@Value("${ilivalidator.downloadedFiles}")
+	@Value("${iliProcesses.downloadedFiles}")
 	private String downloadedFiles;
 
-	@Value("${ilivalidator.iliDirectory}")
+	@Value("${iliProcesses.iliDirectory}")
 	private String iliDirectory;
+	
+	@Value("${iliProcesses.temporalDirectoryPrefix}")
+	private String temporalDirectoryPrefix;
 
 	@RequestMapping(value = "validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation(value = "Validate XTF")
@@ -71,7 +74,7 @@ public class MainController {
 
 		try {
 
-			String tmpDirectoryPrefix = "ilivalidator_";
+			String tmpDirectoryPrefix = temporalDirectoryPrefix;
 			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
 
 			// Upload model files
