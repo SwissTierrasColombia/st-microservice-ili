@@ -55,9 +55,12 @@ public class MainController {
 
 	@Value("${iliProcesses.iliDirectory}")
 	private String iliDirectory;
-	
+
 	@Value("${iliProcesses.temporalDirectoryPrefix}")
 	private String temporalDirectoryPrefix;
+
+	@Value("${iliProcesses.iliDirectoryPlugins}")
+	private String iliDirectoryPlugins;
 
 	@RequestMapping(value = "validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation(value = "Validate XTF")
@@ -134,7 +137,14 @@ public class MainController {
 
 				if (evaluableFiles.size() > 0) {
 					for (String file : evaluableFiles) {
-						result = ilivalidator.validate(file, iliDirectory);
+
+						String localModelsDirectory = tmpDirectory.toString();
+						String logFileValidation = tmpDirectory.toString() + File.separator + "validation.log";
+						String logFileValidationXTF = tmpDirectory.toString() + File.separator + "validation.xtf";
+
+						result = ilivalidator.validate(file, iliDirectory, localModelsDirectory, iliDirectoryPlugins,
+								logFileValidation, logFileValidationXTF, null);
+
 						String resultId = Paths.get(FilenameUtils.getFullPath(file)).getFileName().getName(0)
 								.toString();
 						String transfer = FilenameUtils.getName(file);
