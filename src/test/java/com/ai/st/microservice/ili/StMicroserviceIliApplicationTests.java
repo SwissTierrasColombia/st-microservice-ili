@@ -1,10 +1,10 @@
-package ch.so.agi.interlis;
+package com.ai.st.microservice.ili;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class StMicroserviceIlivalidatorApplicationTests {
+class StMicroserviceIliApplicationTests {
 
 	@Test
 	void contextLoads() {

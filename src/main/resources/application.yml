@@ -1,6 +1,6 @@
 spring:
   application:
-    name: st-microservice-ilivalidator
+    name: st-microservice-ili
   servlet:
     multipart:
       maxFileSize: 250MB
@@ -16,8 +16,4 @@ server:
   tomcat:
     max-threads: 0
 
-logging:
-  level:
-    ch:
-      so: DEBUG
       

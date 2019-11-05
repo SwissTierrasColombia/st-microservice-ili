@@ -1,6 +1,6 @@
 spring:
   application:
-    name: st-microservice-ilivalidator
+    name: st-microservice-ili
   profiles:
     active: 
       - "develop"

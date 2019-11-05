@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ilivalidator.controllers;
+package com.ai.st.microservice.ili.controllers;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,18 +20,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ai.st.microservice.ilivalidator.services.Ili2pgService;
-import com.ai.st.microservice.ilivalidator.swagger.api.transfers.ValidationModel;
+import com.ai.st.microservice.ili.services.Ili2pgService;
+import com.ai.st.microservice.ili.swagger.api.transfers.ValidationModel;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Api(value = "Ili2", description = "Import and export file XTF to databases", tags = { "ili2" })
+@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE,
+		RequestMethod.OPTIONS })
+@Api(value = "Ili2pg", description = "Import and export file XTF to databases posgresql", tags = { "ili2pg" })
 @RestController
-@RequestMapping("api/ili2")
-public class Ili2Controller {
+@RequestMapping("api/ili/ili2pg")
+public class Ili2pgController {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -49,12 +52,12 @@ public class Ili2Controller {
 	@Value("${iliProcesses.srs}")
 	private String srsDefault;
 
-	@RequestMapping(value = "pg/schema", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "schema-import", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Generate database")
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Model generated"),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Database generated"),
 			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
 	@ResponseBody
-	public void generateSchema(@RequestParam(name = "databaseHost", required = true) String databaseHost,
+	public void schemaImport(@RequestParam(name = "databaseHost", required = true) String databaseHost,
 			@RequestParam(name = "databasePort", required = true) String databasePort,
 			@RequestParam(name = "databaseName", required = true) String databaseName,
 			@RequestParam(name = "databaseSchema", required = true) String databaseSchema,
@@ -79,9 +82,10 @@ public class Ili2Controller {
 
 	}
 
-	@RequestMapping(value = "import/pg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@ApiOperation(value = "Import file XTF to database")
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Processed file", response = ValidationModel.class),
+	@RequestMapping(value = "import", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@ApiOperation(value = "Generate database and import data from XTF file")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Database generated and data imported", response = ValidationModel.class),
 			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
 	@ResponseBody
 	public void importXtf(@RequestParam(name = "fileXTF", required = true) MultipartFile uploadFile,

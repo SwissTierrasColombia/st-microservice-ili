@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ilivalidator.services;
+package com.ai.st.microservice.ili.services;
 
 import java.io.File;
 import java.io.IOException;

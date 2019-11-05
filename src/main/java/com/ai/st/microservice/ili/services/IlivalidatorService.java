@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ilivalidator.services;
+package com.ai.st.microservice.ili.services;
 
 import org.springframework.stereotype.Service;
 

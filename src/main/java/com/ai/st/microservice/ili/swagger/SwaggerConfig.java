@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ilivalidator.swagger;
+package com.ai.st.microservice.ili.swagger;
 
 import com.google.common.base.Predicate;
 
@@ -25,7 +25,7 @@ public class SwaggerConfig {
 	}
 
 	private ApiInfo usersApiInfo() {
-		return new ApiInfoBuilder().title("Microservice Ilivalidator").version("1.0").license("GNU GENERAL PUBLIC LICENSE - Version 2").build();
+		return new ApiInfoBuilder().title("Microservice Ili").version("1.0").license("GNU GENERAL PUBLIC LICENSE - Version 2").build();
 	}
 
 	private Predicate<String> userPaths() {

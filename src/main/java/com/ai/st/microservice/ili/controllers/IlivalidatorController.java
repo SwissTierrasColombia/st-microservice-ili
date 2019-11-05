@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ilivalidator.controllers;
+package com.ai.st.microservice.ili.controllers;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ai.st.microservice.ilivalidator.services.IlivalidatorService;
-import com.ai.st.microservice.ilivalidator.swagger.api.transfers.ValidationModel;
+import com.ai.st.microservice.ili.services.IlivalidatorService;
+import com.ai.st.microservice.ili.swagger.api.transfers.ValidationModel;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -40,10 +40,10 @@ import io.swagger.annotations.ApiResponses;
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE,
 		RequestMethod.OPTIONS })
-@Api(value = "Ilivalidator", description = "Validations", tags = { "ilivalidator" })
+@Api(value = "Ilivalidator", description = "Validations XTF files", tags = { "ilivalidator" })
 @RestController
-@RequestMapping("api/ilivalidator")
-public class MainController {
+@RequestMapping("api/ili/ilivalidator")
+public class IlivalidatorController {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
