@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ai.st.microservice.ili.services.Ili2pgService;
 import com.ai.st.microservice.ili.swagger.api.transfers.ImportModel;
-import com.ai.st.microservice.ili.swagger.api.transfers.ValidationModel;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
