@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.controllers;
+package com.ai.st.microservice.ili.controllers.v1;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ai.st.microservice.ili.dto.ValidationDto;
 import com.ai.st.microservice.ili.services.IlivalidatorService;
-import com.ai.st.microservice.ili.swagger.api.transfers.ValidationModel;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -42,8 +42,8 @@ import io.swagger.annotations.ApiResponses;
 		RequestMethod.OPTIONS })
 @Api(value = "Ilivalidator", description = "Validations XTF files", tags = { "ilivalidator" })
 @RestController
-@RequestMapping("api/ili/ilivalidator")
-public class IlivalidatorController {
+@RequestMapping("api/ili/ilivalidator/v1")
+public class IlivalidatorV1Controller {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -64,16 +64,16 @@ public class IlivalidatorController {
 
 	@RequestMapping(value = "validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation(value = "Validate XTF")
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Processed file", response = ValidationModel.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Processed file", response = ValidationDto.class),
 			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
 	@ResponseBody
-	public ResponseEntity<List<ValidationModel>> validateXTF(
+	public ResponseEntity<List<ValidationDto>> validateXTF(
 			@RequestParam(name = "filesXTF[]", required = true) MultipartFile[] uploadfiles,
 			@RequestParam(name = "filesModels[]", required = false) MultipartFile[] iliFiles) {
 
 		IlivalidatorService ilivalidator = new IlivalidatorService();
 
-		List<ValidationModel> listValidations = new ArrayList<>();
+		List<ValidationDto> listValidations = new ArrayList<>();
 
 		try {
 
@@ -148,7 +148,7 @@ public class IlivalidatorController {
 						String resultId = Paths.get(FilenameUtils.getFullPath(file)).getFileName().getName(0)
 								.toString();
 						String transfer = FilenameUtils.getName(file);
-						listValidations.add(new ValidationModel(resultId, transfer, result, true, true));
+						listValidations.add(new ValidationDto(resultId, transfer, result, true, true));
 					}
 				}
 			}

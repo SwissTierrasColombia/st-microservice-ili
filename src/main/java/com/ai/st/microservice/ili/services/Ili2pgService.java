@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ch.ehi.ili2db.base.Ili2db;
-import ch.ehi.ili2db.base.Ili2dbException;
 import ch.ehi.ili2db.gui.Config;
 
 @Service
@@ -50,24 +49,25 @@ public class Ili2pgService {
 
 		Boolean result = false;
 
-		Config config = getDefaultConfig();
-
-		config.setFunction(Config.FC_SCHEMAIMPORT); // --schemaimport
-		config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
-		config.setDefaultSrsCode(srsCode); // --defaultSrsCode
-		config.setModels(models); // --models
-		config.setLogfile(logFileSchemaImport); // --log
-
-		config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
-		config.setDbschema(databaseSchema);
-		config.setDbusr(databaseUsername);
-		config.setDbpwd(databasePassword);
-
 		try {
+
+			Config config = getDefaultConfig();
+
+			config.setFunction(Config.FC_SCHEMAIMPORT); // --schemaimport
+			config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
+			config.setDefaultSrsCode(srsCode); // --defaultSrsCode
+			config.setModels(models); // --models
+			config.setLogfile(logFileSchemaImport); // --log
+
+			config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
+			config.setDbschema(databaseSchema);
+			config.setDbusr(databaseUsername);
+			config.setDbpwd(databasePassword);
+
 			Ili2db.readSettingsFromDb(config);
 			Ili2db.run(config, null);
 			result = true;
-		} catch (Ili2dbException e) {
+		} catch (Exception e) {
 			log.error(e.getMessage());
 			result = false;
 		}
@@ -86,28 +86,29 @@ public class Ili2pgService {
 
 		if (generateSchema) {
 
-			Config config = getDefaultConfig();
-
-			config.setFunction(Config.FC_IMPORT); // --schemaimport
-			config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
-			config.setDefaultSrsCode(srsCode); // --defaultSrsCode
-			config.setModels(models); // --models
-			config.setLogfile(logFileImport); // --log
-			config.setXtffile(fileXTF);
-			if (fileXTF != null && Ili2db.isItfFilename(fileXTF)) {
-				config.setItfTransferfile(true);
-			}
-
-			config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
-			config.setDbschema(databaseSchema);
-			config.setDbusr(databaseUsername);
-			config.setDbpwd(databasePassword);
-
 			try {
+
+				Config config = getDefaultConfig();
+
+				config.setFunction(Config.FC_IMPORT); // --schemaimport
+				config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
+				config.setDefaultSrsCode(srsCode); // --defaultSrsCode
+				config.setModels(models); // --models
+				config.setLogfile(logFileImport); // --log
+				config.setXtffile(fileXTF);
+				if (fileXTF != null && Ili2db.isItfFilename(fileXTF)) {
+					config.setItfTransferfile(true);
+				}
+
+				config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
+				config.setDbschema(databaseSchema);
+				config.setDbusr(databaseUsername);
+				config.setDbpwd(databasePassword);
+
 				Ili2db.readSettingsFromDb(config);
 				Ili2db.run(config, null);
 				result = true;
-			} catch (Ili2dbException e) {
+			} catch (Exception e) {
 				log.error(e.getMessage());
 				result = false;
 			}

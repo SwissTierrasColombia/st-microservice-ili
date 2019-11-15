@@ -1,19 +1,19 @@
-package com.ai.st.microservice.ili.swagger.api.transfers;
+package com.ai.st.microservice.ili.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "ImportModel", description = "Response import")
-public class ImportModel {
+public class ResponseImportDto {
 
 	private Boolean imported;
 	private String message;
 
-	public ImportModel() {
+	public ResponseImportDto() {
 
 	}
 
-	public ImportModel(Boolean imported, String message) {
+	public ResponseImportDto(Boolean imported, String message) {
 		super();
 		this.imported = imported;
 		this.message = message;

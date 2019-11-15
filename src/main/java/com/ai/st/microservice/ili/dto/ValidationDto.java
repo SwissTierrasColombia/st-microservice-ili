@@ -1,10 +1,10 @@
-package com.ai.st.microservice.ili.swagger.api.transfers;
+package com.ai.st.microservice.ili.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "ValidationModel", description = "Response validation")
-public class ValidationModel {
+public class ValidationDto {
 
 	private String resultId;
 	private String transfer;
@@ -12,11 +12,11 @@ public class ValidationModel {
 	private Boolean log;
 	private Boolean xtfLog;
 
-	public ValidationModel() {
+	public ValidationDto() {
 
 	}
 
-	public ValidationModel(String resultId, String transfer, Boolean isValid, Boolean log, Boolean xtfLog) {
+	public ValidationDto(String resultId, String transfer, Boolean isValid, Boolean log, Boolean xtfLog) {
 		super();
 		this.resultId = resultId;
 		this.transfer = transfer;
