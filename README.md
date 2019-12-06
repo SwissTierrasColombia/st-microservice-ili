@@ -83,13 +83,13 @@ $ docker network create st
 ### Create image from Dockerfile
 
 ```sh
-$ docker build -t st-microservice-tasks:ursus .
+$ docker build -t st-microservice-ili:ursus .
 ```
 
 ### Run Container
 
 ```sh
-$ docker run -P -t --network st -d st-microservice-tasks:ursus
+$ docker run -P -t --network st -d st-microservice-ili:ursus
 ```
 
 ### Enter container and create folders
