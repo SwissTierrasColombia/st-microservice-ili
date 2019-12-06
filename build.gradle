@@ -1,0 +1,89 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.0.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+}
+
+apply plugin:'java'
+apply plugin:'eclipse'
+apply plugin:'org.springframework.boot'
+apply plugin: 'application'
+
+group = 'com.ai.st.microservice.ili'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+mainClassName = 'com.ai.st.microservice.ili.StMicroserviceIliApplication'
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
+repositories {
+	maven {
+		url "http://jars.interlis.ch"
+	}
+	
+	mavenCentral()
+	
+	maven { 
+		url "https://repo.spring.io/milestone" 
+	}
+}
+
+ext {
+	set('springCloudVersion', "Hoxton.RC1")
+	geotoolsVersion = 16.1
+}
+
+dependencies {
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+	
+	implementation group: 'commons-io', name: 'commons-io', version: '2.5'
+	
+	implementation group: 'ch.interlis', name: 'ilivalidator', version: '1.11.1'
+	implementation group: 'ch.interlis', name: 'ili2pg', version: '4.3.0'
+	implementation group: 'ch.interlis', name: 'iox-ili', version: '1.20.13'
+  	implementation group: 'ch.interlis', name: 'ili2c-tool', version: '5.0.2'
+  	implementation group: 'ch.interlis', name: 'ili2c-core', version: '5.0.2'
+  	
+  	implementation group: 'ch.ehi', name: 'ehisqlgen', version: '1.13.8'
+  	
+  	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+  	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+  	
+  	implementation group: 'net.iharder', name: 'base64', version: '2.3.9'
+	
+	implementation group: 'org.postgresql', name: 'postgresql', version: '9.4.1208.jre6'
+	
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+jar {
+    baseName = 'gs-gradle'
+    version =  '0.1.0'
+}
+
+test {
+	
+}
