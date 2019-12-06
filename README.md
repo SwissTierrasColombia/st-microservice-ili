@@ -58,6 +58,61 @@ spring:
 
 See [http://localhost:9005/swagger-ui.html](http://localhost:9005/swagger-ui.html)
 
+## Running Production
+
+### Master Branch
+
+Go to the master branch
+
+```sh
+$ git checkout master
+```
+
+### Generate jar
+
+```sh
+$ gradle build
+```
+
+### Create Network Docker
+
+```sh
+$ docker network create st
+```
+
+### Create image from Dockerfile
+
+```sh
+$ docker build -t st-microservice-tasks:ursus .
+```
+
+### Run Container
+
+```sh
+$ docker run -P -t --network st -d st-microservice-tasks:ursus
+```
+
+### Enter container and create folders
+```sh
+$ docker exec -it container_name bash
+```
+```sh
+$ mkdir /opt/uploads
+```
+```sh
+$ mkdir /opt/downloads
+```
+```sh
+$ mkdir /opt/models/2.9.6
+```
+```sh
+$ mkdir /opt/models/2.9.6/plugins
+```
+### Copy models
+```sh
+$ docker cp /opt/storage-microservice-ili/ladm-col/models/2.9.6/. container_id:/opt/models/2.9.6
+```
+
 ## License
 
 GNU AFFERO GENERAL PUBLIC LICENSE 
