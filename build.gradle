@@ -12,6 +12,7 @@ apply plugin: 'application'
 group = 'com.ai.st.microservice.ili'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
+mainClassName = 'com.ai.st.microservice.ili.StMicroserviceIliApplication'
 
 configurations {
 	developmentOnly
@@ -78,6 +79,11 @@ dependencyManagement {
 	}
 }
 
+jar {
+    baseName = 'gs-gradle'
+    version =  '0.1.0'
+}
+
 test {
-	useJUnitPlatform()
+	
 }
