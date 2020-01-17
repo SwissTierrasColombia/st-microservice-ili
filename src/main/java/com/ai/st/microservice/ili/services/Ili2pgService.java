@@ -1,8 +1,14 @@
 package com.ai.st.microservice.ili.services;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import com.ai.st.microservice.ili.drivers.PostgresDriver;
+import com.ai.st.microservice.ili.dto.IntegrationStatDto;
 
 import ch.ehi.ili2db.base.Ili2db;
 import ch.ehi.ili2db.gui.Config;
@@ -115,6 +121,85 @@ public class Ili2pgService {
 		}
 
 		return result;
+	}
+
+	public IntegrationStatDto integration(String cadastreFileXTF, String cadastreLogFileSchemaImport,
+			String cadastreLogFileImport, String registrationFileXTF, String registrationLogFileSchemaImport,
+			String registrationLogFileImport, String iliDirectory, String srsCode, String models, String databaseHost,
+			String databasePort, String databaseName, String databaseSchema, String databaseUsername,
+			String databasePassword) {
+
+		IntegrationStatDto integrationStat = new IntegrationStatDto();
+
+		// load cadastral information
+		Boolean loadCadastral = this.import2pg(cadastreFileXTF, cadastreLogFileSchemaImport, cadastreLogFileImport,
+				iliDirectory, srsCode, models, databaseHost, databasePort, databaseName, databaseSchema,
+				databaseUsername, databasePassword);
+
+		// load registration information
+		Boolean loadRegistration = this.import2pg(registrationFileXTF, registrationLogFileSchemaImport,
+				registrationLogFileImport, iliDirectory, srsCode, models, databaseHost, databasePort, databaseName,
+				databaseSchema, databaseUsername, databasePassword);
+
+		if (loadCadastral && loadRegistration) {
+
+			PostgresDriver connection = new PostgresDriver();
+
+			String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
+			connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
+
+			String sqlObjects = "select  \r\n" + "	  snr_p.t_id as snr_predio_juridico\r\n"
+					+ "	, gc.t_id as gc_predio_catastro\r\n" + "from " + databaseSchema
+					+ ".snr_predio_juridico as snr_p\r\n" + "inner join " + databaseSchema
+					+ ".gc_predio_catastro as gc\r\n" + "	on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial\r\n"
+					+ "	and ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro)\r\n"
+					+ "	and snr_p.codigo_orip = gc.circulo_registral;";
+			ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
+
+			try {
+
+				while (resultsetObjects.next()) {
+
+					String snr = resultsetObjects.getString("snr_predio_juridico");
+					String gc = resultsetObjects.getString("gc_predio_catastro");
+
+					String sqlInsert = "INSERT INTO " + databaseSchema
+							+ ".ini_predio_insumos (gc_predio_catastro, snr_predio_juridico) VALUES (" + gc + ", " + snr
+							+ ");";
+					connection.insert(sqlInsert);
+
+				}
+
+				String sqlCountSNR = "SELECT count(*) FROM " + databaseSchema + ".snr_predio_juridico;";
+				long countSNR = connection.count(sqlCountSNR);
+
+				String sqlCountGC = "SELECT count(*) FROM " + databaseSchema + ".gc_predio_catastro;";
+				long countGC = connection.count(sqlCountGC);
+
+				String sqlCountMatch = "SELECT count(*) FROM " + databaseSchema + ".ini_predio_insumos;";
+				long countMatch = connection.count(sqlCountMatch);
+
+				double percentage = 0.0;
+
+				if (countSNR >= countGC) {
+					percentage = (countMatch * 100) / countSNR;
+				} else {
+					percentage = (countMatch * 100) / countGC;
+				}
+
+				integrationStat.setStatus(true);
+				integrationStat.setCountGC(countGC);
+				integrationStat.setCountSNR(countSNR);
+				integrationStat.setCountMatch(countMatch);
+				integrationStat.setPercentage(percentage);
+
+			} catch (SQLException e) {
+				integrationStat.setStatus(false);
+			}
+
+		}
+
+		return integrationStat;
 	}
 
 }

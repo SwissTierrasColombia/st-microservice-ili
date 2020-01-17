@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationDto;
+import com.ai.st.microservice.ili.dto.IntegrationStatDto;
 import com.ai.st.microservice.ili.dto.RequestIli2pgImportDto;
 import com.ai.st.microservice.ili.dto.ResponseImportDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
@@ -130,6 +132,64 @@ public class Ili2pgV1Controller {
 		}
 
 		return new ResponseEntity<>(new ResponseImportDto(result, message), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "integration/cadastre-registration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@ApiOperation(value = "Integration Cadastre-Registration")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Integration done", response = ResponseImportDto.class),
+			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
+	@ResponseBody
+	public ResponseEntity<IntegrationStatDto> integrationCadestreRegistration(
+			@ModelAttribute Ili2pgIntegrationCadastreRegistrationDto requestIntegrationDto) {
+
+		Ili2pgService ili2pg = new Ili2pgService();
+
+		IntegrationStatDto integrationStatDto = null;
+
+		try {
+
+			String tmpDirectoryPrefix = temporalDirectoryPrefix;
+			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+
+			// upload cadastre file
+			MultipartFile uploadFileCadastre = requestIntegrationDto.getCadastreFileXTF();
+
+			String cadastreFilename = uploadFileCadastre.getOriginalFilename();
+			String cadastreFilepath = Paths.get(tmpDirectory.toString(), cadastreFilename).toString();
+			try (BufferedOutputStream stream = new BufferedOutputStream(
+					new FileOutputStream(new File(cadastreFilepath)))) {
+				stream.write(uploadFileCadastre.getBytes());
+			}
+
+			// upload registration file
+			MultipartFile uploadFileRegistration = requestIntegrationDto.getRegistrationFileXTF();
+			String registrationFilename = uploadFileRegistration.getOriginalFilename();
+			String registrationFilepath = Paths.get(tmpDirectory.toString(), registrationFilename).toString();
+			try (BufferedOutputStream stream = new BufferedOutputStream(
+					new FileOutputStream(new File(registrationFilepath)))) {
+				stream.write(uploadFileRegistration.getBytes());
+			}
+
+			String cadastreLogFileSchemaImport = tmpDirectory.toString() + File.separator
+					+ "cadastre_schema_import.log";
+			String cadastreLogFileImport = tmpDirectory.toString() + File.separator + "cadastre_import.log";
+
+			String registrationLogFileSchemaImport = tmpDirectory.toString() + File.separator
+					+ "registration_schema_import.log";
+			String registrationLogFileImport = tmpDirectory.toString() + File.separator + "registration_import.log";
+
+			integrationStatDto = ili2pg.integration(cadastreFilepath, cadastreLogFileSchemaImport,
+					cadastreLogFileImport, registrationFilepath, registrationLogFileSchemaImport,
+					registrationLogFileImport, iliDirectory, srsDefault, modelsDefault,
+					requestIntegrationDto.getDatabaseHost(), requestIntegrationDto.getDatabasePort(),
+					requestIntegrationDto.getDatabaseName(), requestIntegrationDto.getDatabaseSchema(),
+					requestIntegrationDto.getDatabaseUsername(), requestIntegrationDto.getDatabasePassword());
+
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+
+		return new ResponseEntity<>(integrationStatDto, HttpStatus.OK);
 	}
 
 }
