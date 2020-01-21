@@ -66,6 +66,8 @@ dependencies {
 	
 	implementation group: 'org.postgresql', name: 'postgresql', version: '9.4.1208.jre6'
 	
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: '2.2.3.RELEASE'
+	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {

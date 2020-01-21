@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,11 +23,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ai.st.microservice.ili.dto.BasicResponseDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationDto;
+import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWithoutFilesDto;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
 import com.ai.st.microservice.ili.dto.RequestIli2pgImportDto;
 import com.ai.st.microservice.ili.dto.ResponseImportDto;
+import com.ai.st.microservice.ili.exceptions.InputValidationException;
 import com.ai.st.microservice.ili.services.Ili2pgService;
+import com.ai.st.microservice.ili.services.RabbitMQSenderService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +44,9 @@ import io.swagger.annotations.ApiResponses;
 public class Ili2pgV1Controller {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+	@Autowired
+	private RabbitMQSenderService rabbitSenderService;
 
 	@Value("${iliProcesses.temporalDirectoryPrefix}")
 	private String temporalDirectoryPrefix;
@@ -139,7 +147,7 @@ public class Ili2pgV1Controller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Integration done", response = ResponseImportDto.class),
 			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
 	@ResponseBody
-	public ResponseEntity<IntegrationStatDto> integrationCadestreRegistration(
+	public ResponseEntity<IntegrationStatDto> integrationCadestreRegistrationWithFiles(
 			@ModelAttribute Ili2pgIntegrationCadastreRegistrationDto requestIntegrationDto) {
 
 		Ili2pgService ili2pg = new Ili2pgService();
@@ -190,6 +198,87 @@ public class Ili2pgV1Controller {
 		}
 
 		return new ResponseEntity<>(integrationStatDto, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "integration/cadastre-registration-reference", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Integration Cadastre-Registration")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Integration done", response = ResponseImportDto.class),
+			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
+	@ResponseBody
+	public ResponseEntity<?> integrationCadestreRegistrationWithoutFiles(
+			@RequestBody Ili2pgIntegrationCadastreRegistrationWithoutFilesDto requestIntegrationDto) {
+
+		HttpStatus httpStatus = null;
+		Object responseDto = null;
+
+		try {
+
+			// validation cadastre file
+			String cadastreFile = requestIntegrationDto.getCadastrePathXTF();
+			if (cadastreFile.isEmpty()) {
+				throw new InputValidationException("El archivo de catastro es requerido para la integración.");
+			}
+
+			// validation registration file
+			String registrationFile = requestIntegrationDto.getRegistrationPathXTF();
+			if (registrationFile.isEmpty()) {
+				throw new InputValidationException("El archivo de registro es requerido para la integración.");
+			}
+
+			// validation database host
+			String databaseHost = requestIntegrationDto.getDatabaseHost();
+			if (databaseHost.isEmpty()) {
+				throw new InputValidationException("El host de la base de datos es requerida.");
+			}
+
+			// validation database name
+			String databaseName = requestIntegrationDto.getDatabaseName();
+			if (databaseName.isEmpty()) {
+				throw new InputValidationException("El nombre de la base de datos es requerida.");
+			}
+
+			// validation database schema
+			String databaseSchema = requestIntegrationDto.getDatabaseSchema();
+			if (databaseSchema.isEmpty()) {
+				throw new InputValidationException("El esquema de la base de datos es requerida.");
+			}
+
+			// validation database username
+			String databaseUsername = requestIntegrationDto.getDatabaseUsername();
+			if (databaseUsername.isEmpty()) {
+				throw new InputValidationException("El usuario de base de datos es requerido.");
+			}
+
+			// validation database password
+			String databasePassword = requestIntegrationDto.getDatabasePassword();
+			if (databasePassword.isEmpty()) {
+				throw new InputValidationException("La constraseña de la base de datos es requerida.");
+			}
+
+			// validation database port
+			String databasePort = requestIntegrationDto.getDatabasePort();
+			if (databasePort.isEmpty()) {
+				throw new InputValidationException("El puerto de base de datos es requerido.");
+			}
+
+			rabbitSenderService.sendDataToIntegrate(requestIntegrationDto);
+
+			httpStatus = HttpStatus.OK;
+			responseDto = new BasicResponseDto("Integration started!", 7);
+
+		} catch (InputValidationException e) {
+			log.error("Error Ili2pgV1Controller@integrationCadestreRegistrationWithoutFiles#Validation ---> "
+					+ e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		} catch (Exception e) {
+			log.error("Error Ili2pgV1Controller@integrationCadestreRegistrationWithoutFiles#General ---> "
+					+ e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		}
+
+		return new ResponseEntity<>(responseDto, httpStatus);
 	}
 
 }

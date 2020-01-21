@@ -5,6 +5,8 @@ spring:
     multipart:
       maxFileSize: 250MB
       maxRequestSize: 250MB
+  main:
+    allow-bean-definition-overriding: true
 
 eureka:
   client:
