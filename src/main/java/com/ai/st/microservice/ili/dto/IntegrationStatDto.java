@@ -11,6 +11,7 @@ public class IntegrationStatDto implements Serializable {
 	private long countMatch;
 	private double percentage;
 	private boolean status;
+	private Long integrationId;
 
 	public IntegrationStatDto() {
 		this.countGC = 0;
@@ -57,6 +58,14 @@ public class IntegrationStatDto implements Serializable {
 
 	public void setCountMatch(long countMatch) {
 		this.countMatch = countMatch;
+	}
+
+	public Long getIntegrationId() {
+		return integrationId;
+	}
+
+	public void setIntegrationId(Long integrationId) {
+		this.integrationId = integrationId;
 	}
 
 }

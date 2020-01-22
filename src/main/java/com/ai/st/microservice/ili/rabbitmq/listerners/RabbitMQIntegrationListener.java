@@ -52,7 +52,9 @@ public class RabbitMQIntegrationListener {
 	@RabbitListener(queues = "${st.rabbitmq.queueIntegrations.queue}")
 	public void recievedMessage(Ili2pgIntegrationCadastreRegistrationWithoutFilesDto data) {
 
-		System.out.println("integration started ");
+		log.info("integration started #" + data.getIntegrationId());
+
+		IntegrationStatDto integrationStatDto = null;
 
 		try {
 
@@ -61,12 +63,10 @@ public class RabbitMQIntegrationListener {
 
 			List<String> pathsCadastre = zipService.unzip(data.getCadastrePathXTF(), new File(tmpDirectory.toString()));
 			String pathFileCadastre = tmpDirectory.toString() + File.separator + pathsCadastre.get(0);
-			System.out.println("PATH: " + pathFileCadastre);
 
 			List<String> pathsRegistration = zipService.unzip(data.getRegistrationPathXTF(),
 					new File(tmpDirectory.toString()));
 			String pathFileRegistration = tmpDirectory.toString() + File.separator + pathsRegistration.get(0);
-			System.out.println("PATH: " + pathFileRegistration);
 
 			String cadastreLogFileSchemaImport = tmpDirectory.toString() + File.separator
 					+ "cadastre_schema_import.log";
@@ -76,20 +76,22 @@ public class RabbitMQIntegrationListener {
 					+ "registration_schema_import.log";
 			String registrationLogFileImport = tmpDirectory.toString() + File.separator + "registration_import.log";
 
-			IntegrationStatDto integrationStatDto = ili2pgService.integration(pathFileCadastre,
-					cadastreLogFileSchemaImport, cadastreLogFileImport, pathFileRegistration,
-					registrationLogFileSchemaImport, registrationLogFileImport, iliDirectory, srsDefault, modelsDefault,
-					data.getDatabaseHost(), data.getDatabasePort(), data.getDatabaseName(), data.getDatabaseSchema(),
+			integrationStatDto = ili2pgService.integration(pathFileCadastre, cadastreLogFileSchemaImport,
+					cadastreLogFileImport, pathFileRegistration, registrationLogFileSchemaImport,
+					registrationLogFileImport, iliDirectory, srsDefault, modelsDefault, data.getDatabaseHost(),
+					data.getDatabasePort(), data.getDatabaseName(), data.getDatabaseSchema(),
 					data.getDatabaseUsername(), data.getDatabasePassword());
 
-			System.out.println("stats: " + integrationStatDto.getPercentage());
-
-			rabbitService.sendStats(integrationStatDto);
-
 		} catch (Exception e) {
-			log.error("Integration error: " + e.getMessage());
+			log.error("Integration failed # " + data.getIntegrationId());
+			log.error("Integration error  " + e.getMessage());
+
+			integrationStatDto = new IntegrationStatDto();
+			integrationStatDto.setStatus(false);
 		}
 
+		integrationStatDto.setIntegrationId(data.getIntegrationId());
+		rabbitService.sendStats(integrationStatDto);
 	}
 
 }

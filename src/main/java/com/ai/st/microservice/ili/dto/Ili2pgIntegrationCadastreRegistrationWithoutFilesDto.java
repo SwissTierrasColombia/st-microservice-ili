@@ -34,6 +34,9 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
 	@ApiModelProperty(required = true, notes = "Registration - Path file XTF")
 	private String registrationPathXTF;
 
+	@ApiModelProperty(required = true, notes = "Integration ID")
+	private Long integrationId;
+
 	public Ili2pgIntegrationCadastreRegistrationWithoutFilesDto() {
 
 	}
@@ -100,6 +103,14 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
 
 	public void setRegistrationPathXTF(String registrationPathXTF) {
 		this.registrationPathXTF = registrationPathXTF;
+	}
+
+	public Long getIntegrationId() {
+		return integrationId;
+	}
+
+	public void setIntegrationId(Long integrationId) {
+		this.integrationId = integrationId;
 	}
 
 }
