@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ai.st.microservice.ili.dto.BasicResponseDto;
+import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWithoutFilesDto;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
@@ -279,6 +280,80 @@ public class Ili2pgV1Controller {
 		}
 
 		return new ResponseEntity<>(responseDto, httpStatus);
+	}
+
+	@RequestMapping(value = "export", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Export ")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Integration done", response = ResponseImportDto.class),
+			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
+	@ResponseBody
+	public ResponseEntity<?> exportToXtf(@RequestBody Ili2pgExportDto requestExportDto) {
+
+		HttpStatus httpStatus = null;
+		Object responseDto = null;
+
+		try {
+
+			// validation path file
+			String pathFile = requestExportDto.getPathFileXTF();
+			if (pathFile.isEmpty()) {
+				throw new InputValidationException("La ruta del archivo a generar es requerida.");
+			}
+
+			// validation database host
+			String databaseHost = requestExportDto.getDatabaseHost();
+			if (databaseHost.isEmpty()) {
+				throw new InputValidationException("El host de la base de datos es requerida.");
+			}
+
+			// validation database name
+			String databaseName = requestExportDto.getDatabaseName();
+			if (databaseName.isEmpty()) {
+				throw new InputValidationException("El nombre de la base de datos es requerida.");
+			}
+
+			// validation database schema
+			String databaseSchema = requestExportDto.getDatabaseSchema();
+			if (databaseSchema.isEmpty()) {
+				throw new InputValidationException("El esquema de la base de datos es requerida.");
+			}
+
+			// validation database username
+			String databaseUsername = requestExportDto.getDatabaseUsername();
+			if (databaseUsername.isEmpty()) {
+				throw new InputValidationException("El usuario de base de datos es requerido.");
+			}
+
+			// validation database password
+			String databasePassword = requestExportDto.getDatabasePassword();
+			if (databasePassword.isEmpty()) {
+				throw new InputValidationException("La constraseña de la base de datos es requerida.");
+			}
+
+			// validation database port
+			String databasePort = requestExportDto.getDatabasePort();
+			if (databasePort.isEmpty()) {
+				throw new InputValidationException("El puerto de base de datos es requerido.");
+			}
+
+			rabbitSenderService.sendDataToExport(requestExportDto);
+
+			httpStatus = HttpStatus.OK;
+			responseDto = new BasicResponseDto("¡Export started!", 5);
+
+		} catch (InputValidationException e) {
+			log.error("Error Ili2pgV1Controller@integrationCadestreRegistrationWithoutFiles#Validation ---> "
+					+ e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		} catch (Exception e) {
+			log.error("Error Ili2pgV1Controller@exportToXtf#General ---> " + e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		}
+
+		return new ResponseEntity<>(responseDto, httpStatus);
+
 	}
 
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWithoutFilesDto;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
 
@@ -26,6 +27,12 @@ public class RabbitMQSenderService {
 	@Value("${st.rabbitmq.queueUpdateIntegration.routingkey}")
 	public String routingkeyUpdateIntegrationsName;
 
+	@Value("${st.rabbitmq.queueExports.exchange}")
+	public String exchangeExportsName;
+
+	@Value("${st.rabbitmq.queueExports.routingkey}")
+	public String routingkeyExportsName;
+
 	public void sendDataToIntegrate(Ili2pgIntegrationCadastreRegistrationWithoutFilesDto data) {
 		rabbitTemplate.convertAndSend(exchangeIntegrationsName, routingkeyIntegrationsName, data);
 	}
@@ -33,6 +40,10 @@ public class RabbitMQSenderService {
 	public void sendStats(IntegrationStatDto integrationStats) {
 		rabbitTemplate.convertSendAndReceive(exchangeUpdateIntegrationsName, routingkeyUpdateIntegrationsName,
 				integrationStats);
+	}
+
+	public void sendDataToExport(Ili2pgExportDto data) {
+		rabbitTemplate.convertAndSend(exchangeExportsName, routingkeyExportsName, data);
 	}
 
 }

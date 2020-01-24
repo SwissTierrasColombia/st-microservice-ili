@@ -202,4 +202,38 @@ public class Ili2pgService {
 		return integrationStat;
 	}
 
+	public Boolean exportToXtf(String filePath, String logFileExport, String iliDirectory, String srsCode,
+			String models, String databaseHost, String databasePort, String databaseName, String databaseSchema,
+			String databaseUsername, String databasePassword) {
+
+		Boolean result = false;
+
+		try {
+
+			Config config = getDefaultConfig();
+
+			config.setFunction(Config.FC_EXPORT); // --schemaimport
+			config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
+			config.setDefaultSrsCode(srsCode); // --defaultSrsCode
+			config.setModels(models); // --models
+			config.setLogfile(logFileExport); // --log
+
+			config.setXtffile(filePath);
+
+			config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
+			config.setDbschema(databaseSchema);
+			config.setDbusr(databaseUsername);
+			config.setDbpwd(databasePassword);
+
+			Ili2db.readSettingsFromDb(config);
+			Ili2db.run(config, null);
+			result = true;
+		} catch (Exception e) {
+			log.error("ERROR EXPORT: " + e.getMessage());
+			result = false;
+		}
+
+		return result;
+	}
+
 }
