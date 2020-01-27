@@ -182,9 +182,9 @@ public class Ili2pgService {
 				double percentage = 0.0;
 
 				if (countSNR >= countGC) {
-					percentage = (countMatch * 100) / countSNR;
+					percentage = (double) (countMatch * 100) / countSNR;
 				} else {
-					percentage = (countMatch * 100) / countGC;
+					percentage = (double) (countMatch * 100) / countGC;
 				}
 
 				integrationStat.setStatus(true);
