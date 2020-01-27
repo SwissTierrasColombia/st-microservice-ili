@@ -31,6 +31,9 @@ public class Ili2pgExportDto implements Serializable {
 	@ApiModelProperty(required = true, notes = "Path file export")
 	private String pathFileXTF;
 
+	@ApiModelProperty(required = true, notes = "Integration ID")
+	private Long integrationId;
+
 	public Ili2pgExportDto() {
 
 	}
@@ -89,6 +92,14 @@ public class Ili2pgExportDto implements Serializable {
 
 	public void setPathFileXTF(String pathFileXTF) {
 		this.pathFileXTF = pathFileXTF;
+	}
+
+	public Long getIntegrationId() {
+		return integrationId;
+	}
+
+	public void setIntegrationId(Long integrationId) {
+		this.integrationId = integrationId;
 	}
 
 }

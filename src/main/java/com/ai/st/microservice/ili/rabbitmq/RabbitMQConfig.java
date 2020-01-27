@@ -44,6 +44,17 @@ public class RabbitMQConfig {
 	@Value("${st.rabbitmq.queueExports.routingkey}")
 	public String routingkeyExportsName;
 
+	@Value("${st.rabbitmq.queueUpdateExport.queue}")
+	public String queueUpdateExportName;
+
+	@Value("${st.rabbitmq.queueUpdateExport.exchange}")
+	public String exchangeUpdateExportName;
+
+	@Value("${st.rabbitmq.queueUpdateExport.routingkey}")
+	public String routingkeyUpdateExportName;
+
+	// queue integrations
+
 	@Bean
 	public Queue queueIntegrations() {
 		return new Queue(queueIntegrationsName, false);
@@ -58,6 +69,8 @@ public class RabbitMQConfig {
 	public Binding bindingQueueIntegrations() {
 		return BindingBuilder.bind(queueIntegrations()).to(exchangeIntegrations()).with(routingkeyIntegrationsName);
 	}
+
+	// queue update integrations
 
 	@Bean
 	public Queue queueUpdateIntegrations() {
@@ -75,6 +88,8 @@ public class RabbitMQConfig {
 				.with(routingkeyUpdateIntegrationsName);
 	}
 
+	// queue exports
+
 	@Bean
 	public Queue queueExports() {
 		return new Queue(queueExportsName, false);
@@ -88,6 +103,23 @@ public class RabbitMQConfig {
 	@Bean
 	public Binding bindingQueueExports() {
 		return BindingBuilder.bind(queueExports()).to(exchangeExports()).with(routingkeyExportsName);
+	}
+
+	// queue update exports
+
+	@Bean
+	public Queue queueUpdateExports() {
+		return new Queue(queueUpdateExportName, false);
+	}
+
+	@Bean
+	public DirectExchange exchangeUpdateExports() {
+		return new DirectExchange(exchangeUpdateExportName);
+	}
+
+	@Bean
+	public Binding bindingQueueUpdateExports() {
+		return BindingBuilder.bind(queueUpdateExports()).to(exchangeUpdateExports()).with(routingkeyUpdateExportName);
 	}
 
 	@Bean

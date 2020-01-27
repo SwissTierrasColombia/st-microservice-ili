@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
+import com.ai.st.microservice.ili.dto.IliExportResultDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
 
@@ -44,7 +45,9 @@ public class RabbitMQExportsListener {
 	@RabbitListener(queues = "${st.rabbitmq.queueExports.queue}")
 	public void recievedMessage(Ili2pgExportDto data) {
 
-		log.info("export started #" + data.getPathFileXTF());
+		log.info("export started #" + data.getIntegrationId());
+
+		IliExportResultDto resultDto = new IliExportResultDto();
 
 		try {
 
@@ -53,14 +56,22 @@ public class RabbitMQExportsListener {
 
 			String logExport = Paths.get(tmpDirectory.toString(), "export.log").toString();
 
-			ili2pgService.exportToXtf(data.getPathFileXTF(), logExport, iliDirectory, srsDefault, modelsDefault,
-					data.getDatabaseHost(), data.getDatabasePort(), data.getDatabaseName(), data.getDatabaseSchema(),
-					data.getDatabaseUsername(), data.getDatabasePassword());
+			Boolean result = ili2pgService.exportToXtf(data.getPathFileXTF(), logExport, iliDirectory, srsDefault,
+					modelsDefault, data.getDatabaseHost(), data.getDatabasePort(), data.getDatabaseName(),
+					data.getDatabaseSchema(), data.getDatabaseUsername(), data.getDatabasePassword());
+
+			resultDto.setStatus(result);
+			resultDto.setPathFile(data.getPathFileXTF());
 
 		} catch (Exception e) {
+			log.error("Export failed # " + data.getIntegrationId());
 			log.error("Export error  " + e.getMessage());
+
+			resultDto.setStatus(false);
 		}
 
+		resultDto.setIntegrationId(data.getIntegrationId());
+		rabbitService.sendResultExport(resultDto);
 	}
 
 }
