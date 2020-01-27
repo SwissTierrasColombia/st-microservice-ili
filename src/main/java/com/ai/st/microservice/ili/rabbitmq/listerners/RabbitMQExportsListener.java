@@ -42,7 +42,7 @@ public class RabbitMQExportsListener {
 	@Value("${iliProcesses.srs}")
 	private String srsDefault;
 
-	@RabbitListener(queues = "${st.rabbitmq.queueExports.queue}")
+	@RabbitListener(queues = "${st.rabbitmq.queueExports.queue}", concurrency = "${st.rabbitmq.queueExports.concurrency}")
 	public void recievedMessage(Ili2pgExportDto data) {
 
 		log.info("export started #" + data.getIntegrationId());

@@ -49,7 +49,7 @@ public class RabbitMQIntegrationListener {
 	@Value("${iliProcesses.srs}")
 	private String srsDefault;
 
-	@RabbitListener(queues = "${st.rabbitmq.queueIntegrations.queue}")
+	@RabbitListener(queues = "${st.rabbitmq.queueIntegrations.queue}", concurrency = "${st.rabbitmq.queueIntegrations.concurrency}")
 	public void recievedMessage(Ili2pgIntegrationCadastreRegistrationWithoutFilesDto data) {
 
 		log.info("integration started #" + data.getIntegrationId());
