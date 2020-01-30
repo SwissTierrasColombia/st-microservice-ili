@@ -53,6 +53,24 @@ public class RabbitMQConfig {
 	@Value("${st.rabbitmq.queueUpdateExport.routingkey}")
 	public String routingkeyUpdateExportName;
 
+	@Value("${st.rabbitmq.queueIlivalidator.queue}")
+	public String queueIlivalidatorName;
+
+	@Value("${st.rabbitmq.queueIlivalidator.exchange}")
+	public String exchangeIlivalidatorName;
+
+	@Value("${st.rabbitmq.queueIlivalidator.routingkey}")
+	public String routingkeyIlivalidatorName;
+
+	@Value("${st.rabbitmq.queueUpdateStateSupply.queue}")
+	public String queueUpdateStateSupplyName;
+
+	@Value("${st.rabbitmq.queueUpdateStateSupply.exchange}")
+	public String exchangeUpdateStateSupplyName;
+
+	@Value("${st.rabbitmq.queueUpdateStateSupply.routingkey}")
+	public String routingkeyUpdateStateSupplyName;
+
 	// queue integrations
 
 	@Bean
@@ -120,6 +138,42 @@ public class RabbitMQConfig {
 	@Bean
 	public Binding bindingQueueUpdateExports() {
 		return BindingBuilder.bind(queueUpdateExports()).to(exchangeUpdateExports()).with(routingkeyUpdateExportName);
+	}
+
+	// queue ilivalidator
+
+	@Bean
+	public Queue queueIlivalidator() {
+		return new Queue(queueIlivalidatorName, false);
+	}
+
+	@Bean
+	public DirectExchange exchangeIlivalidator() {
+		return new DirectExchange(exchangeIlivalidatorName);
+	}
+
+	@Bean
+	public Binding bindingQueueIlivalidator() {
+		return BindingBuilder.bind(queueIlivalidator()).to(exchangeIlivalidator())
+				.with(routingkeyIlivalidatorName);
+	}
+
+	// queue update state supply
+
+	@Bean
+	public Queue queueUpdateStateSupply() {
+		return new Queue(queueUpdateStateSupplyName, false);
+	}
+
+	@Bean
+	public DirectExchange exchangeUpdateStateSupply() {
+		return new DirectExchange(exchangeUpdateStateSupplyName);
+	}
+
+	@Bean
+	public Binding bindingQueueUpdateStateSupply() {
+		return BindingBuilder.bind(queueUpdateStateSupply()).to(exchangeUpdateStateSupply())
+				.with(routingkeyUpdateStateSupplyName);
 	}
 
 	@Bean

@@ -12,10 +12,12 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,8 +25,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ai.st.microservice.ili.dto.BasicResponseDto;
+import com.ai.st.microservice.ili.dto.IlivalidatorBackgroundDto;
+import com.ai.st.microservice.ili.dto.ResponseImportDto;
 import com.ai.st.microservice.ili.dto.ValidationDto;
+import com.ai.st.microservice.ili.exceptions.InputValidationException;
 import com.ai.st.microservice.ili.services.IlivalidatorService;
+import com.ai.st.microservice.ili.services.RabbitMQSenderService;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -58,6 +65,9 @@ public class IlivalidatorV1Controller {
 
 	@Value("${iliProcesses.iliDirectoryPlugins}")
 	private String iliDirectoryPlugins;
+
+	@Autowired
+	private RabbitMQSenderService rabbitSenderService;
 
 	@RequestMapping(value = "validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation(value = "Validate XTF")
@@ -155,6 +165,42 @@ public class IlivalidatorV1Controller {
 			log.error(e.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+	}
+
+	@RequestMapping(value = "validate/background", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Export ")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Integration done", response = ResponseImportDto.class),
+			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
+	@ResponseBody
+	public ResponseEntity<?> validateBackground(@RequestBody IlivalidatorBackgroundDto requestIlivadatorDto) {
+
+		HttpStatus httpStatus = null;
+		Object responseDto = null;
+
+		try {
+
+			// validation path file
+			String pathFile = requestIlivadatorDto.getPathFile();
+			if (pathFile.isEmpty()) {
+				throw new InputValidationException("La ruta del archivo a generar es requerida.");
+			}
+
+			rabbitSenderService.sendDataToValidator(requestIlivadatorDto);
+
+			httpStatus = HttpStatus.OK;
+			responseDto = new BasicResponseDto("¡Validation started!", 5);
+
+		} catch (InputValidationException e) {
+			log.error("Error Ili2pgV1Controller@validateBackground#Validation ---> " + e.getMessage());
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		} catch (Exception e) {
+			log.error("Error Ili2pgV1Controller@validateBackground#General ---> " + e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		}
+
+		return new ResponseEntity<>(responseDto, httpStatus);
 	}
 
 }

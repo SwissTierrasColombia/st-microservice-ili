@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWithoutFilesDto;
 import com.ai.st.microservice.ili.dto.IliExportResultDto;
+import com.ai.st.microservice.ili.dto.IlivalidatorBackgroundDto;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
+import com.ai.st.microservice.ili.dto.ValidationDto;
 
 @Service
 public class RabbitMQSenderService {
@@ -40,6 +42,18 @@ public class RabbitMQSenderService {
 	@Value("${st.rabbitmq.queueUpdateExport.routingkey}")
 	public String routingkeyUpdateExportName;
 
+	@Value("${st.rabbitmq.queueIlivalidator.exchange}")
+	public String exchangeIlivalidatorName;
+
+	@Value("${st.rabbitmq.queueIlivalidator.routingkey}")
+	public String routingkeyIlivalidatorName;
+
+	@Value("${st.rabbitmq.queueUpdateStateSupply.exchange}")
+	public String exchangeUpdateStateSupplyName;
+
+	@Value("${st.rabbitmq.queueUpdateStateSupply.routingkey}")
+	public String routingkeyUpdateStateSupplyName;
+
 	public void sendDataToIntegrate(Ili2pgIntegrationCadastreRegistrationWithoutFilesDto data) {
 		rabbitTemplate.convertAndSend(exchangeIntegrationsName, routingkeyIntegrationsName, data);
 	}
@@ -55,6 +69,14 @@ public class RabbitMQSenderService {
 
 	public void sendResultExport(IliExportResultDto data) {
 		rabbitTemplate.convertAndSend(exchangeUpdateExportName, routingkeyUpdateExportName, data);
+	}
+
+	public void sendDataToValidator(IlivalidatorBackgroundDto data) {
+		rabbitTemplate.convertAndSend(exchangeIlivalidatorName, routingkeyIlivalidatorName, data);
+	}
+
+	public void sendStatsValidation(ValidationDto data) {
+		rabbitTemplate.convertAndSend(exchangeUpdateStateSupplyName, routingkeyUpdateStateSupplyName, data);
 	}
 
 }

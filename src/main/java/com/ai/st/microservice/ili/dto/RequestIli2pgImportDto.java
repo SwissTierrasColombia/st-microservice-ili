@@ -14,27 +14,30 @@ public class RequestIli2pgImportDto implements Serializable {
 
 	@ApiModelProperty(required = true, notes = "Database host")
 	private String databaseHost;
-	
+
 	@ApiModelProperty(required = true, notes = "Database port")
 	private String databasePort;
-	
+
 	@ApiModelProperty(required = true, notes = "Database schema")
 	private String databaseSchema;
-	
+
 	@ApiModelProperty(required = true, notes = "Database username")
 	private String databaseUsername;
-	
+
 	@ApiModelProperty(required = true, notes = "Database password")
 	private String databasePassword;
-	
+
 	@ApiModelProperty(required = true, notes = "Database name")
 	private String databaseName;
-	
+
 	@ApiModelProperty(required = true, notes = "File XTF")
 	private MultipartFile fileXTF;
 
-	public RequestIli2pgImportDto() {
+	@ApiModelProperty(required = false, notes = "Model version")
+	private String versionModel;
 
+	public RequestIli2pgImportDto() {
+		this.versionModel = "2.9.4";
 	}
 
 	public String getDatabaseHost() {
@@ -91,6 +94,14 @@ public class RequestIli2pgImportDto implements Serializable {
 
 	public void setFileXTF(MultipartFile fileXTF) {
 		this.fileXTF = fileXTF;
+	}
+
+	public String getVersionModel() {
+		return versionModel;
+	}
+
+	public void setVersionModel(String versionModel) {
+		this.versionModel = versionModel;
 	}
 
 }

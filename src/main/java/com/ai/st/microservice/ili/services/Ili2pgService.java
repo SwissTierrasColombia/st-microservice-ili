@@ -74,7 +74,7 @@ public class Ili2pgService {
 			Ili2db.run(config, null);
 			result = true;
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error("ERROR generating schema: " + e.getMessage());
 			result = false;
 		}
 

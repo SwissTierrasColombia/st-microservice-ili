@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.BasicResponseDto;
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationDto;
@@ -30,6 +31,7 @@ import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWitho
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
 import com.ai.st.microservice.ili.dto.RequestIli2pgImportDto;
 import com.ai.st.microservice.ili.dto.ResponseImportDto;
+import com.ai.st.microservice.ili.exceptions.BusinessException;
 import com.ai.st.microservice.ili.exceptions.InputValidationException;
 import com.ai.st.microservice.ili.services.Ili2pgService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
@@ -48,6 +50,9 @@ public class Ili2pgV1Controller {
 
 	@Autowired
 	private RabbitMQSenderService rabbitSenderService;
+
+	@Autowired
+	private VersionBusiness versionBusiness;
 
 	@Value("${iliProcesses.temporalDirectoryPrefix}")
 	private String temporalDirectoryPrefix;
@@ -70,33 +75,86 @@ public class Ili2pgV1Controller {
 			@ApiResponse(code = 200, message = "Database generated", response = ResponseImportDto.class),
 			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
 	@ResponseBody
-	public ResponseEntity<ResponseImportDto> schemaImport(@RequestBody RequestIli2pgImportDto ili2pgImportDto) {
+	public ResponseEntity<?> schemaImport(@RequestBody RequestIli2pgImportDto ili2pgImportDto) {
 
 		Ili2pgService ili2pg = new Ili2pgService();
 
-		Boolean result = false;
-		String message = "";
+		HttpStatus httpStatus = null;
+		Object responseDto = null;
 
 		try {
+
+			// validation database host
+			String databaseHost = ili2pgImportDto.getDatabaseHost();
+			if (databaseHost.isEmpty()) {
+				throw new InputValidationException("El host de la base de datos es requerida.");
+			}
+
+			// validation database name
+			String databaseName = ili2pgImportDto.getDatabaseName();
+			if (databaseName.isEmpty()) {
+				throw new InputValidationException("El nombre de la base de datos es requerida.");
+			}
+
+			// validation database schema
+			String databaseSchema = ili2pgImportDto.getDatabaseSchema();
+			if (databaseSchema.isEmpty()) {
+				throw new InputValidationException("El esquema de la base de datos es requerida.");
+			}
+
+			// validation database username
+			String databaseUsername = ili2pgImportDto.getDatabaseUsername();
+			if (databaseUsername.isEmpty()) {
+				throw new InputValidationException("El usuario de base de datos es requerido.");
+			}
+
+			// validation database password
+			String databasePassword = ili2pgImportDto.getDatabasePassword();
+			if (databasePassword.isEmpty()) {
+				throw new InputValidationException("La constraseña de la base de datos es requerida.");
+			}
+
+			// validation database port
+			String databasePort = ili2pgImportDto.getDatabasePort();
+			if (databasePort.isEmpty()) {
+				throw new InputValidationException("El puerto de base de datos es requerido.");
+			}
+
+			versionBusiness.getVersionByName(ili2pgImportDto.getVersionModel());
 
 			String tmpDirectoryPrefix = temporalDirectoryPrefix;
 			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
 
 			String logFileSchemaImport = tmpDirectory.toString() + File.separator + "schema_import.log";
 
-			result = ili2pg.generateSchema(logFileSchemaImport, iliDirectory, srsDefault, modelsDefault,
+			Boolean result = ili2pg.generateSchema(logFileSchemaImport, iliDirectory, srsDefault, modelsDefault,
 					ili2pgImportDto.getDatabaseHost(), ili2pgImportDto.getDatabasePort(),
 					ili2pgImportDto.getDatabaseName(), ili2pgImportDto.getDatabaseSchema(),
 					ili2pgImportDto.getDatabaseUsername(), ili2pgImportDto.getDatabasePassword());
 
-			message = (result) ? "Information imported" : "The process could not be performed";
+			if (result) {
+				responseDto = new ResponseImportDto(true, "Se ha generado el esquema en la base de datos.");
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+				responseDto = new ResponseImportDto(false, "No se ha podido generar el esquema en la base de datos.");
+			}
 
+		} catch (InputValidationException e) {
+			log.error("Error Ili2pgV1Controller@schemaImport#Validation ---> " + e.getMessage());
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		} catch (BusinessException e) {
+			log.error("Error Ili2pgV1Controller@schemaImport#Validation ---> " + e.getMessage());
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
 		} catch (IOException e) {
-			log.error(e.getMessage());
+			log.error("Error Ili2pgV1Controller@schemaImport#General ---> " + e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
 		}
 
-		return new ResponseEntity<>(new ResponseImportDto(result, message), HttpStatus.OK);
-
+		return new ResponseEntity<>(responseDto, httpStatus);
 	}
 
 	@RequestMapping(value = "import", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -342,9 +400,9 @@ public class Ili2pgV1Controller {
 			responseDto = new BasicResponseDto("¡Export started!", 5);
 
 		} catch (InputValidationException e) {
-			log.error("Error Ili2pgV1Controller@integrationCadestreRegistrationWithoutFiles#Validation ---> "
+			log.error("Error Ili2pgV1Controller@exportToXtf#Validation ---> "
 					+ e.getMessage());
-			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			httpStatus = HttpStatus.BAD_REQUEST;
 			responseDto = new BasicResponseDto(e.getMessage(), 3);
 		} catch (Exception e) {
 			log.error("Error Ili2pgV1Controller@exportToXtf#General ---> " + e.getMessage());

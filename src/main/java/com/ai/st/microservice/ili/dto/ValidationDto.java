@@ -1,16 +1,25 @@
 package com.ai.st.microservice.ili.dto;
 
+import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "ValidationModel", description = "Response validation")
-public class ValidationDto {
+public class ValidationDto implements Serializable {
+
+	private static final long serialVersionUID = -1404342333733043427L;
 
 	private String resultId;
 	private String transfer;
 	private Boolean isValid;
 	private Boolean log;
 	private Boolean xtfLog;
+	private Long requestId;
+	private Long supplyRequestedId;
+	private String filenameTemporal;
+	private Long userCode;
+	private String observations;
 
 	public ValidationDto() {
 
@@ -68,6 +77,46 @@ public class ValidationDto {
 
 	public void setXtfLog(Boolean xtfLog) {
 		this.xtfLog = xtfLog;
+	}
+
+	public Long getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(Long requestId) {
+		this.requestId = requestId;
+	}
+
+	public Long getSupplyRequestedId() {
+		return supplyRequestedId;
+	}
+
+	public void setSupplyRequestedId(Long supplyRequestedId) {
+		this.supplyRequestedId = supplyRequestedId;
+	}
+
+	public String getFilenameTemporal() {
+		return filenameTemporal;
+	}
+
+	public void setFilenameTemporal(String filenameTemporal) {
+		this.filenameTemporal = filenameTemporal;
+	}
+
+	public Long getUserCode() {
+		return userCode;
+	}
+
+	public void setUserCode(Long userCode) {
+		this.userCode = userCode;
+	}
+
+	public String getObservations() {
+		return observations;
+	}
+
+	public void setObservations(String observations) {
+		this.observations = observations;
 	}
 
 }
