@@ -9,6 +9,7 @@ public class IliExportResultDto implements Serializable {
 	private boolean status;
 	private Long integrationId;
 	private String pathFile;
+	private IntegrationStatDto stats;
 
 	public IliExportResultDto() {
 
@@ -36,6 +37,14 @@ public class IliExportResultDto implements Serializable {
 
 	public void setPathFile(String pathFile) {
 		this.pathFile = pathFile;
+	}
+
+	public IntegrationStatDto getStats() {
+		return stats;
+	}
+
+	public void setStats(IntegrationStatDto stats) {
+		this.stats = stats;
 	}
 
 }

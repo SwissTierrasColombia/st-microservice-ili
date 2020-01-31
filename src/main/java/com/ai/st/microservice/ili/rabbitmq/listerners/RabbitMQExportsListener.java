@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
 import com.ai.st.microservice.ili.dto.IliExportResultDto;
+import com.ai.st.microservice.ili.dto.IntegrationStatDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
 
@@ -51,6 +52,13 @@ public class RabbitMQExportsListener {
 
 		try {
 
+			IntegrationStatDto stats = null;
+			if (data.getWithStats()) {
+				stats = ili2pgService.getIntegrationStats(data.getDatabaseHost(), data.getDatabasePort(),
+						data.getDatabaseName(), data.getDatabaseUsername(), data.getDatabasePassword(),
+						data.getDatabaseSchema());
+			}
+
 			String tmpDirectoryPrefix = temporalDirectoryPrefix;
 			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
 
@@ -62,6 +70,7 @@ public class RabbitMQExportsListener {
 
 			resultDto.setStatus(result);
 			resultDto.setPathFile(data.getPathFileXTF());
+			resultDto.setStats(stats);
 
 		} catch (Exception e) {
 			log.error("Export failed # " + data.getIntegrationId());

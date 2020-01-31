@@ -1,6 +1,7 @@
 package com.ai.st.microservice.ili.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class VersionDto implements Serializable {
 
@@ -8,8 +9,7 @@ public class VersionDto implements Serializable {
 
 	private Long id;
 	private String name;
-	private String url;
-	private String models;
+	private Date createdAt;
 
 	public VersionDto() {
 
@@ -31,20 +31,12 @@ public class VersionDto implements Serializable {
 		this.name = name;
 	}
 
-	public String getUrl() {
-		return url;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public String getModels() {
-		return models;
-	}
-
-	public void setModels(String models) {
-		this.models = models;
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 
 }

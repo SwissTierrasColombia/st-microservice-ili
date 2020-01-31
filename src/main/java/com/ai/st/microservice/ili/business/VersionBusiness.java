@@ -25,13 +25,13 @@ public class VersionBusiness {
 			versionDto = new VersionDto();
 			versionDto.setId(versionEntity.getId());
 			versionDto.setName(versionEntity.getName());
-			versionDto.setUrl(versionEntity.getUrl());
+//			versionDto.setUrl(versionEntity.getUrl());
 
 			String models = "";
-			for (ModelEntity modelEntity : versionEntity.getModels()) {
-				models += modelEntity.getName() + ";";
-			}
-			versionDto.setModels(models);
+//			for (ModelEntity modelEntity : versionEntity.getModels()) {
+//				models += modelEntity.getName() + ";";
+//			}
+			
 
 		}
 

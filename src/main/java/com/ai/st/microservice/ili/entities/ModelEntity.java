@@ -23,17 +23,16 @@ public class ModelEntity {
 	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "version_id", referencedColumnName = "id", nullable = false)
-	private VersionEntity version;
+	@JoinColumn(name = "version_concept_id", referencedColumnName = "id", nullable = false)
+	private VersionConceptEntity versionConcept;
 
 	public ModelEntity() {
 
 	}
 
-	public ModelEntity(String name, VersionEntity version) {
-		super();
+	public ModelEntity(String name, VersionConceptEntity versionConcept) {
 		this.name = name;
-		this.version = version;
+		this.versionConcept = versionConcept;
 	}
 
 	public Long getId() {
@@ -52,12 +51,12 @@ public class ModelEntity {
 		this.name = name;
 	}
 
-	public VersionEntity getVersion() {
-		return version;
+	public VersionConceptEntity getVersionConcept() {
+		return versionConcept;
 	}
 
-	public void setVersion(VersionEntity version) {
-		this.version = version;
+	public void setVersionConcept(VersionConceptEntity versionConcept) {
+		this.versionConcept = versionConcept;
 	}
 
 }

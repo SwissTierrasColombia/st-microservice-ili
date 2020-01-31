@@ -34,6 +34,9 @@ public class Ili2pgExportDto implements Serializable {
 	@ApiModelProperty(required = true, notes = "Integration ID")
 	private Long integrationId;
 
+	@ApiModelProperty(required = true, notes = "its required stats?")
+	private Boolean withStats;
+
 	public Ili2pgExportDto() {
 
 	}
@@ -100,6 +103,14 @@ public class Ili2pgExportDto implements Serializable {
 
 	public void setIntegrationId(Long integrationId) {
 		this.integrationId = integrationId;
+	}
+
+	public Boolean getWithStats() {
+		return withStats;
+	}
+
+	public void setWithStats(Boolean withStats) {
+		this.withStats = withStats;
 	}
 
 }

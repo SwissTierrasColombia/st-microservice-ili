@@ -169,35 +169,54 @@ public class Ili2pgService {
 					connection.insert(sqlInsert);
 
 				}
+				connection.disconnect();
 
-				String sqlCountSNR = "SELECT count(*) FROM " + databaseSchema + ".snr_predio_juridico;";
-				long countSNR = connection.count(sqlCountSNR);
-
-				String sqlCountGC = "SELECT count(*) FROM " + databaseSchema + ".gc_predio_catastro;";
-				long countGC = connection.count(sqlCountGC);
-
-				String sqlCountMatch = "SELECT count(*) FROM " + databaseSchema + ".ini_predio_insumos;";
-				long countMatch = connection.count(sqlCountMatch);
-
-				double percentage = 0.0;
-
-				if (countSNR >= countGC) {
-					percentage = (double) (countMatch * 100) / countSNR;
-				} else {
-					percentage = (double) (countMatch * 100) / countGC;
-				}
-
+				integrationStat = this.getIntegrationStats(databaseHost, databasePort, databaseName, databaseUsername,
+						databasePassword, databaseSchema);
 				integrationStat.setStatus(true);
-				integrationStat.setCountGC(countGC);
-				integrationStat.setCountSNR(countSNR);
-				integrationStat.setCountMatch(countMatch);
-				integrationStat.setPercentage(percentage);
 
 			} catch (SQLException e) {
 				integrationStat.setStatus(false);
+				connection.disconnect();
 			}
 
 		}
+
+		return integrationStat;
+	}
+
+	public IntegrationStatDto getIntegrationStats(String databaseHost, String databasePort, String databaseName,
+			String databaseUsername, String databasePassword, String databaseSchema) {
+
+		PostgresDriver connection = new PostgresDriver();
+
+		String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
+		connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
+
+		String sqlCountSNR = "SELECT count(*) FROM " + databaseSchema + ".snr_predio_juridico;";
+		long countSNR = connection.count(sqlCountSNR);
+
+		String sqlCountGC = "SELECT count(*) FROM " + databaseSchema + ".gc_predio_catastro;";
+		long countGC = connection.count(sqlCountGC);
+
+		String sqlCountMatch = "SELECT count(*) FROM " + databaseSchema + ".ini_predio_insumos;";
+		long countMatch = connection.count(sqlCountMatch);
+
+		double percentage = 0.0;
+
+		if (countSNR >= countGC) {
+			percentage = (double) (countMatch * 100) / countSNR;
+		} else {
+			percentage = (double) (countMatch * 100) / countGC;
+		}
+
+		connection.disconnect();
+
+		IntegrationStatDto integrationStat = new IntegrationStatDto();
+		integrationStat.setCountGC(countGC);
+		integrationStat.setCountSNR(countSNR);
+		integrationStat.setCountMatch(countMatch);
+		integrationStat.setPercentage(percentage);
 
 		return integrationStat;
 	}

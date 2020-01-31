@@ -393,6 +393,12 @@ public class Ili2pgV1Controller {
 			if (databasePort.isEmpty()) {
 				throw new InputValidationException("El puerto de base de datos es requerido.");
 			}
+			
+			// validation with stats
+			Boolean requiredStats = requestExportDto.getWithStats();
+			if (requiredStats == null) {
+				throw new InputValidationException("Se debe especificar si se requiren estadisticas.");
+			}
 
 			rabbitSenderService.sendDataToExport(requestExportDto);
 
