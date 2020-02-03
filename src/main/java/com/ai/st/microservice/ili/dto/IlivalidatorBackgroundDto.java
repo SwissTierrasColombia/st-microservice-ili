@@ -12,9 +12,10 @@ public class IlivalidatorBackgroundDto implements Serializable {
 	private String filenameTemporal;
 	private Long userCode;
 	private String observations;
+	private String versionModel;
 
 	public IlivalidatorBackgroundDto() {
-
+		this.versionModel = "2.9.4";
 	}
 
 	public String getPathFile() {
@@ -63,6 +64,14 @@ public class IlivalidatorBackgroundDto implements Serializable {
 
 	public void setObservations(String observations) {
 		this.observations = observations;
+	}
+
+	public String getVersionModel() {
+		return versionModel;
+	}
+
+	public void setVersionModel(String versionModel) {
+		this.versionModel = versionModel;
 	}
 
 }

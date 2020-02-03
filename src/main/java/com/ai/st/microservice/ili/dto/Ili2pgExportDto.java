@@ -37,8 +37,11 @@ public class Ili2pgExportDto implements Serializable {
 	@ApiModelProperty(required = true, notes = "its required stats?")
 	private Boolean withStats;
 
-	public Ili2pgExportDto() {
+	@ApiModelProperty(required = false, notes = "Model version")
+	private String versionModel;
 
+	public Ili2pgExportDto() {
+		this.versionModel = "2.9.4";
 	}
 
 	public String getDatabaseHost() {
@@ -111,6 +114,14 @@ public class Ili2pgExportDto implements Serializable {
 
 	public void setWithStats(Boolean withStats) {
 		this.withStats = withStats;
+	}
+
+	public String getVersionModel() {
+		return versionModel;
+	}
+
+	public void setVersionModel(String versionModel) {
+		this.versionModel = versionModel;
 	}
 
 }

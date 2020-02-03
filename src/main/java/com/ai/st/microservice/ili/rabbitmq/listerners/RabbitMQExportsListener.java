@@ -11,9 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.ai.st.microservice.ili.business.ConceptBusiness;
+import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
 import com.ai.st.microservice.ili.dto.IliExportResultDto;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
+import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
 
@@ -28,17 +31,14 @@ public class RabbitMQExportsListener {
 	@Autowired
 	private RabbitMQSenderService rabbitService;
 
+	@Autowired
+	private VersionBusiness versionBusiness;
+
 	@Value("${iliProcesses.temporalDirectoryPrefix}")
 	private String temporalDirectoryPrefix;
 
 	@Value("${iliProcesses.uploadedFiles}")
 	private String uploadedFiles;
-
-	@Value("${iliProcesses.iliDirectory}")
-	private String iliDirectory;
-
-	@Value("${iliProcesses.models}")
-	private String modelsDefault;
 
 	@Value("${iliProcesses.srs}")
 	private String srsDefault;
@@ -52,25 +52,31 @@ public class RabbitMQExportsListener {
 
 		try {
 
-			IntegrationStatDto stats = null;
-			if (data.getWithStats()) {
-				stats = ili2pgService.getIntegrationStats(data.getDatabaseHost(), data.getDatabasePort(),
-						data.getDatabaseName(), data.getDatabaseUsername(), data.getDatabasePassword(),
-						data.getDatabaseSchema());
+			VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
+					ConceptBusiness.CONCEPT_OPERATION);
+			if (versionData instanceof VersionDataDto) {
+
+				IntegrationStatDto stats = null;
+				if (data.getWithStats()) {
+					stats = ili2pgService.getIntegrationStats(data.getDatabaseHost(), data.getDatabasePort(),
+							data.getDatabaseName(), data.getDatabaseUsername(), data.getDatabasePassword(),
+							data.getDatabaseSchema());
+				}
+
+				String tmpDirectoryPrefix = temporalDirectoryPrefix;
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+
+				String logExport = Paths.get(tmpDirectory.toString(), "export.log").toString();
+
+				Boolean result = ili2pgService.exportToXtf(data.getPathFileXTF(), logExport, versionData.getUrl(),
+						srsDefault, versionData.getModels(), data.getDatabaseHost(), data.getDatabasePort(),
+						data.getDatabaseName(), data.getDatabaseSchema(), data.getDatabaseUsername(),
+						data.getDatabasePassword());
+
+				resultDto.setStatus(result);
+				resultDto.setPathFile(data.getPathFileXTF());
+				resultDto.setStats(stats);
 			}
-
-			String tmpDirectoryPrefix = temporalDirectoryPrefix;
-			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
-
-			String logExport = Paths.get(tmpDirectory.toString(), "export.log").toString();
-
-			Boolean result = ili2pgService.exportToXtf(data.getPathFileXTF(), logExport, iliDirectory, srsDefault,
-					modelsDefault, data.getDatabaseHost(), data.getDatabasePort(), data.getDatabaseName(),
-					data.getDatabaseSchema(), data.getDatabaseUsername(), data.getDatabasePassword());
-
-			resultDto.setStatus(result);
-			resultDto.setPathFile(data.getPathFileXTF());
-			resultDto.setStats(stats);
 
 		} catch (Exception e) {
 			log.error("Export failed # " + data.getIntegrationId());

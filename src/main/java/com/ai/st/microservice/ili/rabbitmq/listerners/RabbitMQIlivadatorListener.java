@@ -11,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.ai.st.microservice.ili.business.ConceptBusiness;
+import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.IlivalidatorBackgroundDto;
 import com.ai.st.microservice.ili.dto.ValidationDto;
+import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.IlivalidatorService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
 
@@ -27,12 +30,6 @@ public class RabbitMQIlivadatorListener {
 	@Value("${iliProcesses.uploadedFiles}")
 	private String uploadedFiles;
 
-	@Value("${iliProcesses.iliDirectory}")
-	private String iliDirectory;
-
-	@Value("${iliProcesses.models}")
-	private String modelsDefault;
-
 	@Value("${iliProcesses.srs}")
 	private String srsDefault;
 
@@ -41,6 +38,9 @@ public class RabbitMQIlivadatorListener {
 
 	@Autowired
 	private RabbitMQSenderService rabbitService;
+
+	@Autowired
+	private VersionBusiness versionBusiness;
 
 	@RabbitListener(queues = "${st.rabbitmq.queueIlivalidator.queue}", concurrency = "${st.rabbitmq.queueIlivalidator.concurrency}")
 	public void ilivalidator(IlivalidatorBackgroundDto data) {
@@ -51,14 +51,20 @@ public class RabbitMQIlivadatorListener {
 
 		try {
 
-			String tmpDirectoryPrefix = temporalDirectoryPrefix;
-			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+			VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
+					ConceptBusiness.CONCEPT_OPERATION);
+			if (versionData instanceof VersionDataDto) {
 
-			String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
-			String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
+				String tmpDirectoryPrefix = temporalDirectoryPrefix;
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
 
-			validation = ilivalidatorService.validate(data.getPathFile(), iliDirectory, modelsDefault, null,
-					logFileValidation, logFileValidationXTF, null);
+				String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
+				String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
+
+				validation = ilivalidatorService.validate(data.getPathFile(), versionData.getUrl(),
+						versionData.getModels(), null, logFileValidation, logFileValidationXTF, null);
+
+			}
 
 		} catch (Exception e) {
 			log.error("validation failed # " + data.getRequestId() + " : " + e.getMessage());

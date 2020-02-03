@@ -7,6 +7,12 @@ spring:
       maxRequestSize: 250MB
   main:
     allow-bean-definition-overriding: true
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    hibernate.ddl-auto: create
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
 
 eureka:
   client:

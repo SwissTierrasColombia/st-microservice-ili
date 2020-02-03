@@ -1,5 +1,7 @@
 package com.ai.st.microservice.ili.services;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,11 @@ public class VersionService implements IVersionService {
 	@Override
 	public VersionEntity getVersionByName(String name) {
 		return versionRepository.findByName(name);
+	}
+
+	@Override
+	public List<VersionEntity> getVersions() {
+		return versionRepository.findAll();
 	}
 
 }

@@ -36,8 +36,11 @@ public class Ili2pgIntegrationCadastreRegistrationDto implements Serializable {
 	@ApiModelProperty(required = true, notes = "Registration - File XTF")
 	private MultipartFile registrationFileXTF;
 
-	public Ili2pgIntegrationCadastreRegistrationDto() {
+	@ApiModelProperty(required = false, notes = "Model version")
+	private String versionModel;
 
+	public Ili2pgIntegrationCadastreRegistrationDto() {
+		this.versionModel = "2.9.4";
 	}
 
 	public String getDatabaseHost() {
@@ -102,6 +105,14 @@ public class Ili2pgIntegrationCadastreRegistrationDto implements Serializable {
 
 	public void setRegistrationFileXTF(MultipartFile registrationFileXTF) {
 		this.registrationFileXTF = registrationFileXTF;
+	}
+
+	public String getVersionModel() {
+		return versionModel;
+	}
+
+	public void setVersionModel(String versionModel) {
+		this.versionModel = versionModel;
 	}
 
 }

@@ -37,8 +37,11 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
 	@ApiModelProperty(required = true, notes = "Integration ID")
 	private Long integrationId;
 
-	public Ili2pgIntegrationCadastreRegistrationWithoutFilesDto() {
+	@ApiModelProperty(required = false, notes = "Model version")
+	private String versionModel;
 
+	public Ili2pgIntegrationCadastreRegistrationWithoutFilesDto() {
+		this.versionModel = "2.9.4";
 	}
 
 	public String getDatabaseHost() {
@@ -111,6 +114,14 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
 
 	public void setIntegrationId(Long integrationId) {
 		this.integrationId = integrationId;
+	}
+
+	public String getVersionModel() {
+		return versionModel;
+	}
+
+	public void setVersionModel(String versionModel) {
+		this.versionModel = versionModel;
 	}
 
 }
