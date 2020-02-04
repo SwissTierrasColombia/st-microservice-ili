@@ -76,6 +76,7 @@ public class RabbitMQExportsListener {
 				resultDto.setStatus(result);
 				resultDto.setPathFile(data.getPathFileXTF());
 				resultDto.setStats(stats);
+				resultDto.setModelVersion(data.getVersionModel());
 			}
 
 		} catch (Exception e) {

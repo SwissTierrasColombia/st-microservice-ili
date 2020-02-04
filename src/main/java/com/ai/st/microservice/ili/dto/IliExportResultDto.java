@@ -10,6 +10,7 @@ public class IliExportResultDto implements Serializable {
 	private Long integrationId;
 	private String pathFile;
 	private IntegrationStatDto stats;
+	private String modelVersion;
 
 	public IliExportResultDto() {
 
@@ -45,6 +46,14 @@ public class IliExportResultDto implements Serializable {
 
 	public void setStats(IntegrationStatDto stats) {
 		this.stats = stats;
+	}
+
+	public String getModelVersion() {
+		return modelVersion;
+	}
+
+	public void setModelVersion(String modelVersion) {
+		this.modelVersion = modelVersion;
 	}
 
 }
