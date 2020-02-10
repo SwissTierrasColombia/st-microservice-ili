@@ -37,6 +37,9 @@ public class VersionConceptEntity {
 	@OneToMany(mappedBy = "versionConcept", cascade = CascadeType.ALL)
 	private List<ModelEntity> models = new ArrayList<ModelEntity>();
 
+	@OneToMany(mappedBy = "versionConcept", cascade = CascadeType.ALL)
+	private List<QueryEntity> querys = new ArrayList<QueryEntity>();
+
 	public Long getId() {
 		return id;
 	}
@@ -75,6 +78,14 @@ public class VersionConceptEntity {
 
 	public void setModels(List<ModelEntity> models) {
 		this.models = models;
+	}
+
+	public List<QueryEntity> getQuerys() {
+		return querys;
+	}
+
+	public void setQuerys(List<QueryEntity> querys) {
+		this.querys = querys;
 	}
 
 }

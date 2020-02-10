@@ -354,7 +354,7 @@ public class Ili2pgV1Controller {
 					versionData.getUrl(), srsDefault, versionData.getModels(), requestIntegrationDto.getDatabaseHost(),
 					requestIntegrationDto.getDatabasePort(), requestIntegrationDto.getDatabaseName(),
 					requestIntegrationDto.getDatabaseSchema(), requestIntegrationDto.getDatabaseUsername(),
-					requestIntegrationDto.getDatabasePassword());
+					requestIntegrationDto.getDatabasePassword(), requestIntegrationDto.getVersionModel());
 
 			httpStatus = HttpStatus.OK;
 

@@ -60,7 +60,7 @@ public class RabbitMQExportsListener {
 				if (data.getWithStats()) {
 					stats = ili2pgService.getIntegrationStats(data.getDatabaseHost(), data.getDatabasePort(),
 							data.getDatabaseName(), data.getDatabaseUsername(), data.getDatabasePassword(),
-							data.getDatabaseSchema());
+							data.getDatabaseSchema(), data.getVersionModel());
 				}
 
 				String tmpDirectoryPrefix = temporalDirectoryPrefix;

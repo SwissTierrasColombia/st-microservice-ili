@@ -5,16 +5,24 @@ import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ai.st.microservice.ili.business.QueryTypeBusiness;
 import com.ai.st.microservice.ili.drivers.PostgresDriver;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
+import com.ai.st.microservice.ili.entities.QueryEntity;
+import com.ai.st.microservice.ili.entities.VersionConceptEntity;
+import com.ai.st.microservice.ili.entities.VersionEntity;
 
 import ch.ehi.ili2db.base.Ili2db;
 import ch.ehi.ili2db.gui.Config;
 
 @Service
 public class Ili2pgService {
+
+	@Autowired
+	private IVersionService versionService;
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -127,7 +135,7 @@ public class Ili2pgService {
 			String cadastreLogFileImport, String registrationFileXTF, String registrationLogFileSchemaImport,
 			String registrationLogFileImport, String iliDirectory, String srsCode, String models, String databaseHost,
 			String databasePort, String databaseName, String databaseSchema, String databaseUsername,
-			String databasePassword) {
+			String databasePassword, String modelVersion) {
 
 		IntegrationStatDto integrationStat = new IntegrationStatDto();
 
@@ -141,19 +149,22 @@ public class Ili2pgService {
 				registrationLogFileImport, iliDirectory, srsCode, models, databaseHost, databasePort, databaseName,
 				databaseSchema, databaseUsername, databasePassword);
 
-		if (loadCadastral && loadRegistration) {
+		VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
+
+		if (loadCadastral && loadRegistration && versionEntity instanceof VersionEntity) {
+
+			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().get(0);
+
+			QueryEntity queryMatchIntegrationEntity = versionConcept.getQuerys().stream()
+					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_MATCH_INTEGRATION).findAny()
+					.orElse(null);
 
 			PostgresDriver connection = new PostgresDriver();
-
 			String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
 			connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
 
-			String sqlObjects = "select  \r\n" + "	  snr_p.t_id as snr_predio_juridico\r\n"
-					+ "	, gc.t_id as gc_predio_catastro\r\n" + "from " + databaseSchema
-					+ ".snr_predio_juridico as snr_p\r\n" + "inner join " + databaseSchema
-					+ ".gc_predio_catastro as gc\r\n" + "	on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial\r\n"
-					+ "	and ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro)\r\n"
-					+ "	and snr_p.codigo_orip = gc.circulo_registral;";
+			String sqlObjects = queryMatchIntegrationEntity.getQuery().replace("{dbschema}", databaseSchema);
+
 			ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
 
 			try {
@@ -163,16 +174,20 @@ public class Ili2pgService {
 					String snr = resultsetObjects.getString("snr_predio_juridico");
 					String gc = resultsetObjects.getString("gc_predio_catastro");
 
-					String sqlInsert = "INSERT INTO " + databaseSchema
-							+ ".ini_predio_insumos (gc_predio_catastro, snr_predio_juridico) VALUES (" + gc + ", " + snr
-							+ ");";
+					QueryEntity queryInsertEntity = versionConcept.getQuerys().stream()
+							.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_)
+							.findAny().orElse(null);
+
+					String sqlInsert = queryInsertEntity.getQuery().replace("{dbschema}", databaseSchema)
+							.replace("{cadastre}", gc).replace("{snr}", snr);
+
 					connection.insert(sqlInsert);
 
 				}
 				connection.disconnect();
 
 				integrationStat = this.getIntegrationStats(databaseHost, databasePort, databaseName, databaseUsername,
-						databasePassword, databaseSchema);
+						databasePassword, databaseSchema, modelVersion);
 				integrationStat.setStatus(true);
 
 			} catch (SQLException e) {
@@ -180,43 +195,61 @@ public class Ili2pgService {
 				connection.disconnect();
 			}
 
+		} else {
+			integrationStat.setStatus(false);
 		}
 
 		return integrationStat;
 	}
 
 	public IntegrationStatDto getIntegrationStats(String databaseHost, String databasePort, String databaseName,
-			String databaseUsername, String databasePassword, String databaseSchema) {
-
-		PostgresDriver connection = new PostgresDriver();
-
-		String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
-		connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
-
-		String sqlCountSNR = "SELECT count(*) FROM " + databaseSchema + ".snr_predio_juridico;";
-		long countSNR = connection.count(sqlCountSNR);
-
-		String sqlCountGC = "SELECT count(*) FROM " + databaseSchema + ".gc_predio_catastro;";
-		long countGC = connection.count(sqlCountGC);
-
-		String sqlCountMatch = "SELECT count(*) FROM " + databaseSchema + ".ini_predio_insumos;";
-		long countMatch = connection.count(sqlCountMatch);
-
-		double percentage = 0.0;
-
-		if (countSNR >= countGC) {
-			percentage = (double) (countMatch * 100) / countSNR;
-		} else {
-			percentage = (double) (countMatch * 100) / countGC;
-		}
-
-		connection.disconnect();
+			String databaseUsername, String databasePassword, String databaseSchema, String modelVersion) {
 
 		IntegrationStatDto integrationStat = new IntegrationStatDto();
-		integrationStat.setCountGC(countGC);
-		integrationStat.setCountSNR(countSNR);
-		integrationStat.setCountMatch(countMatch);
-		integrationStat.setPercentage(percentage);
+
+		VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
+		if (versionEntity instanceof VersionEntity) {
+
+			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().get(0);
+
+			PostgresDriver connection = new PostgresDriver();
+
+			String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
+			connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
+
+			QueryEntity queryCountSnrEntity = versionConcept.getQuerys().stream()
+					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_COUNT_SNR_INTEGRATION)
+					.findAny().orElse(null);
+			String sqlCountSNR = queryCountSnrEntity.getQuery().replace("{dbschema}", databaseSchema);
+			long countSNR = connection.count(sqlCountSNR);
+
+			QueryEntity queryCountCadastreEntity = versionConcept.getQuerys().stream()
+					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION)
+					.findAny().orElse(null);
+			String sqlCountGC = queryCountCadastreEntity.getQuery().replace("{dbschema}", databaseSchema);
+			long countGC = connection.count(sqlCountGC);
+
+			QueryEntity queryCountMatchEntity = versionConcept.getQuerys().stream()
+					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_COUNT_MATCH_INTEGRATION)
+					.findAny().orElse(null);
+			String sqlCountMatch = queryCountMatchEntity.getQuery().replace("{dbschema}", databaseSchema);
+			long countMatch = connection.count(sqlCountMatch);
+
+			double percentage = 0.0;
+
+			if (countSNR >= countGC) {
+				percentage = (double) (countMatch * 100) / countSNR;
+			} else {
+				percentage = (double) (countMatch * 100) / countGC;
+			}
+
+			connection.disconnect();
+
+			integrationStat.setCountGC(countGC);
+			integrationStat.setCountSNR(countSNR);
+			integrationStat.setCountMatch(countMatch);
+			integrationStat.setPercentage(percentage);
+		}
 
 		return integrationStat;
 	}
@@ -248,7 +281,7 @@ public class Ili2pgService {
 			Ili2db.run(config, null);
 			result = true;
 		} catch (Exception e) {
-			log.error("ERROR EXPORT: " + e.getMessage());
+			log.error(e.getMessage());
 			result = false;
 		}
 

@@ -6,10 +6,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ai.st.microservice.ili.dto.QueryDto;
+import com.ai.st.microservice.ili.dto.QueryTypeDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.dto.VersionDto;
 import com.ai.st.microservice.ili.entities.ConceptEntity;
 import com.ai.st.microservice.ili.entities.ModelEntity;
+import com.ai.st.microservice.ili.entities.QueryEntity;
+import com.ai.st.microservice.ili.entities.QueryTypeEntity;
 import com.ai.st.microservice.ili.entities.VersionConceptEntity;
 import com.ai.st.microservice.ili.entities.VersionEntity;
 import com.ai.st.microservice.ili.exceptions.BusinessException;
@@ -43,6 +47,15 @@ public class VersionBusiness {
 			String models = "";
 			for (ModelEntity modelEntity : versionConcept.getModels()) {
 				models += modelEntity.getName() + ";";
+			}
+
+			for (QueryEntity queryEntity : versionConcept.getQuerys()) {
+				QueryDto queryDto = new QueryDto();
+				queryDto.setId(queryEntity.getId());
+				queryDto.setQuery(queryEntity.getQuery());
+				QueryTypeEntity queryTypeEntity = queryEntity.getQueryType();
+				queryDto.setQueryType(new QueryTypeDto(queryTypeEntity.getId(), queryTypeEntity.getName()));
+				versionDataDto.getQueries().add(queryDto);
 			}
 
 			versionDataDto.setUrl(versionConcept.getUrl());

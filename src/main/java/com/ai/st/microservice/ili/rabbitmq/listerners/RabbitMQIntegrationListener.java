@@ -79,12 +79,14 @@ public class RabbitMQIntegrationListener {
 				String registrationLogFileSchemaImport = tmpDirectory.toString() + File.separator
 						+ "registration_schema_import.log";
 				String registrationLogFileImport = tmpDirectory.toString() + File.separator + "registration_import.log";
+				
+				versionData.getQueries();
 
 				integrationStatDto = ili2pgService.integration(pathFileCadastre, cadastreLogFileSchemaImport,
 						cadastreLogFileImport, pathFileRegistration, registrationLogFileSchemaImport,
 						registrationLogFileImport, versionData.getUrl(), srsDefault, versionData.getModels(),
 						data.getDatabaseHost(), data.getDatabasePort(), data.getDatabaseName(),
-						data.getDatabaseSchema(), data.getDatabaseUsername(), data.getDatabasePassword());
+						data.getDatabaseSchema(), data.getDatabaseUsername(), data.getDatabasePassword(), data.getVersionModel());
 			}
 
 		} catch (Exception e) {
