@@ -222,7 +222,7 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 				querys296.add(new QueryEntity(versionConceptOperation296, queryIntegration,
 						"select snr_p.t_id as snr_predio_juridico, gc.t_id as gc_predio_catastro from {dbschema}.snr_predio_registro as snr_p inner "
 								+ "join {dbschema}.gc_predio_catastro as gc on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial "
-								+ "and snr_p.codigo_orip = gc.circulo_registral"));
+								+ "and ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro) and snr_p.codigo_orip = gc.circulo_registral"));
 				querys296.add(new QueryEntity(versionConceptOperation296, queryInsertIntegration,
 						"insert into {dbschema}.ini_predio_insumos (gc_predio_catastro, snr_predio_juridico) values ( {cadastre}, {snr})"));
 				querys296.add(new QueryEntity(versionConceptOperation296, queryCountSnr,
