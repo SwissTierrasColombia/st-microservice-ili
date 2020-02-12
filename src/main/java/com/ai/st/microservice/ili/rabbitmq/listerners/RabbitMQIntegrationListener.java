@@ -59,7 +59,7 @@ public class RabbitMQIntegrationListener {
 		try {
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
-					ConceptBusiness.CONCEPT_OPERATION);
+					ConceptBusiness.CONCEPT_INTEGRATION);
 			if (versionData instanceof VersionDataDto) {
 				String tmpDirectoryPrefix = temporalDirectoryPrefix;
 				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);

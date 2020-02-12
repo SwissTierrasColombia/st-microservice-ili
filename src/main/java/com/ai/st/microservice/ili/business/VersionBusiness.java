@@ -42,7 +42,8 @@ public class VersionBusiness {
 			versionDataDto = new VersionDataDto();
 			versionDataDto.setVersion(versionName);
 
-			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().get(0);
+			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
+					.filter(vC -> vC.getConcept().getId() == conceptId).findAny().orElse(null);
 
 			String models = "";
 			for (ModelEntity modelEntity : versionConcept.getModels()) {

@@ -53,7 +53,7 @@ public class RabbitMQExportsListener {
 		try {
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
-					ConceptBusiness.CONCEPT_OPERATION);
+					ConceptBusiness.CONCEPT_INTEGRATION);
 			if (versionData instanceof VersionDataDto) {
 
 				IntegrationStatDto stats = null;
