@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ai.st.microservice.ili.business.ConceptBusiness;
 import com.ai.st.microservice.ili.business.QueryTypeBusiness;
 import com.ai.st.microservice.ili.drivers.PostgresDriver;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
@@ -153,7 +154,9 @@ public class Ili2pgService {
 
 		if (loadCadastral && loadRegistration && versionEntity instanceof VersionEntity) {
 
-			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().get(0);
+			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
+					.filter(vC -> vC.getConcept().getId() == ConceptBusiness.CONCEPT_INTEGRATION).findAny()
+					.orElse(null);
 
 			QueryEntity queryMatchIntegrationEntity = versionConcept.getQuerys().stream()
 					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_MATCH_INTEGRATION).findAny()
@@ -210,7 +213,9 @@ public class Ili2pgService {
 		VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
 		if (versionEntity instanceof VersionEntity) {
 
-			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().get(0);
+			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
+					.filter(vC -> vC.getConcept().getId() == ConceptBusiness.CONCEPT_INTEGRATION).findAny()
+					.orElse(null);
 
 			PostgresDriver connection = new PostgresDriver();
 

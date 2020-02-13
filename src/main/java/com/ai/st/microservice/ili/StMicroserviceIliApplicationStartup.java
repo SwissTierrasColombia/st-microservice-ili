@@ -164,34 +164,37 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 
 				versionConceptOperation294.setModels(models294Operation);
 
-				List<QueryEntity> querys294 = new ArrayList<>();
-				querys294.add(new QueryEntity(versionConceptOperation294, queryIntegration,
-						"select snr_p.t_id as snr_predio_juridico, gc.t_id as gc_predio_catastro from {dbschema}.snr_predio_juridico as snr_p inner"
-								+ " join {dbschema}.gc_predio_catastro as gc on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial and "
-								+ "ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro) and snr_p.codigo_orip = gc.circulo_registral"));
-				querys294.add(new QueryEntity(versionConceptOperation294, queryInsertIntegration,
-						"insert into {dbschema}.ini_predio_insumos (gc_predio_catastro, snr_predio_juridico) values ( {cadastre}, {snr})"));
-				querys294.add(new QueryEntity(versionConceptOperation294, queryCountSnr,
-						"select count(*) from {dbschema}.snr_predio_juridico"));
-				querys294.add(new QueryEntity(versionConceptOperation294, queryCountCadastre,
-						"select count(*) from {dbschema}.gc_predio_catastro"));
-				querys294.add(new QueryEntity(versionConceptOperation294, queryCountMatch,
-						"select count(*) from {dbschema}.ini_predio_insumos"));
-				versionConceptOperation294.setQuerys(querys294);
-
 				versionConceptService.createVersionConcept(versionConceptOperation294);
-				
+
 				VersionConceptEntity versionConceptIntegration294 = new VersionConceptEntity();
 				versionConceptIntegration294.setUrl("/opt/storage-microservice-ili/ladm-col/models/2.9.4");
 				versionConceptIntegration294.setVersion(version294);
 				versionConceptIntegration294.setConcept(conceptIntegration);
-				
+
 				List<ModelEntity> models294Integration = new ArrayList<ModelEntity>();
-				models294Integration.add(new ModelEntity("Datos_Gestor_Catastral_V2_9_4", versionConceptIntegration294));
+				models294Integration
+						.add(new ModelEntity("Datos_Gestor_Catastral_V2_9_4", versionConceptIntegration294));
 				models294Integration.add(new ModelEntity("Datos_SNR_V2_9_4", versionConceptIntegration294));
-				models294Integration.add(new ModelEntity("Datos_Integracion_Insumos_V2_9_4", versionConceptIntegration294));
+				models294Integration
+						.add(new ModelEntity("Datos_Integracion_Insumos_V2_9_4", versionConceptIntegration294));
 
 				versionConceptIntegration294.setModels(models294Integration);
+
+				List<QueryEntity> querys294 = new ArrayList<>();
+				querys294.add(new QueryEntity(versionConceptIntegration294, queryIntegration,
+						"select snr_p.t_id as snr_predio_juridico, gc.t_id as gc_predio_catastro from {dbschema}.snr_predio_juridico as snr_p inner"
+								+ " join {dbschema}.gc_predio_catastro as gc on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial and "
+								+ "ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro) and snr_p.codigo_orip = gc.circulo_registral"));
+				querys294.add(new QueryEntity(versionConceptIntegration294, queryInsertIntegration,
+						"insert into {dbschema}.ini_predio_insumos (gc_predio_catastro, snr_predio_juridico) values ( {cadastre}, {snr})"));
+				querys294.add(new QueryEntity(versionConceptIntegration294, queryCountSnr,
+						"select count(*) from {dbschema}.snr_predio_juridico"));
+				querys294.add(new QueryEntity(versionConceptIntegration294, queryCountCadastre,
+						"select count(*) from {dbschema}.gc_predio_catastro"));
+				querys294.add(new QueryEntity(versionConceptIntegration294, queryCountMatch,
+						"select count(*) from {dbschema}.ini_predio_insumos"));
+				versionConceptIntegration294.setQuerys(querys294);
+
 				versionConceptService.createVersionConcept(versionConceptIntegration294);
 
 				VersionEntity version296 = new VersionEntity();
@@ -218,34 +221,37 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 
 				versionConceptOperation296.setModels(models296Operation);
 
-				List<QueryEntity> querys296 = new ArrayList<>();
-				querys296.add(new QueryEntity(versionConceptOperation296, queryIntegration,
-						"select snr_p.t_id as snr_predio_juridico, gc.t_id as gc_predio_catastro from {dbschema}.snr_predio_registro as snr_p inner "
-								+ "join {dbschema}.gc_predio_catastro as gc on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial "
-								+ "and ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro) and snr_p.codigo_orip = gc.circulo_registral"));
-				querys296.add(new QueryEntity(versionConceptOperation296, queryInsertIntegration,
-						"insert into {dbschema}.ini_predio_insumos (gc_predio_catastro, snr_predio_juridico) values ( {cadastre}, {snr})"));
-				querys296.add(new QueryEntity(versionConceptOperation296, queryCountSnr,
-						"select count(*) from {dbschema}.snr_predio_registro"));
-				querys296.add(new QueryEntity(versionConceptOperation296, queryCountCadastre,
-						"select count(*) from {dbschema}.gc_predio_catastro"));
-				querys296.add(new QueryEntity(versionConceptOperation296, queryCountMatch,
-						"select count(*) from {dbschema}.ini_predio_insumos"));
-				versionConceptOperation296.setQuerys(querys296);
-
 				versionConceptService.createVersionConcept(versionConceptOperation296);
-				
+
 				VersionConceptEntity versionConceptIntegration296 = new VersionConceptEntity();
 				versionConceptIntegration296.setUrl("/opt/storage-microservice-ili/ladm-col/models/2.9.6");
 				versionConceptIntegration296.setVersion(version296);
 				versionConceptIntegration296.setConcept(conceptIntegration);
-				
+
 				List<ModelEntity> models296Integration = new ArrayList<ModelEntity>();
-				models296Integration.add(new ModelEntity("Datos_Gestor_Catastral_V2_9_6", versionConceptIntegration296));
+				models296Integration
+						.add(new ModelEntity("Datos_Gestor_Catastral_V2_9_6", versionConceptIntegration296));
 				models296Integration.add(new ModelEntity("Datos_SNR_V2_9_6", versionConceptIntegration296));
-				models296Integration.add(new ModelEntity("Datos_Integracion_Insumos_V2_9_6", versionConceptIntegration296));
+				models296Integration
+						.add(new ModelEntity("Datos_Integracion_Insumos_V2_9_6", versionConceptIntegration296));
 
 				versionConceptIntegration296.setModels(models296Integration);
+
+				List<QueryEntity> querys296 = new ArrayList<>();
+				querys296.add(new QueryEntity(versionConceptIntegration296, queryIntegration,
+						"select snr_p.t_id as snr_predio_juridico, gc.t_id as gc_predio_catastro from {dbschema}.snr_predio_registro as snr_p inner "
+								+ "join {dbschema}.gc_predio_catastro as gc on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial "
+								+ "and ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro) and snr_p.codigo_orip = gc.circulo_registral"));
+				querys296.add(new QueryEntity(versionConceptIntegration296, queryInsertIntegration,
+						"insert into {dbschema}.ini_predio_insumos (gc_predio_catastro, snr_predio_juridico) values ( {cadastre}, {snr})"));
+				querys296.add(new QueryEntity(versionConceptIntegration296, queryCountSnr,
+						"select count(*) from {dbschema}.snr_predio_registro"));
+				querys296.add(new QueryEntity(versionConceptIntegration296, queryCountCadastre,
+						"select count(*) from {dbschema}.gc_predio_catastro"));
+				querys296.add(new QueryEntity(versionConceptIntegration296, queryCountMatch,
+						"select count(*) from {dbschema}.ini_predio_insumos"));
+				versionConceptIntegration296.setQuerys(querys296);
+
 				versionConceptService.createVersionConcept(versionConceptIntegration296);
 
 				log.info("The domains 'versions' have been loaded!");
