@@ -1,9 +1,12 @@
 package com.ai.st.microservice.ili.rabbitmq.listerners;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -18,6 +21,7 @@ import com.ai.st.microservice.ili.dto.ValidationDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.IlivalidatorService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
+import com.ai.st.microservice.ili.services.ZipService;
 
 @Component
 public class RabbitMQIlivadatorListener {
@@ -40,6 +44,9 @@ public class RabbitMQIlivadatorListener {
 	private RabbitMQSenderService rabbitService;
 
 	@Autowired
+	private ZipService zipService;
+
+	@Autowired
 	private VersionBusiness versionBusiness;
 
 	@RabbitListener(queues = "${st.rabbitmq.queueIlivalidator.queue}", concurrency = "${st.rabbitmq.queueIlivalidator.concurrency}")
@@ -55,14 +62,39 @@ public class RabbitMQIlivadatorListener {
 					ConceptBusiness.CONCEPT_OPERATION);
 			if (versionData instanceof VersionDataDto) {
 
-				String tmpDirectoryPrefix = temporalDirectoryPrefix;
-				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+				Path path = Paths.get(data.getPathFile());
+				String fileName = path.getFileName().toString();
+				String fileExtension = FilenameUtils.getExtension(fileName);
 
-				String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
-				String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
+				System.out.println("PATH: " + data.getPathFile());
 
-				validation = ilivalidatorService.validate(data.getPathFile(), versionData.getUrl(),
-						versionData.getModels(), null, logFileValidation, logFileValidationXTF, null);
+				String pathFileXTF = "";
+
+				if (fileExtension.equalsIgnoreCase("zip")) {
+
+					String tmpDirectoryPrefix = temporalDirectoryPrefix;
+					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+
+					List<String> paths = zipService.unzip(data.getPathFile(), new File(tmpDirectory.toString()));
+					pathFileXTF = tmpDirectory.toString() + File.separator + paths.get(0);
+
+				} else if (fileExtension.equalsIgnoreCase("xtf")) {
+					pathFileXTF = data.getPathFile();
+				}
+
+				if (pathFileXTF.isBlank() || pathFileXTF.isEmpty()) {
+					log.error("there is not file xtf.");
+				} else {
+					String tmpDirectoryPrefix = temporalDirectoryPrefix;
+					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+
+					String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
+					String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
+
+					validation = ilivalidatorService.validate(pathFileXTF, versionData.getUrl(),
+							versionData.getModels(), null, logFileValidation, logFileValidationXTF, null);
+					log.info("validation successful with result: " + validation);
+				}
 
 			}
 
