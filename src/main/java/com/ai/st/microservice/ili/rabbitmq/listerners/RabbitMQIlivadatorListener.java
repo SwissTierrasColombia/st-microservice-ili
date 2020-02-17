@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,13 +71,16 @@ public class RabbitMQIlivadatorListener {
 
 				String pathFileXTF = "";
 
+				File unzipFile = null;
+
 				if (fileExtension.equalsIgnoreCase("zip")) {
 
-					String tmpDirectoryPrefix = temporalDirectoryPrefix;
-					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
 
 					List<String> paths = zipService.unzip(data.getPathFile(), new File(tmpDirectory.toString()));
 					pathFileXTF = tmpDirectory.toString() + File.separator + paths.get(0);
+
+					unzipFile = tmpDirectory.toFile();
 
 				} else if (fileExtension.equalsIgnoreCase("xtf")) {
 					pathFileXTF = data.getPathFile();
@@ -85,8 +89,8 @@ public class RabbitMQIlivadatorListener {
 				if (pathFileXTF.isBlank() || pathFileXTF.isEmpty()) {
 					log.error("there is not file xtf.");
 				} else {
-					String tmpDirectoryPrefix = temporalDirectoryPrefix;
-					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+
+					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
 
 					String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
 					String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
@@ -94,6 +98,16 @@ public class RabbitMQIlivadatorListener {
 					validation = ilivalidatorService.validate(pathFileXTF, versionData.getUrl(),
 							versionData.getModels(), null, logFileValidation, logFileValidationXTF, null);
 					log.info("validation successful with result: " + validation);
+
+					try {
+						FileUtils.deleteDirectory(tmpDirectory.toFile());
+						if (unzipFile != null) {
+							FileUtils.deleteDirectory(unzipFile);
+						}
+					} catch (Exception e) {
+						log.error("It has not been possible delete the directory: " + e.getMessage());
+					}
+
 				}
 
 			}

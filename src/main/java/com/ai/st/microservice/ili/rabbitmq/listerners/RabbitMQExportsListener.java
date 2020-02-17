@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -63,8 +64,7 @@ public class RabbitMQExportsListener {
 							data.getDatabaseSchema(), data.getVersionModel());
 				}
 
-				String tmpDirectoryPrefix = temporalDirectoryPrefix;
-				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
 
 				String logExport = Paths.get(tmpDirectory.toString(), "export.log").toString();
 
@@ -77,6 +77,15 @@ public class RabbitMQExportsListener {
 				resultDto.setPathFile(data.getPathFileXTF());
 				resultDto.setStats(stats);
 				resultDto.setModelVersion(data.getVersionModel());
+
+				log.info("Export finished with result: " + resultDto.isStatus());
+
+				try {
+					FileUtils.deleteDirectory(tmpDirectory.toFile());
+				} catch (Exception e) {
+					log.error("It has not been possible delete the directory: " + e.getMessage());
+				}
+
 			}
 
 		} catch (Exception e) {

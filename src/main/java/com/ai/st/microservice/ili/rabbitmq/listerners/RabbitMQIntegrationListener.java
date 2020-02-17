@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -61,8 +62,8 @@ public class RabbitMQIntegrationListener {
 			VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
 					ConceptBusiness.CONCEPT_INTEGRATION);
 			if (versionData instanceof VersionDataDto) {
-				String tmpDirectoryPrefix = temporalDirectoryPrefix;
-				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
 
 				List<String> pathsCadastre = zipService.unzip(data.getCadastrePathXTF(),
 						new File(tmpDirectory.toString()));
@@ -79,14 +80,23 @@ public class RabbitMQIntegrationListener {
 				String registrationLogFileSchemaImport = tmpDirectory.toString() + File.separator
 						+ "registration_schema_import.log";
 				String registrationLogFileImport = tmpDirectory.toString() + File.separator + "registration_import.log";
-				
+
 				versionData.getQueries();
 
 				integrationStatDto = ili2pgService.integration(pathFileCadastre, cadastreLogFileSchemaImport,
 						cadastreLogFileImport, pathFileRegistration, registrationLogFileSchemaImport,
 						registrationLogFileImport, versionData.getUrl(), srsDefault, versionData.getModels(),
 						data.getDatabaseHost(), data.getDatabasePort(), data.getDatabaseName(),
-						data.getDatabaseSchema(), data.getDatabaseUsername(), data.getDatabasePassword(), data.getVersionModel());
+						data.getDatabaseSchema(), data.getDatabaseUsername(), data.getDatabasePassword(),
+						data.getVersionModel());
+
+				try {
+					FileUtils.deleteDirectory(tmpDirectory.toFile());
+				} catch (Exception e) {
+					log.error("It has not been possible delete the directory: " + e.getMessage());
+				}
+
+				log.info("Integration finished with result: " + integrationStatDto.isStatus());
 			}
 
 		} catch (Exception e) {
