@@ -2,15 +2,13 @@ package com.ai.st.microservice.ili.dto;
 
 import java.io.Serializable;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "Ili2pgImportDto", description = "Ili2pg Import Dto")
-public class RequestIli2pgImportDto implements Serializable {
+@ApiModel(value = "Ili2pgExportDto", description = "Ili2pg Export")
+public class Ili2pgExportDto implements Serializable {
 
-	private static final long serialVersionUID = -6634224004229230650L;
+	private static final long serialVersionUID = -4791993304492124731L;
 
 	@ApiModelProperty(required = true, notes = "Database host")
 	private String databaseHost;
@@ -30,13 +28,19 @@ public class RequestIli2pgImportDto implements Serializable {
 	@ApiModelProperty(required = true, notes = "Database name")
 	private String databaseName;
 
-	@ApiModelProperty(required = true, notes = "File XTF")
-	private MultipartFile fileXTF;
+	@ApiModelProperty(required = true, notes = "Path file export")
+	private String pathFileXTF;
+
+	@ApiModelProperty(required = true, notes = "Integration ID")
+	private Long integrationId;
+
+	@ApiModelProperty(required = true, notes = "its required stats?")
+	private Boolean withStats;
 
 	@ApiModelProperty(required = false, notes = "Model version")
 	private String versionModel;
 
-	public RequestIli2pgImportDto() {
+	public Ili2pgExportDto() {
 		this.versionModel = "2.9.4";
 	}
 
@@ -88,12 +92,28 @@ public class RequestIli2pgImportDto implements Serializable {
 		this.databaseName = databaseName;
 	}
 
-	public MultipartFile getFileXTF() {
-		return fileXTF;
+	public String getPathFileXTF() {
+		return pathFileXTF;
 	}
 
-	public void setFileXTF(MultipartFile fileXTF) {
-		this.fileXTF = fileXTF;
+	public void setPathFileXTF(String pathFileXTF) {
+		this.pathFileXTF = pathFileXTF;
+	}
+
+	public Long getIntegrationId() {
+		return integrationId;
+	}
+
+	public void setIntegrationId(Long integrationId) {
+		this.integrationId = integrationId;
+	}
+
+	public Boolean getWithStats() {
+		return withStats;
+	}
+
+	public void setWithStats(Boolean withStats) {
+		this.withStats = withStats;
 	}
 
 	public String getVersionModel() {

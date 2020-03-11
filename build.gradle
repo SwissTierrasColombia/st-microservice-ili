@@ -42,6 +42,7 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
@@ -52,8 +53,8 @@ dependencies {
 	implementation group: 'commons-io', name: 'commons-io', version: '2.5'
 	
 	implementation group: 'ch.interlis', name: 'ilivalidator', version: '1.11.1'
-	implementation group: 'ch.interlis', name: 'ili2pg', version: '4.3.0'
-	implementation group: 'ch.interlis', name: 'iox-ili', version: '1.20.13'
+	implementation group: 'ch.interlis', name: 'ili2pg', version: '4.3.2'
+	implementation group: 'ch.interlis', name: 'iox-ili', version: '1.20.14'
   	implementation group: 'ch.interlis', name: 'ili2c-tool', version: '5.0.2'
   	implementation group: 'ch.interlis', name: 'ili2c-core', version: '5.0.2'
   	
@@ -65,6 +66,8 @@ dependencies {
   	implementation group: 'net.iharder', name: 'base64', version: '2.3.9'
 	
 	implementation group: 'org.postgresql', name: 'postgresql', version: '9.4.1208.jre6'
+	
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: '2.2.3.RELEASE'
 	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	

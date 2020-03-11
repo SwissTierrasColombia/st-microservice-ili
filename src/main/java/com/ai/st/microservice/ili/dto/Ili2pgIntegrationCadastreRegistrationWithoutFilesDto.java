@@ -2,15 +2,13 @@ package com.ai.st.microservice.ili.dto;
 
 import java.io.Serializable;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "Ili2pgImportDto", description = "Ili2pg Import Dto")
-public class RequestIli2pgImportDto implements Serializable {
+@ApiModel(value = "Ili2pgIntegrationCadastreRegistrationDto", description = "Ili2pg Integration Cadastre-Registration")
+public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Serializable {
 
-	private static final long serialVersionUID = -6634224004229230650L;
+	private static final long serialVersionUID = -2379043053790590513L;
 
 	@ApiModelProperty(required = true, notes = "Database host")
 	private String databaseHost;
@@ -30,13 +28,19 @@ public class RequestIli2pgImportDto implements Serializable {
 	@ApiModelProperty(required = true, notes = "Database name")
 	private String databaseName;
 
-	@ApiModelProperty(required = true, notes = "File XTF")
-	private MultipartFile fileXTF;
+	@ApiModelProperty(required = true, notes = "Cadastre - Path file XTF")
+	private String cadastrePathXTF;
+
+	@ApiModelProperty(required = true, notes = "Registration - Path file XTF")
+	private String registrationPathXTF;
+
+	@ApiModelProperty(required = true, notes = "Integration ID")
+	private Long integrationId;
 
 	@ApiModelProperty(required = false, notes = "Model version")
 	private String versionModel;
 
-	public RequestIli2pgImportDto() {
+	public Ili2pgIntegrationCadastreRegistrationWithoutFilesDto() {
 		this.versionModel = "2.9.4";
 	}
 
@@ -88,12 +92,28 @@ public class RequestIli2pgImportDto implements Serializable {
 		this.databaseName = databaseName;
 	}
 
-	public MultipartFile getFileXTF() {
-		return fileXTF;
+	public String getCadastrePathXTF() {
+		return cadastrePathXTF;
 	}
 
-	public void setFileXTF(MultipartFile fileXTF) {
-		this.fileXTF = fileXTF;
+	public void setCadastrePathXTF(String cadastrePathXTF) {
+		this.cadastrePathXTF = cadastrePathXTF;
+	}
+
+	public String getRegistrationPathXTF() {
+		return registrationPathXTF;
+	}
+
+	public void setRegistrationPathXTF(String registrationPathXTF) {
+		this.registrationPathXTF = registrationPathXTF;
+	}
+
+	public Long getIntegrationId() {
+		return integrationId;
+	}
+
+	public void setIntegrationId(Long integrationId) {
+		this.integrationId = integrationId;
 	}
 
 	public String getVersionModel() {

@@ -7,10 +7,10 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "Ili2pgImportDto", description = "Ili2pg Import Dto")
-public class RequestIli2pgImportDto implements Serializable {
+@ApiModel(value = "Ili2pgIntegrationCadastreRegistrationDto", description = "Ili2pg Integration Cadastre-Registration")
+public class Ili2pgIntegrationCadastreRegistrationDto implements Serializable {
 
-	private static final long serialVersionUID = -6634224004229230650L;
+	private static final long serialVersionUID = -2379043053790590513L;
 
 	@ApiModelProperty(required = true, notes = "Database host")
 	private String databaseHost;
@@ -30,13 +30,16 @@ public class RequestIli2pgImportDto implements Serializable {
 	@ApiModelProperty(required = true, notes = "Database name")
 	private String databaseName;
 
-	@ApiModelProperty(required = true, notes = "File XTF")
-	private MultipartFile fileXTF;
+	@ApiModelProperty(required = true, notes = "Cadastre - File XTF")
+	private MultipartFile cadastreFileXTF;
+
+	@ApiModelProperty(required = true, notes = "Registration - File XTF")
+	private MultipartFile registrationFileXTF;
 
 	@ApiModelProperty(required = false, notes = "Model version")
 	private String versionModel;
 
-	public RequestIli2pgImportDto() {
+	public Ili2pgIntegrationCadastreRegistrationDto() {
 		this.versionModel = "2.9.4";
 	}
 
@@ -88,12 +91,20 @@ public class RequestIli2pgImportDto implements Serializable {
 		this.databaseName = databaseName;
 	}
 
-	public MultipartFile getFileXTF() {
-		return fileXTF;
+	public MultipartFile getCadastreFileXTF() {
+		return cadastreFileXTF;
 	}
 
-	public void setFileXTF(MultipartFile fileXTF) {
-		this.fileXTF = fileXTF;
+	public void setCadastreFileXTF(MultipartFile cadastreFileXTF) {
+		this.cadastreFileXTF = cadastreFileXTF;
+	}
+
+	public MultipartFile getRegistrationFileXTF() {
+		return registrationFileXTF;
+	}
+
+	public void setRegistrationFileXTF(MultipartFile registrationFileXTF) {
+		this.registrationFileXTF = registrationFileXTF;
 	}
 
 	public String getVersionModel() {
