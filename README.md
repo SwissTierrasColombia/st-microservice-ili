@@ -10,26 +10,21 @@ $ gradle bootRun
 
 ## Configuration
 
-In the file a you can configure the following properties
+### Database connection
+
+You must create a database in PostgreSQL with a **scheme** called "**ili**" and then configure the connection data in the st-microservice-tasks/src/main/resources/**application.yml** file
 
 ```yml
-iliProcesses:
-  temporalDirectoryPrefix: "ili_process_"
-  uploadedFiles: "/opt/storage-microservice-ili/uploads"
-  iliDirectory: "/opt/storage-microservice-ili/ladm-col/models/2.9.6"
-  iliDirectoryPlugins: "/opt/storage-microservice-ili/ladm-col/models/2.9.6plugins"
-  models: "Cartografia_Referencia_V2_9_6;Avaluos_V2_9_6;Operacion_V2_9_6;LADM_COL_V1_2;Formulario_Catastro_V2_9_6;ISO19107_PLANAS_V1;Datos_Gestor_Catastral_V2_9_6;Datos_SNR_V2_9_6;Datos_Integracion_Insumos_V2_9_6"
-  srs: "3116"
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sistema-transicion
+    username: postgres
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    hibernate.ddl-auto: create
 ```
-
-| Property | Description |
-| ------ | ------ |
-| temporalDirectoryPrefix | Directory prefix where uploaded files will be saved |
-| uploadedFiles | Directory where the temporarily loaded files will be saved |
-| iliDirectory | Directory where interlist models are stored |
-| iliDirectoryPlugins | Directory where interlist plugins are stored |
-| models | Model names to be used for ili2db operations |
-| srs | Reference system code to use (SRS) |
 
 ### How to disable eureka client?
 
@@ -83,34 +78,13 @@ $ docker network create st
 ### Create image from Dockerfile
 
 ```sh
-$ docker build -t st-microservice-ili:ursus .
+$ docker build -t st-microservice-ili:lynx .
 ```
 
 ### Run Container
 
 ```sh
-$ docker run -P -t --network st -d st-microservice-ili:ursus
-```
-
-### Enter container and create folders
-```sh
-$ docker exec -it container_name bash
-```
-```sh
-$ mkdir /opt/uploads
-```
-```sh
-$ mkdir /opt/downloads
-```
-```sh
-$ mkdir /opt/models/2.9.6
-```
-```sh
-$ mkdir /opt/models/2.9.6/plugins
-```
-### Copy models
-```sh
-$ docker cp /opt/storage-microservice-ili/ladm-col/models/2.9.6/. container_id:/opt/models/2.9.6
+$ docker run -P -t --network st -d st-microservice-ili:lynx
 ```
 
 ## License
