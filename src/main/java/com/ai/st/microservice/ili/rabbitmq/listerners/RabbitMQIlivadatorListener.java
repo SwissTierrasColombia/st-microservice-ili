@@ -67,8 +67,6 @@ public class RabbitMQIlivadatorListener {
 				String fileName = path.getFileName().toString();
 				String fileExtension = FilenameUtils.getExtension(fileName);
 
-				System.out.println("PATH: " + data.getPathFile());
-
 				String pathFileXTF = "";
 
 				File unzipFile = null;
