@@ -71,6 +71,15 @@ public class RabbitMQConfig {
 	@Value("${st.rabbitmq.queueUpdateStateSupply.routingkey}")
 	public String routingkeyUpdateStateSupplyName;
 
+	@Value("${st.rabbitmq.queueIli.queue}")
+	public String queueIliName;
+
+	@Value("${st.rabbitmq.queueIli.exchange}")
+	public String exchangeIliName;
+
+	@Value("${st.rabbitmq.queueIli.routingkey}")
+	public String routingkeyIliName;
+
 	// queue integrations
 
 	@Bean
@@ -154,8 +163,7 @@ public class RabbitMQConfig {
 
 	@Bean
 	public Binding bindingQueueIlivalidator() {
-		return BindingBuilder.bind(queueIlivalidator()).to(exchangeIlivalidator())
-				.with(routingkeyIlivalidatorName);
+		return BindingBuilder.bind(queueIlivalidator()).to(exchangeIlivalidator()).with(routingkeyIlivalidatorName);
 	}
 
 	// queue update state supply
@@ -174,6 +182,23 @@ public class RabbitMQConfig {
 	public Binding bindingQueueUpdateStateSupply() {
 		return BindingBuilder.bind(queueUpdateStateSupply()).to(exchangeUpdateStateSupply())
 				.with(routingkeyUpdateStateSupplyName);
+	}
+
+	// queue ili
+
+	@Bean
+	public Queue queueIli() {
+		return new Queue(queueIliName, false);
+	}
+
+	@Bean
+	public DirectExchange exchangeIli() {
+		return new DirectExchange(exchangeIliName);
+	}
+
+	@Bean
+	public Binding bindingQueueIli() {
+		return BindingBuilder.bind(queueIli()).to(exchangeIli()).with(routingkeyIliName);
 	}
 
 	@Bean

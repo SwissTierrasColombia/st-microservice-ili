@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ai.st.microservice.ili.business.ConceptBusiness;
 import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.BasicResponseDto;
+import com.ai.st.microservice.ili.dto.IliProcessQueueDto;
 import com.ai.st.microservice.ili.dto.IlivalidatorBackgroundDto;
 import com.ai.st.microservice.ili.dto.ResponseImportDto;
 import com.ai.st.microservice.ili.dto.ValidationDto;
@@ -219,7 +220,11 @@ public class IlivalidatorV1Controller {
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
 
-			rabbitSenderService.sendDataToValidator(requestIlivadatorDto);
+			IliProcessQueueDto data = new IliProcessQueueDto();
+			data.setType(IliProcessQueueDto.VALIDATOR);
+			data.setIlivalidatorData(requestIlivadatorDto);
+
+			rabbitSenderService.sendDataToIliProcess(data);
 
 			httpStatus = HttpStatus.OK;
 			responseDto = new BasicResponseDto("¡Validación iniciada!", 5);
