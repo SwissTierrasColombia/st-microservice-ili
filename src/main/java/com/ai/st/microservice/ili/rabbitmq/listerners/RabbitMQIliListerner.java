@@ -64,15 +64,15 @@ public class RabbitMQIliListerner {
 		
 		log.info("ili process started");
 
-		if (data.getType() == IliProcessQueueDto.VALIDATOR) {
+		if (data.getType().equals(IliProcessQueueDto.VALIDATOR)) {
 			this.ilivalidator(data.getIlivalidatorData());
 		}
 
-		if (data.getType() == IliProcessQueueDto.INTEGRATOR) {
+		if (data.getType().equals(IliProcessQueueDto.INTEGRATOR)) {
 			this.integration(data.getIntegrationData());
 		}
 
-		if (data.getType() == IliProcessQueueDto.EXPORT) {
+		if (data.getType().equals(IliProcessQueueDto.EXPORT)) {
 			this.export(data.getExportData());
 		}
 
