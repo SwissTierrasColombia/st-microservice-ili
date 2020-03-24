@@ -29,6 +29,7 @@ import com.ai.st.microservice.ili.dto.BasicResponseDto;
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWithoutFilesDto;
+import com.ai.st.microservice.ili.dto.IliProcessQueueDto;
 import com.ai.st.microservice.ili.dto.RequestIli2pgImportDto;
 import com.ai.st.microservice.ili.dto.ResponseImportDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
@@ -446,7 +447,11 @@ public class Ili2pgV1Controller {
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
 
-			rabbitSenderService.sendDataToIntegrate(requestIntegrationDto);
+			IliProcessQueueDto data = new IliProcessQueueDto();
+			data.setType(IliProcessQueueDto.INTEGRATOR);
+			data.setIntegrationData(requestIntegrationDto);
+
+			rabbitSenderService.sendDataToIliProcess(data);
 
 			httpStatus = HttpStatus.OK;
 			responseDto = new BasicResponseDto("Integración iniciada!", 7);
@@ -538,7 +543,11 @@ public class Ili2pgV1Controller {
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
 
-			rabbitSenderService.sendDataToExport(requestExportDto);
+			IliProcessQueueDto data = new IliProcessQueueDto();
+			data.setType(IliProcessQueueDto.EXPORT);
+			data.setExportData(requestExportDto);
+
+			rabbitSenderService.sendDataToIliProcess(data);
 
 			httpStatus = HttpStatus.OK;
 			responseDto = new BasicResponseDto("¡Export started!", 5);

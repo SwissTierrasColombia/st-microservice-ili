@@ -43,7 +43,7 @@ public class VersionBusiness {
 			versionDataDto.setVersion(versionName);
 
 			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
-					.filter(vC -> vC.getConcept().getId() == conceptId).findAny().orElse(null);
+					.filter(vC -> vC.getConcept().getId().equals(conceptId)).findAny().orElse(null);
 
 			String models = "";
 			for (ModelEntity modelEntity : versionConcept.getModels()) {

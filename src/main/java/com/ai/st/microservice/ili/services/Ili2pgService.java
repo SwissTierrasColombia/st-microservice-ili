@@ -155,11 +155,11 @@ public class Ili2pgService {
 		if (loadCadastral && loadRegistration && versionEntity instanceof VersionEntity) {
 
 			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
-					.filter(vC -> vC.getConcept().getId() == ConceptBusiness.CONCEPT_INTEGRATION).findAny()
+					.filter(vC -> vC.getConcept().getId().equals(ConceptBusiness.CONCEPT_INTEGRATION)).findAny()
 					.orElse(null);
 
 			QueryEntity queryMatchIntegrationEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_MATCH_INTEGRATION).findAny()
+					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_MATCH_INTEGRATION)).findAny()
 					.orElse(null);
 
 			PostgresDriver connection = new PostgresDriver();
@@ -178,7 +178,7 @@ public class Ili2pgService {
 					String gc = resultsetObjects.getString("gc_predio_catastro");
 
 					QueryEntity queryInsertEntity = versionConcept.getQuerys().stream()
-							.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_)
+							.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
 							.findAny().orElse(null);
 
 					String sqlInsert = queryInsertEntity.getQuery().replace("{dbschema}", databaseSchema)
@@ -214,7 +214,7 @@ public class Ili2pgService {
 		if (versionEntity instanceof VersionEntity) {
 
 			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
-					.filter(vC -> vC.getConcept().getId() == ConceptBusiness.CONCEPT_INTEGRATION).findAny()
+					.filter(vC -> vC.getConcept().getId().equals(ConceptBusiness.CONCEPT_INTEGRATION)).findAny()
 					.orElse(null);
 
 			PostgresDriver connection = new PostgresDriver();
@@ -223,19 +223,19 @@ public class Ili2pgService {
 			connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
 
 			QueryEntity queryCountSnrEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_COUNT_SNR_INTEGRATION)
+					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_SNR_INTEGRATION))
 					.findAny().orElse(null);
 			String sqlCountSNR = queryCountSnrEntity.getQuery().replace("{dbschema}", databaseSchema);
 			long countSNR = connection.count(sqlCountSNR);
 
 			QueryEntity queryCountCadastreEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION)
+					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
 					.findAny().orElse(null);
 			String sqlCountGC = queryCountCadastreEntity.getQuery().replace("{dbschema}", databaseSchema);
 			long countGC = connection.count(sqlCountGC);
 
 			QueryEntity queryCountMatchEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId() == QueryTypeBusiness.QUERY_TYPE_COUNT_MATCH_INTEGRATION)
+					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_MATCH_INTEGRATION))
 					.findAny().orElse(null);
 			String sqlCountMatch = queryCountMatchEntity.getQuery().replace("{dbschema}", databaseSchema);
 			long countMatch = connection.count(sqlCountMatch);
