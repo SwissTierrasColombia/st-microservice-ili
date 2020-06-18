@@ -1,8 +1,11 @@
 package com.ai.st.microservice.ili.controllers.v1;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -10,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,8 +29,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.ai.st.microservice.ili.business.ConceptBusiness;
+import com.ai.st.microservice.ili.business.Ili2JsonBusiness;
 import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.BasicResponseDto;
 import com.ai.st.microservice.ili.dto.IliProcessQueueDto;
@@ -37,6 +44,7 @@ import com.ai.st.microservice.ili.exceptions.BusinessException;
 import com.ai.st.microservice.ili.exceptions.InputValidationException;
 import com.ai.st.microservice.ili.services.IlivalidatorService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -71,6 +79,10 @@ public class IlivalidatorV1Controller {
 	@Autowired
 	private VersionBusiness versionBusiness;
 
+	@Autowired
+	private Ili2JsonBusiness ili2jsonBusiness;
+
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation(value = "Validate XTF")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Processed file", response = ValidationDto.class),
@@ -79,7 +91,12 @@ public class IlivalidatorV1Controller {
 	public ResponseEntity<?> validateXTF(
 			@RequestParam(name = "filesXTF[]", required = true) MultipartFile[] uploadfiles,
 			@RequestParam(name = "filesModels[]", required = false) MultipartFile[] iliFiles,
-			@RequestParam(name = "versionModel", required = false) String versionModel) {
+			@RequestParam(name = "versionModel", required = false) String versionModel,
+			@RequestParam(name = "log", required = false) Boolean fullLog) {
+
+		if (fullLog == null) {
+			fullLog = false;
+		}
 
 		IlivalidatorService ilivalidator = new IlivalidatorService();
 
@@ -170,7 +187,26 @@ public class IlivalidatorV1Controller {
 						String resultId = Paths.get(FilenameUtils.getFullPath(file)).getFileName().getName(0)
 								.toString();
 						String transfer = FilenameUtils.getName(file);
-						listValidations.add(new ValidationDto(resultId, transfer, result, true, true));
+
+						List<String> lines = new ArrayList<>();
+						String geom = "";
+						if (fullLog) {
+							File lfile = new File(logFileValidation);
+							FileReader fr = new FileReader(lfile);
+							BufferedReader br = new BufferedReader(fr);
+							String line;
+							while ((line = br.readLine()) != null) {
+								lines.add(line);
+							}
+							fr.close();
+							if (!result) {
+								ArrayList<File> list = new ArrayList<>();
+								File fileValidationXTF = new File(logFileValidationXTF);
+								list.add(fileValidationXTF);
+								geom = ili2jsonBusiness.ili2Json(list, new ArrayList<>(), tmpDirectory);
+							}
+						}
+						listValidations.add(new ValidationDto(resultId, transfer, result, true, true, lines, geom));
 					}
 				}
 			}
@@ -191,6 +227,58 @@ public class IlivalidatorV1Controller {
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 			responseDto = new BasicResponseDto(e.getMessage(), 3);
 		}
+		Gson gson = new Gson();
+		String jsonInString = gson.toJson(responseDto);
+		return new ResponseEntity<>(jsonInString, httpStatus);
+	}
+
+	@RequestMapping(value = "validate/validationxtf/{resultId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Export ")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Integration done", response = ResponseImportDto.class),
+			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
+	@ResponseBody
+	public ResponseEntity<?> validateBackground(@RequestBody IlivalidatorBackgroundDto requestIlivadatorDto) {
+
+		HttpStatus httpStatus = null;
+		Object responseDto = null;
+
+		try {
+
+			// validation path file
+			String pathFile = requestIlivadatorDto.getPathFile();
+			if (pathFile.isEmpty()) {
+				throw new InputValidationException("La ruta del archivo a generar es requerida.");
+			}
+
+			VersionDataDto versionData = versionBusiness.getDataVersion(requestIlivadatorDto.getVersionModel(),
+					ConceptBusiness.CONCEPT_OPERATION);
+			if (!(versionData instanceof VersionDataDto)) {
+				throw new InputValidationException(
+						"No se puede realizar la operación por falta de configuración de los modelos ILI");
+			}
+
+			IliProcessQueueDto data = new IliProcessQueueDto();
+			data.setType(IliProcessQueueDto.VALIDATOR);
+			data.setIlivalidatorData(requestIlivadatorDto);
+
+			rabbitSenderService.sendDataToIliProcess(data);
+
+			httpStatus = HttpStatus.OK;
+			responseDto = new BasicResponseDto("¡Validación iniciada!", 5);
+
+		} catch (InputValidationException e) {
+			log.error("Error Ili2pgV1Controller@validateBackground#Validation ---> " + e.getMessage());
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		} catch (BusinessException e) {
+			log.error("Error Ili2pgV1Controller@validateBackground#Business ---> " + e.getMessage());
+			httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		} catch (Exception e) {
+			log.error("Error Ili2pgV1Controller@validateBackground#General ---> " + e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		}
 
 		return new ResponseEntity<>(responseDto, httpStatus);
 	}
@@ -200,7 +288,7 @@ public class IlivalidatorV1Controller {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Integration done", response = ResponseImportDto.class),
 			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
 	@ResponseBody
-	public ResponseEntity<?> validateBackground(@RequestBody IlivalidatorBackgroundDto requestIlivadatorDto) {
+	public ResponseEntity<?> getValidationXTF(@RequestBody IlivalidatorBackgroundDto requestIlivadatorDto) {
 
 		HttpStatus httpStatus = null;
 		Object responseDto = null;
