@@ -33,3 +33,5 @@ iliProcesses:
   iliDirectoryPlugins: "/opt/storage-microservice-ili/ladm-col/models/2.9.6plugins"
   models: "Cartografia_Referencia_V2_9_6;Avaluos_V2_9_6;Operacion_V2_9_6;LADM_COL_V1_2;Formulario_Catastro_V2_9_6;ISO19107_PLANAS_V1;Datos_Gestor_Catastral_V2_9_6;Datos_SNR_V2_9_6;Datos_Integracion_Insumos_V2_9_6"
   srs: "3116"
+  ogrPath: /usr/bin
+  
