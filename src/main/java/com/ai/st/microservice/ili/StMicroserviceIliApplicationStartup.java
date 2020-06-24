@@ -254,6 +254,66 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 
 				versionConceptService.createVersionConcept(versionConceptIntegration296);
 
+				// version 3.0
+				VersionEntity version30 = new VersionEntity();
+				version30.setName("3.0");
+				version30.setCreatedAt(new Date());
+				versionService.createVersion(version30);
+
+				VersionConceptEntity versionConceptOperation30 = new VersionConceptEntity();
+				versionConceptOperation30.setUrl("/opt/storage-microservice-ili/ladm-col/models/3.0");
+				versionConceptOperation30.setVersion(version30);
+				versionConceptOperation30.setConcept(conceptOperator);
+
+				List<ModelEntity> models30Operation = new ArrayList<ModelEntity>();
+				models30Operation
+						.add(new ModelEntity("Submodelo_Cartografia_Catastral_V1_0", versionConceptOperation30));
+				models30Operation.add(new ModelEntity("Sumodelo_Avaluos_V1_0", versionConceptOperation30));
+				models30Operation.add(new ModelEntity("LADM_COL_V3_0", versionConceptOperation30));
+				models30Operation
+						.add(new ModelEntity("Modelo_Aplicacion_LADMCOL_Lev_Cat_V1_0", versionConceptOperation30));
+				models30Operation.add(new ModelEntity("ISO19107_PLANAS_V3_0", versionConceptOperation30));
+				models30Operation
+						.add(new ModelEntity("Submodelo_Insumos_Gestor_Catastral_V1_0", versionConceptOperation30));
+				models30Operation.add(new ModelEntity("Submodelo_Insumos_SNR_V1_0", versionConceptOperation30));
+				models30Operation.add(new ModelEntity("Submodelo_Integracion_Insumos_V1_0", versionConceptOperation30));
+
+				versionConceptOperation30.setModels(models30Operation);
+
+				versionConceptService.createVersionConcept(versionConceptOperation30);
+
+				VersionConceptEntity versionConceptIntegration30 = new VersionConceptEntity();
+				versionConceptIntegration30.setUrl("/opt/storage-microservice-ili/ladm-col/models/3.0");
+				versionConceptIntegration30.setVersion(version30);
+				versionConceptIntegration30.setConcept(conceptIntegration);
+
+				List<ModelEntity> models30Integration = new ArrayList<ModelEntity>();
+				models30Integration
+						.add(new ModelEntity("Submodelo_Insumos_Gestor_Catastral_V1_0", versionConceptIntegration30));
+				models30Integration.add(new ModelEntity("Submodelo_Insumos_SNR_V1_0", versionConceptIntegration30));
+				models30Integration
+						.add(new ModelEntity("Submodelo_Integracion_Insumos_V1_0", versionConceptIntegration30));
+
+				versionConceptIntegration30.setModels(models30Integration);
+
+				List<QueryEntity> querys30 = new ArrayList<>();
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryIntegration,
+						"select snr_p.t_id as snr_predio_juridico, gc.t_id as gc_predio_catastro from {dbschema}.snr_predio_registro as snr_p inner "
+								+ "join {dbschema}.gc_predio_catastro as gc on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial "
+								+ "and ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro) and snr_p.codigo_orip = gc.circulo_registral"));
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryInsertIntegration,
+						"insert into {dbschema}.ini_predio_insumos (gc_predio_catastro, snr_predio_juridico) values ( {cadastre}, {snr})"));
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountSnr,
+						"select count(*) from {dbschema}.snr_predio_registro"));
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountCadastre,
+						"select count(*) from {dbschema}.gc_predio_catastro"));
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountMatch,
+						"select count(*) from {dbschema}.ini_predio_insumos"));
+
+				versionConceptIntegration30.setQuerys(querys30);
+
+				versionConceptService.createVersionConcept(versionConceptIntegration30);
+
 				log.info("The domains 'versions' have been loaded!");
 			} catch (Exception e) {
 				log.error("Failed to load 'versions' domains");
