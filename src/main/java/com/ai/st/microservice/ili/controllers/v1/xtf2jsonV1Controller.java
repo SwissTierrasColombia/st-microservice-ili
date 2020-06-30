@@ -8,7 +8,12 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,6 +137,57 @@ public class xtf2jsonV1Controller {
 			String mediaType = "application/json";
 			for (String f : files) {
 				returnFile = f;
+			}
+			File file = new File(returnFile);
+			InputStream is = new FileInputStream(file);
+
+			return ResponseEntity.ok().contentLength(file.length()).contentType(MediaType.parseMediaType(mediaType))
+					.header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
+					.body(new InputStreamResource(is));
+		} catch (IOException e) {
+			log.error(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@RequestMapping(value = "kml2json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Convert KML to GeoJSON")
+	@ResponseBody
+	public ResponseEntity<InputStreamResource> convertKml2Json(@RequestParam("file[]") MultipartFile[] uploadfiles) {
+		ArrayList<String> files;
+		try {
+			files = ili2jsonBusiness.kml2Json(uploadfiles);
+			String returnFile = null;
+			String mediaType = "application/json";
+			for (String f : files) {
+				returnFile = f;
+			}
+			File file = new File(returnFile);
+			InputStream is = new FileInputStream(file);
+
+			return ResponseEntity.ok().contentLength(file.length()).contentType(MediaType.parseMediaType(mediaType))
+					.header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
+					.body(new InputStreamResource(is));
+		} catch (IOException e) {
+			log.error(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@RequestMapping(value = "supply2json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Convert Supply to GeoJSON")
+	@ResponseBody
+	public ResponseEntity<InputStreamResource> convertSupply2Json(@RequestParam("url") String uploadfiles) {
+		ArrayList<String> files;
+		try {
+			files = ili2jsonBusiness.supply2Json(uploadfiles);
+			String returnFile = null;
+			String mediaType = "application/json";
+			for (String f : files) {
+				returnFile = f;
+			}
+			if (returnFile == null) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 			File file = new File(returnFile);
 			InputStream is = new FileInputStream(file);
