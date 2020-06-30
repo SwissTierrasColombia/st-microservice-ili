@@ -546,4 +546,27 @@ public class Ili2JsonService {
 		// Alert: This can generate data loss
 		return outName + ".json";
 	}
+
+	public String kml2json(File uploadfile) {
+		String workingDir = uploadfile.getParent();
+
+		String format = "GeoJSON";
+
+		String outName = workingDir + File.separator
+				+ uploadfile.getName().substring(0, uploadfile.getName().lastIndexOf('.'));
+
+		List parameters = new ArrayList();
+		parameters.add(getOgrDirPath() + File.separator + "ogr2ogr");
+		parameters.add("-skipfailures");
+		parameters.add("-f");
+		parameters.add(format);
+		parameters.add(outName + ".json");
+		parameters.add(uploadfile.getAbsolutePath());
+
+		executeCommand(parameters);
+
+		// Convertion without models
+		// Alert: This can generate data loss
+		return outName + ".json";
+	}
 }

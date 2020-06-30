@@ -1,19 +1,22 @@
 package com.ai.st.microservice.ili.business;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,24 +42,29 @@ public class Ili2JsonBusiness {
 
 	@Value("${iliProcesses.ogrPath}")
 	private String ogrPath;
-	
+
 	@Value("${iliProcesses.temporalDirectoryPrefix}")
 	private String temporalDirectoryPrefix;
-	
+
 	public String ili2Json(MultipartFile[] uploadfiles, MultipartFile[] iliFiles) throws IOException {
 		Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
-		return ili2Json(multipartFileTArray(uploadfiles, tmpDirectory), multipartFileTArray(iliFiles, tmpDirectory), tmpDirectory);
+		return ili2Json(multipartFileTArray(uploadfiles, tmpDirectory), multipartFileTArray(iliFiles, tmpDirectory),
+				tmpDirectory);
 	}
 
-	public String ili2Json(MultipartFile[] uploadfiles, MultipartFile[] iliFiles, Path tmpDirectory) throws IOException {
-		return ili2Json(multipartFileTArray(uploadfiles, tmpDirectory), multipartFileTArray(iliFiles, tmpDirectory), tmpDirectory);
+	public String ili2Json(MultipartFile[] uploadfiles, MultipartFile[] iliFiles, Path tmpDirectory)
+			throws IOException {
+		return ili2Json(multipartFileTArray(uploadfiles, tmpDirectory), multipartFileTArray(iliFiles, tmpDirectory),
+				tmpDirectory);
 	}
 
-	public String ili2Json(ArrayList<File> uploadfiles, MultipartFile[] iliFiles, Path tmpDirectory) throws IOException {
+	public String ili2Json(ArrayList<File> uploadfiles, MultipartFile[] iliFiles, Path tmpDirectory)
+			throws IOException {
 		return ili2Json(uploadfiles, multipartFileTArray(iliFiles, tmpDirectory), tmpDirectory);
 	}
 
-	public String ili2Json(ArrayList<File> uploadfiles, ArrayList<File> iliFiles, Path tmpDirectory) throws IOException {
+	public String ili2Json(ArrayList<File> uploadfiles, ArrayList<File> iliFiles, Path tmpDirectory)
+			throws IOException {
 
 		Ili2JsonService ili2json = new Ili2JsonService();
 		ili2json.setEnv(uploadedFiles, downloadedFiles, iliDirectory, iliDirectoryPlugins, ogrPath);
@@ -73,11 +81,11 @@ public class Ili2JsonBusiness {
 			if (!iliFileName.equals("")) {
 				String ilifilepath = Paths.get(tmpDirectory.toString(), iliFileName).toString();
 
-				/*try ( // Save the file locally
-						BufferedOutputStream ilistream = new BufferedOutputStream(
-								new FileOutputStream(new File(ilifilepath)))) {
-					ilistream.write(this.readFileToByteArray(iliFile));
-				}*/
+				/*
+				 * try ( // Save the file locally BufferedOutputStream ilistream = new
+				 * BufferedOutputStream( new FileOutputStream(new File(ilifilepath)))) {
+				 * ilistream.write(this.readFileToByteArray(iliFile)); }
+				 */
 
 				TransferDescription td = ili2json.getTansfDesc(ilifilepath); // Convert ili 2 imd
 
@@ -103,9 +111,11 @@ public class Ili2JsonBusiness {
 			String pathXTF = Paths.get(tmpDirectory.toString(), fileXTF).toString();
 			String workingDir = tmpDirectory.toString();
 
-			/*try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(pathXTF)))) {
-				stream.write(this.readFileToByteArray(uploadfile));
-			}*/
+			/*
+			 * try (BufferedOutputStream stream = new BufferedOutputStream(new
+			 * FileOutputStream(new File(pathXTF)))) {
+			 * stream.write(this.readFileToByteArray(uploadfile)); }
+			 */
 
 			ArrayList<String> iliModels = ili2json.getIliModels(pathXTF);
 
@@ -151,38 +161,13 @@ public class Ili2JsonBusiness {
 		return list;
 	}
 
-	/**
-	 * This method uses java.io.FileInputStream to read
-	 * https://www.netjstech.com/2015/11/how-to-convert-file-to-byte-array-java.html
-	 * file content into a byte array
-	 * 
-	 * @param file
-	 * @return
-	 */
-	private byte[] readFileToByteArray(File file) {
-		FileInputStream fis = null;
-		// Creating a byte array using the length of the file
-		// file.length returns long which is cast to int
-		byte[] bArray = new byte[(int) file.length()];
-		try {
-			fis = new FileInputStream(file);
-			fis.read(bArray);
-			fis.close();
-
-		} catch (IOException ioExp) {
-			ioExp.printStackTrace();
-		}
-		return bArray;
-	}
-	
-
-	public ArrayList<String> shp2Json(MultipartFile[] uploadfiles) throws IOException{
+	public ArrayList<String> shp2Json(MultipartFile[] uploadfiles) throws IOException {
 		Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
 		return shp2Json(multipartFileTArray(uploadfiles, tmpDirectory), tmpDirectory);
 	}
 
-	public ArrayList<String> shp2Json(ArrayList<File> uploadfiles, Path tmpDirectory) throws IOException{
-		ArrayList<String> resp =  new ArrayList<>();
+	public ArrayList<String> shp2Json(ArrayList<File> uploadfiles, Path tmpDirectory) throws IOException {
+		ArrayList<String> resp = new ArrayList<>();
 		Ili2JsonService ili2json = new Ili2JsonService();
 		ili2json.setEnv(uploadedFiles, downloadedFiles, iliDirectory, iliDirectoryPlugins, ogrPath);
 		for (File uploadfile : uploadfiles) {
@@ -195,15 +180,128 @@ public class Ili2JsonBusiness {
 		Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
 		return gpkg2Json(multipartFileTArray(uploadfiles, tmpDirectory), tmpDirectory);
 	}
-	
+
 	public ArrayList<String> gpkg2Json(ArrayList<File> uploadfiles, Path tmpDirectory) throws IOException {
-		ArrayList<String> resp =  new ArrayList<>();
+		ArrayList<String> resp = new ArrayList<>();
 		Ili2JsonService ili2json = new Ili2JsonService();
 		ili2json.setEnv(uploadedFiles, downloadedFiles, iliDirectory, iliDirectoryPlugins, ogrPath);
 		for (File uploadfile : uploadfiles) {
 			resp.add(ili2json.gpkg2json(uploadfile));
 		}
 		return resp;
+	}
+
+	public ArrayList<String> kml2Json(MultipartFile[] uploadfiles) throws IOException {
+		Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+		return kml2Json(multipartFileTArray(uploadfiles, tmpDirectory), tmpDirectory);
+	}
+
+	public ArrayList<String> kml2Json(ArrayList<File> uploadfiles, Path tmpDirectory) throws IOException {
+		ArrayList<String> resp = new ArrayList<>();
+		Ili2JsonService ili2json = new Ili2JsonService();
+		ili2json.setEnv(uploadedFiles, downloadedFiles, iliDirectory, iliDirectoryPlugins, ogrPath);
+		for (File uploadfile : uploadfiles) {
+			resp.add(ili2json.kml2json(uploadfile));
+		}
+		return resp;
+	}
+
+	public ArrayList<String> supply2Json(String uploadfiles) throws IOException {
+		ArrayList<String> exts = new ArrayList<>();
+		exts.add("shp");
+		exts.add("kml");
+		exts.add("gpkg");
+		exts.add("xtf");
+		String filename = this.zipContainsFile(uploadfiles, exts);
+		if (filename.length() > 0) {
+			if (this.unzipping(uploadfiles)) {
+				String path = FilenameUtils.getFullPath(uploadfiles);
+				File convFile = new File(path.toString(), filename);
+				ArrayList<File> uf = new ArrayList<File>();
+				uf.add(convFile);
+				switch (FilenameUtils.getExtension(filename)) {
+				case "shp":
+					return this.shp2Json(uf, Paths.get(path));
+				case "kml":
+					return this.kml2Json(uf, Paths.get(path));
+				case "gpkg":
+					return this.gpkg2Json(uf, Paths.get(path));
+				case "xtf":
+					ArrayList<String> rsp = new ArrayList<String>();
+					rsp.add(this.ili2Json(uf, new ArrayList<File>(), Paths.get(path)));
+					return rsp;
+				}
+			}
+		}
+		return new ArrayList<String>();
+	}
+
+	private boolean unzipping(String filePathZip) {
+
+		try {
+
+			ZipFile zipFile = new ZipFile(filePathZip);
+
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while (entries.hasMoreElements()) {
+				ZipEntry entry = entries.nextElement();
+				InputStream stream = zipFile.getInputStream(entry);
+
+				String fileEntryOutName = FilenameUtils.getFullPath(filePathZip) + entry.getName();
+				FileOutputStream outputStream = new FileOutputStream(new File(fileEntryOutName));
+
+				int read = 0;
+				byte[] bytes = new byte[1024];
+
+				while ((read = stream.read(bytes)) != -1) {
+					outputStream.write(bytes, 0, read);
+				}
+				stream.close();
+				outputStream.close();
+
+			}
+
+			zipFile.close();
+
+			return true;
+		} catch (IOException e) {
+
+		}
+
+		return false;
+	}
+
+	private String zipContainsFile(String filePathZip, List<String> extensionsToSearch) {
+
+		String fileFound = "";
+
+		try {
+
+			ZipFile zipFile = new ZipFile(filePathZip);
+
+			for (String extension : extensionsToSearch) {
+
+				Enumeration<? extends ZipEntry> entries = zipFile.entries();
+				while (entries.hasMoreElements()) {
+					ZipEntry entry = entries.nextElement();
+					if (FilenameUtils.getExtension(entry.getName()).equalsIgnoreCase(extension)) {
+						fileFound = entry.getName();
+						break;
+					}
+				}
+
+				if (fileFound.length() > 0) {
+					break;
+				}
+
+			}
+
+			zipFile.close();
+		} catch (IOException e) {
+			fileFound = "";
+		}
+
+		return fileFound;
 	}
 
 }
