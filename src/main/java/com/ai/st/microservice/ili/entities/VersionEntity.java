@@ -24,7 +24,7 @@ public class VersionEntity {
 	@Column(name = "id", nullable = false)
 	private Long id;
 
-	@Column(name = "name", nullable = false, length = 20)
+	@Column(name = "name", nullable = false, length = 255)
 	private String name;
 
 	@Column(name = "created_at", nullable = false)
