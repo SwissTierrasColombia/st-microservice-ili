@@ -11,6 +11,7 @@ import com.ai.st.microservice.ili.dto.IliExportResultDto;
 import com.ai.st.microservice.ili.dto.IliProcessQueueDto;
 import com.ai.st.microservice.ili.dto.IlivalidatorBackgroundDto;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
+import com.ai.st.microservice.ili.dto.ResultImportDto;
 import com.ai.st.microservice.ili.dto.ValidationDto;
 
 @Service
@@ -61,6 +62,12 @@ public class RabbitMQSenderService {
 	@Value("${st.rabbitmq.queueIli.routingkey}")
 	public String routingkeyIliName;
 
+	@Value("${st.rabbitmq.queueResultImport.exchange}")
+	public String exchangeResultImportName;
+
+	@Value("${st.rabbitmq.queueResultImport.routingkey}")
+	public String routingkeyResultImportName;
+
 	public void sendDataToIntegrate(Ili2pgIntegrationCadastreRegistrationWithoutFilesDto data) {
 		rabbitTemplate.convertAndSend(exchangeIntegrationsName, routingkeyIntegrationsName, data);
 	}
@@ -88,6 +95,10 @@ public class RabbitMQSenderService {
 
 	public void sendDataToIliProcess(IliProcessQueueDto data) {
 		rabbitTemplate.convertAndSend(exchangeIliName, routingkeyIliName, data);
+	}
+
+	public void sendResultToImport(ResultImportDto data) {
+		rabbitTemplate.convertAndSend(exchangeResultImportName, routingkeyResultImportName, data);
 	}
 
 }

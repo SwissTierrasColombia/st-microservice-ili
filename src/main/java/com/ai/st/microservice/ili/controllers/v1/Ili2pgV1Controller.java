@@ -27,6 +27,7 @@ import com.ai.st.microservice.ili.business.ConceptBusiness;
 import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.BasicResponseDto;
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
+import com.ai.st.microservice.ili.dto.Ili2pgImportReferenceDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWithoutFilesDto;
 import com.ai.st.microservice.ili.dto.IliProcessQueueDto;
@@ -567,7 +568,103 @@ public class Ili2pgV1Controller {
 		}
 
 		return new ResponseEntity<>(responseDto, httpStatus);
+	}
 
+	@RequestMapping(value = "import-reference", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Import xtf to database with ili2pg")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Import started", response = ResponseImportDto.class),
+			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
+	@ResponseBody
+	public ResponseEntity<?> importPerReference(@RequestBody Ili2pgImportReferenceDto importReferenceDto) {
+
+		HttpStatus httpStatus = null;
+		Object responseDto = null;
+
+		try {
+
+			// validation file
+			String pathFile = importReferenceDto.getPathXTF();
+			if (pathFile.isEmpty()) {
+				throw new InputValidationException("El archivo es requerido.");
+			}
+
+			// validation database host
+			String databaseHost = importReferenceDto.getDatabaseHost();
+			if (databaseHost.isEmpty()) {
+				throw new InputValidationException("El host de la base de datos es requerida.");
+			}
+
+			// validation database name
+			String databaseName = importReferenceDto.getDatabaseName();
+			if (databaseName.isEmpty()) {
+				throw new InputValidationException("El nombre de la base de datos es requerida.");
+			}
+
+			// validation database schema
+			String databaseSchema = importReferenceDto.getDatabaseSchema();
+			if (databaseSchema.isEmpty()) {
+				throw new InputValidationException("El esquema de la base de datos es requerida.");
+			}
+
+			// validation database username
+			String databaseUsername = importReferenceDto.getDatabaseUsername();
+			if (databaseUsername.isEmpty()) {
+				throw new InputValidationException("El usuario de base de datos es requerido.");
+			}
+
+			// validation database password
+			String databasePassword = importReferenceDto.getDatabasePassword();
+			if (databasePassword.isEmpty()) {
+				throw new InputValidationException("La constraseña de la base de datos es requerida.");
+			}
+
+			// validation database port
+			String databasePort = importReferenceDto.getDatabasePort();
+			if (databasePort.isEmpty()) {
+				throw new InputValidationException("El puerto de base de datos es requerido.");
+			}
+
+			// validation version model
+			String versionModel = importReferenceDto.getVersionModel();
+			if (databasePort.isEmpty()) {
+				throw new InputValidationException("La version del modelo LADM COL es requerida.");
+			}
+
+			// validation concept
+			Long conceptId = importReferenceDto.getConceptId();
+			if (conceptId == null) {
+				throw new InputValidationException("El concepto es requerido.");
+			}
+
+			VersionDataDto versionData = versionBusiness.getDataVersion(versionModel, conceptId);
+			if (!(versionData instanceof VersionDataDto)) {
+				throw new InputValidationException(
+						"No se puede realizar la operación por falta de configuración de los modelos ILI");
+			}
+
+			IliProcessQueueDto data = new IliProcessQueueDto();
+			data.setType(IliProcessQueueDto.IMPORT_REFERENCE);
+			data.setImportReferenceData(importReferenceDto);
+			rabbitSenderService.sendDataToIliProcess(data);
+
+			httpStatus = HttpStatus.OK;
+			responseDto = new BasicResponseDto("Proceso iniciado!", 7);
+
+		} catch (InputValidationException e) {
+			log.error("Error Ili2pgV1Controller@importPerReference#Validation ---> " + e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		} catch (BusinessException e) {
+			log.error("Error Ili2pgV1Controller@importPerReference#Business ---> " + e.getMessage());
+			httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		} catch (Exception e) {
+			log.error("Error Ili2pgV1Controller@importPerReference#General ---> " + e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		}
+
+		return new ResponseEntity<>(responseDto, httpStatus);
 	}
 
 }

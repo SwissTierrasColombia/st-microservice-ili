@@ -5,10 +5,10 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "Ili2pgIntegrationCadastreRegistrationDto", description = "Ili2pg Integration Cadastre-Registration")
-public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Serializable {
+@ApiModel(value = "Ili2pgImportReferenceDto")
+public class Ili2pgImportReferenceDto implements Serializable {
 
-	private static final long serialVersionUID = -2379043053790590513L;
+	private static final long serialVersionUID = 1L;
 
 	@ApiModelProperty(required = true, notes = "Database host")
 	private String databaseHost;
@@ -28,20 +28,20 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
 	@ApiModelProperty(required = true, notes = "Database name")
 	private String databaseName;
 
-	@ApiModelProperty(required = true, notes = "Cadastre - Path file XTF")
-	private String cadastrePathXTF;
+	@ApiModelProperty(required = true, notes = "Path file XTF")
+	private String pathXTF;
 
-	@ApiModelProperty(required = true, notes = "Registration - Path file XTF")
-	private String registrationPathXTF;
-
-	@ApiModelProperty(required = true, notes = "Integration ID")
-	private Long integrationId;
-
-	@ApiModelProperty(required = false, notes = "Model version")
+	@ApiModelProperty(required = true, notes = "Model version")
 	private String versionModel;
 
-	public Ili2pgIntegrationCadastreRegistrationWithoutFilesDto() {
-		this.versionModel = "3.0";
+	@ApiModelProperty(required = true, notes = "Concept (operation, integration, etc)")
+	private Long conceptId;
+
+	@ApiModelProperty(required = false, notes = "Reference")
+	private String reference;
+
+	public Ili2pgImportReferenceDto() {
+
 	}
 
 	public String getDatabaseHost() {
@@ -92,28 +92,12 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
 		this.databaseName = databaseName;
 	}
 
-	public String getCadastrePathXTF() {
-		return cadastrePathXTF;
+	public String getPathXTF() {
+		return pathXTF;
 	}
 
-	public void setCadastrePathXTF(String cadastrePathXTF) {
-		this.cadastrePathXTF = cadastrePathXTF;
-	}
-
-	public String getRegistrationPathXTF() {
-		return registrationPathXTF;
-	}
-
-	public void setRegistrationPathXTF(String registrationPathXTF) {
-		this.registrationPathXTF = registrationPathXTF;
-	}
-
-	public Long getIntegrationId() {
-		return integrationId;
-	}
-
-	public void setIntegrationId(Long integrationId) {
-		this.integrationId = integrationId;
+	public void setPathXTF(String pathXTF) {
+		this.pathXTF = pathXTF;
 	}
 
 	public String getVersionModel() {
@@ -122,6 +106,22 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
 
 	public void setVersionModel(String versionModel) {
 		this.versionModel = versionModel;
+	}
+
+	public Long getConceptId() {
+		return conceptId;
+	}
+
+	public void setConceptId(Long conceptId) {
+		this.conceptId = conceptId;
+	}
+
+	public String getReference() {
+		return reference;
+	}
+
+	public void setReference(String reference) {
+		this.reference = reference;
 	}
 
 }
