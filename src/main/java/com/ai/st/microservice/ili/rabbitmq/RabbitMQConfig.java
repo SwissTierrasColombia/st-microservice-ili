@@ -80,6 +80,15 @@ public class RabbitMQConfig {
 	@Value("${st.rabbitmq.queueIli.routingkey}")
 	public String routingkeyIliName;
 
+	@Value("${st.rabbitmq.queueResultImport.queue}")
+	public String queueResultImportName;
+
+	@Value("${st.rabbitmq.queueResultImport.exchange}")
+	public String exchangeResultImportName;
+
+	@Value("${st.rabbitmq.queueResultImport.routingkey}")
+	public String routingkeyResultImportName;
+
 	// queue integrations
 
 	@Bean
@@ -200,6 +209,25 @@ public class RabbitMQConfig {
 	public Binding bindingQueueIli() {
 		return BindingBuilder.bind(queueIli()).to(exchangeIli()).with(routingkeyIliName);
 	}
+
+	// queue result imports reference
+
+	@Bean
+	public Queue queueResultImport() {
+		return new Queue(queueResultImportName, false);
+	}
+
+	@Bean
+	public DirectExchange exchangeResultImport() {
+		return new DirectExchange(exchangeResultImportName);
+	}
+
+	@Bean
+	public Binding bindingQueueResultImport() {
+		return BindingBuilder.bind(queueResultImport()).to(exchangeResultImport()).with(routingkeyResultImportName);
+	}
+
+	// Setup
 
 	@Bean
 	public Jackson2JsonMessageConverter jsonMessageConverter() {

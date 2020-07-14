@@ -18,11 +18,13 @@ import org.springframework.stereotype.Component;
 import com.ai.st.microservice.ili.business.ConceptBusiness;
 import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
+import com.ai.st.microservice.ili.dto.Ili2pgImportReferenceDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWithoutFilesDto;
 import com.ai.st.microservice.ili.dto.IliExportResultDto;
 import com.ai.st.microservice.ili.dto.IliProcessQueueDto;
 import com.ai.st.microservice.ili.dto.IlivalidatorBackgroundDto;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
+import com.ai.st.microservice.ili.dto.ResultImportDto;
 import com.ai.st.microservice.ili.dto.ValidationDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
@@ -61,7 +63,7 @@ public class RabbitMQIliListerner {
 
 	@RabbitListener(queues = "${st.rabbitmq.queueIli.queue}", concurrency = "${st.rabbitmq.queueIli.concurrency}")
 	public void iliProcess(IliProcessQueueDto data) {
-		
+
 		log.info("ili process started");
 
 		if (data.getType().equals(IliProcessQueueDto.VALIDATOR)) {
@@ -74,6 +76,10 @@ public class RabbitMQIliListerner {
 
 		if (data.getType().equals(IliProcessQueueDto.EXPORT)) {
 			this.export(data.getExportData());
+		}
+
+		if (data.getType().equals(IliProcessQueueDto.IMPORT_REFERENCE)) {
+			this.importReference(data.getImportReferenceData());
 		}
 
 	}
@@ -182,8 +188,6 @@ public class RabbitMQIliListerner {
 						+ "registration_schema_import.log";
 				String registrationLogFileImport = tmpDirectory.toString() + File.separator + "registration_import.log";
 
-				versionData.getQueries();
-
 				integrationStatDto = ili2pgService.integration(pathFileCadastre, cadastreLogFileSchemaImport,
 						cadastreLogFileImport, pathFileRegistration, registrationLogFileSchemaImport,
 						registrationLogFileImport, versionData.getUrl(), srsDefault, versionData.getModels(),
@@ -264,6 +268,81 @@ public class RabbitMQIliListerner {
 
 		resultDto.setIntegrationId(data.getIntegrationId());
 		rabbitService.sendResultExport(resultDto);
+	}
+
+	public void importReference(Ili2pgImportReferenceDto data) {
+
+		log.info("import reference started # " + data.getReference());
+
+		ResultImportDto resultImportDto = new ResultImportDto();
+		resultImportDto.setResult(false);
+		resultImportDto.setPathFile(data.getPathXTF());
+		resultImportDto.setReference(data.getReference());
+
+		try {
+
+			VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(), data.getConceptId());
+			if (versionData instanceof VersionDataDto) {
+				Path path = Paths.get(data.getPathXTF());
+				String fileName = path.getFileName().toString();
+				String fileExtension = FilenameUtils.getExtension(fileName);
+
+				String pathFileXTF = "";
+				File unzipFile = null;
+
+				if (fileExtension.equalsIgnoreCase("zip")) {
+
+					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+
+					List<String> paths = zipService.unzip(data.getPathXTF(), new File(tmpDirectory.toString()));
+					pathFileXTF = tmpDirectory.toString() + File.separator + paths.get(0);
+
+					unzipFile = tmpDirectory.toFile();
+
+				} else if (fileExtension.equalsIgnoreCase("xtf")) {
+					pathFileXTF = data.getPathXTF();
+				}
+
+				if (pathFileXTF.isEmpty()) {
+					log.error("No existe archivo xtf para realizar el proceso.");
+				} else {
+
+					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+
+					String logFileSchemaImport = tmpDirectory.toString() + File.separator + "schema_import.log";
+					String logFileImport = tmpDirectory.toString() + File.separator + "import.log";
+
+					Boolean importValid = ili2pgService.import2pg(pathFileXTF, logFileSchemaImport, logFileImport,
+							versionData.getUrl(), srsDefault, versionData.getModels(), data.getDatabaseHost(),
+							data.getDatabasePort(), data.getDatabaseName(), data.getDatabaseSchema(),
+							data.getDatabaseUsername(), data.getDatabasePassword());
+
+					try {
+						FileUtils.deleteDirectory(tmpDirectory.toFile());
+						if (unzipFile != null) {
+							FileUtils.deleteDirectory(unzipFile);
+						}
+					} catch (Exception e) {
+						log.error("It has not been possible delete the directory: " + e.getMessage());
+					}
+
+					resultImportDto.setResult(importValid);
+					log.info("Import reference finished with result: " + importValid);
+
+				}
+			}
+
+		} catch (Exception e) {
+			resultImportDto.setResult(false);
+			log.error("Import failed with error: " + e.getMessage());
+		}
+
+		try {
+			rabbitService.sendResultToImport(resultImportDto);
+		} catch (Exception e) {
+			log.error("Error sending result from import: " + e.getMessage());
+		}
+
 	}
 
 }

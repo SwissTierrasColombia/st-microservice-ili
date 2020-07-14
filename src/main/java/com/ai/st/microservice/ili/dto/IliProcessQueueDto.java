@@ -9,11 +9,13 @@ public class IliProcessQueueDto implements Serializable {
 	public static final Long VALIDATOR = (long) 1;
 	public static final Long INTEGRATOR = (long) 2;
 	public static final Long EXPORT = (long) 3;
+	public static final Long IMPORT_REFERENCE = (long) 4;
 
 	private Long type;
 	private IlivalidatorBackgroundDto ilivalidatorData;
 	private Ili2pgIntegrationCadastreRegistrationWithoutFilesDto integrationData;
 	private Ili2pgExportDto exportData;
+	private Ili2pgImportReferenceDto importReferenceData;
 
 	public IliProcessQueueDto() {
 
@@ -49,6 +51,14 @@ public class IliProcessQueueDto implements Serializable {
 
 	public void setExportData(Ili2pgExportDto exportData) {
 		this.exportData = exportData;
+	}
+
+	public Ili2pgImportReferenceDto getImportReferenceData() {
+		return importReferenceData;
+	}
+
+	public void setImportReferenceData(Ili2pgImportReferenceDto importReferenceData) {
+		this.importReferenceData = importReferenceData;
 	}
 
 }

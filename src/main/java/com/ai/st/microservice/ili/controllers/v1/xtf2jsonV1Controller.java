@@ -3,8 +3,13 @@ package com.ai.st.microservice.ili.controllers.v1;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -58,47 +63,6 @@ public class xtf2jsonV1Controller {
 		String date_time = dtf.format(now);
 		model.addAttribute("date_time", date_time);
 		return "health";
-	}
-
-	@RequestMapping(value = "download/{id}/{key}/{type}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Download GeoJSON Result")
-	@ResponseBody
-	public ResponseEntity<InputStreamResource> downloadResult(@PathVariable String id, @PathVariable String key,
-			@PathVariable String type) throws FileNotFoundException {
-
-		String fileName = key.substring(0, key.lastIndexOf("."));
-		String returnFile = null;
-		String mediaType = "application/octet-stream";
-		switch (type) {
-		case "json":
-			returnFile = uploadedFiles + File.separator + id + File.separator + fileName + ".json";
-			mediaType = "application/json";
-			break;
-		}
-
-		File file = new File(returnFile);
-		InputStream is = new FileInputStream(file);
-
-		return ResponseEntity.ok().contentLength(file.length()).contentType(MediaType.parseMediaType(mediaType))
-				.header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
-				.body(new InputStreamResource(is));
-	}
-
-	@RequestMapping(value = "ili2json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Convert XTF to GeoJSON")
-	@ResponseBody
-	public ResponseEntity<String> convertIli2Json(@RequestParam("file[]") MultipartFile[] uploadfiles,
-			@RequestParam(name = "model_file[]", required = false) MultipartFile[] iliFiles) {
-		try {
-
-			String out = ili2jsonBusiness.ili2Json(uploadfiles, iliFiles);
-
-			return new ResponseEntity<>("[" + out + "]", HttpStatus.OK);
-
-		} catch (IOException e) {
-			log.error(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
 	}
 
 	@RequestMapping(value = "shp2json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -177,17 +141,26 @@ public class xtf2jsonV1Controller {
 	@RequestMapping(value = "supply2json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Convert Supply to GeoJSON")
 	@ResponseBody
-	public ResponseEntity<InputStreamResource> convertSupply2Json(@RequestParam("url") String uploadfiles) {
+	public ResponseEntity<InputStreamResource> convertSupply2Json(
+			@RequestParam("url") String uploadfiles, 
+			@RequestParam(name = "version", required = false) String version) {
+		
 		ArrayList<String> files;
+		
 		try {
-			files = ili2jsonBusiness.supply2Json(uploadfiles);
+			files = ili2jsonBusiness.supply2Json(uploadfiles, version);
 			String returnFile = null;
 			String mediaType = "application/json";
 			for (String f : files) {
+				/* TODO: Unificar files */
 				returnFile = f;
 			}
 			if (returnFile == null) {
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				returnFile = "/tmp/resp.json";
+				FileWriter myWriter = new FileWriter("/tmp/resp.json");
+				myWriter.write("{}");
+				myWriter.close();
+				
 			}
 			File file = new File(returnFile);
 			InputStream is = new FileInputStream(file);
