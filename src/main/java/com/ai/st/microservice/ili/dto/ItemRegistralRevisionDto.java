@@ -34,6 +34,24 @@ public class ItemRegistralRevisionDto implements Serializable {
 	@ApiModelProperty(required = true, notes = "File ID")
 	private Long fileId;
 
+	@ApiModelProperty(required = true, notes = "Boundary ID")
+	private Long boundaryId;
+
+	@ApiModelProperty(required = true, notes = "Issuing city")
+	private String issuingCity;
+
+	@ApiModelProperty(required = true, notes = "Inssuing entity")
+	private String issuingEntity;
+
+	@ApiModelProperty(required = true, notes = "Document date")
+	private String documentDate;
+
+	@ApiModelProperty(required = true, notes = "Document number")
+	private String documentNumber;
+
+	@ApiModelProperty(required = true, notes = "Document type")
+	private String documentType;
+
 	public ItemRegistralRevisionDto() {
 
 	}
@@ -100,6 +118,54 @@ public class ItemRegistralRevisionDto implements Serializable {
 
 	public void setFileId(Long fileId) {
 		this.fileId = fileId;
+	}
+
+	public Long getBoundaryId() {
+		return boundaryId;
+	}
+
+	public void setBoundaryId(Long boundaryId) {
+		this.boundaryId = boundaryId;
+	}
+
+	public String getIssuingCity() {
+		return issuingCity;
+	}
+
+	public void setIssuingCity(String issuingCity) {
+		this.issuingCity = issuingCity;
+	}
+
+	public String getIssuingEntity() {
+		return issuingEntity;
+	}
+
+	public void setIssuingEntity(String issuingEntity) {
+		this.issuingEntity = issuingEntity;
+	}
+
+	public String getDocumentDate() {
+		return documentDate;
+	}
+
+	public void setDocumentDate(String documentDate) {
+		this.documentDate = documentDate;
+	}
+
+	public String getDocumentNumber() {
+		return documentNumber;
+	}
+
+	public void setDocumentNumber(String documentNumber) {
+		this.documentNumber = documentNumber;
+	}
+
+	public String getDocumentType() {
+		return documentType;
+	}
+
+	public void setDocumentType(String documentType) {
+		this.documentType = documentType;
 	}
 
 }

@@ -64,7 +64,7 @@ public class QueryBusiness {
 
 							ItemRegistralRevisionDto item = new ItemRegistralRevisionDto();
 
-							String file = resultsetObjects.getString("file");
+							String file = resultsetObjects.getString("archivo");
 							if (file != null) {
 								item.setFileId(Long.parseLong(file));
 							}
@@ -102,6 +102,36 @@ public class QueryBusiness {
 							String realEstateRegistration = resultsetObjects.getString("matricula_inmobiliaria");
 							if (realEstateRegistration != null) {
 								item.setRealEstateRegistration(realEstateRegistration);
+							}
+
+							String boundarySpaceId = resultsetObjects.getString("cabidalindero_id");
+							if (boundarySpaceId != null) {
+								item.setBoundaryId(Long.parseLong(boundarySpaceId));
+							}
+
+							String issuingCity = resultsetObjects.getString("ciudad_emisora");
+							if (issuingCity != null) {
+								item.setIssuingCity(issuingCity);
+							}
+
+							String issuingEntity = resultsetObjects.getString("ente_emisor");
+							if (issuingEntity != null) {
+								item.setIssuingEntity(issuingEntity);
+							}
+
+							String documentDate = resultsetObjects.getString("fecha_documento");
+							if (documentDate != null) {
+								item.setDocumentDate(documentDate);
+							}
+
+							String documentNumber = resultsetObjects.getString("numero_documento");
+							if (documentNumber != null) {
+								item.setDocumentNumber(documentNumber);
+							}
+
+							String documentType = resultsetObjects.getString("tipo_documento");
+							if (documentType != null) {
+								item.setDocumentType(documentType);
 							}
 
 							records.add(item);

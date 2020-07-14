@@ -203,7 +203,8 @@ public class IlivalidatorV1Controller {
 								ArrayList<File> list = new ArrayList<>();
 								File fileValidationXTF = new File(logFileValidationXTF);
 								list.add(fileValidationXTF);
-								geom = ili2jsonBusiness.ili2Json(list, new ArrayList<>(), tmpDirectory);
+								geom = ili2jsonBusiness.ili2Json(list, new ArrayList<>(), tmpDirectory,
+										localModelsDirectory);
 							}
 						}
 						listValidations.add(new ValidationDto(resultId, transfer, result, true, true, lines, geom));

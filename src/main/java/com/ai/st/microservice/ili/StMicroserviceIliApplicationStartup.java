@@ -214,16 +214,21 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 						"select count(*) from {dbschema}.gc_prediocatastro"));
 				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountMatch,
 						"select count(*) from {dbschema}.ini_predioinsumos"));
-				querys30.add(new QueryEntity(versionConceptIntegration30, queryRegistralToRevision,
-						"select p.t_id, (select e.t_id from {dbschema}.extarchivo e where e.snr_fuentecabidalndros_archivo = f.t_id ) as file,"
-								+ "p.numero_predial_nuevo_en_fmi, "
-								+ "	p.numero_predial_anterior_en_fmi, p.codigo_orip, "
-								+ "	p.matricula_inmobiliaria, p.nomenclatura_registro,"
-								+ "	p.cabida_linderos from {dbschema}.snr_predioregistro p join {dbschema}.snr_fuentecabidalinderos f on f.t_id  = p.snr_fuente_cabidalinderos"
-								+ " order by p.t_id limit {limit} offset ({page} * {limit})"));
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryRegistralToRevision, "select "
+						+ "	p.t_id, f.t_id as cabidalindero_id, f.ciudad_emisora, "
+						+ "	f.ente_emisor, f.fecha_documento, f.numero_documento, "
+						+ "	ft.dispname as tipo_documento, (select e.t_id from {dbschema}.extarchivo e where "
+						+ "	e.snr_fuentecabidalndros_archivo = f.t_id ) as archivo, "
+						+ "	p.numero_predial_nuevo_en_fmi, p.numero_predial_anterior_en_fmi, "
+						+ "	p.codigo_orip, p.matricula_inmobiliaria, p.nomenclatura_registro, "
+						+ "	p.cabida_linderos from {dbschema}.snr_predioregistro p "
+						+ " join {dbschema}.snr_fuentecabidalinderos f on f.t_id = p.snr_fuente_cabidalinderos "
+						+ " join {dbschema}.snr_fuentetipo ft on ft.t_id = f.tipo_documento order by "
+						+ "	p.t_id limit {limit} offset ({page} * {limit})"));
 				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountRegistralToRevision,
-						"select count(*) from {dbschema}.snr_predioregistro p "
-								+ "join {dbschema}.snr_fuentecabidalinderos f on f.t_id = p.snr_fuente_cabidalinderos"));
+						"select count(*) from {dbschema}.snr_predioregistro p join {dbschema}.snr_fuentecabidalinderos f on " + 
+						" f.t_id = p.snr_fuente_cabidalinderos " + 
+						" join {dbschema}.snr_fuentetipo ft on ft.t_id = f.tipo_documento "));
 
 				versionConceptIntegration30.setQuerys(querys30);
 
