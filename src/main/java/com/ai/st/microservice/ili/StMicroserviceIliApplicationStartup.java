@@ -119,6 +119,21 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 						.setName("COUNT CONSULTA DE REGISTROS PARA ACTUALIZAR FUENTE CABIDAD LINDEROS");
 				queryTypeService.createQueryType(typeCountRegistralToRevision);
 
+				QueryTypeEntity typeInsertToRevision = new QueryTypeEntity();
+				typeInsertToRevision.setId(QueryTypeBusiness.QUERY_TYPE_INSERT_EXTARCHIVO_REVISION);
+				typeInsertToRevision.setName("INSERT EN TABLA EXTARCHIVO");
+				queryTypeService.createQueryType(typeInsertToRevision);
+
+				QueryTypeEntity typeSelectToRevision = new QueryTypeEntity();
+				typeSelectToRevision.setId(QueryTypeBusiness.QUERY_TYPE_SELECT_EXTARCHIVO_REVISION);
+				typeSelectToRevision.setName("SELECT EN TABLA EXTARCHIVO");
+				queryTypeService.createQueryType(typeSelectToRevision);
+
+				QueryTypeEntity typeUpdateToRevision = new QueryTypeEntity();
+				typeUpdateToRevision.setId(QueryTypeBusiness.QUERY_TYPE_UPDATE_EXTARCHIVO_REVISION);
+				typeUpdateToRevision.setName("UPDATE EN TABLA EXTARCHIVO");
+				queryTypeService.createQueryType(typeUpdateToRevision);
+
 				log.info("The domains 'queries types' have been loaded!");
 			} catch (Exception e) {
 				log.error("Failed to load 'queries types' domains");
@@ -155,6 +170,15 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 
 				QueryTypeEntity queryCountRegistralToRevision = queryTypeService
 						.getQueryTypeById(QueryTypeBusiness.QUERY_TYPE_COUNT_REGISTRAL_GET_RECORDS_TO_REVISION);
+
+				QueryTypeEntity queryInsertToRevision = queryTypeService
+						.getQueryTypeById(QueryTypeBusiness.QUERY_TYPE_INSERT_EXTARCHIVO_REVISION);
+
+				QueryTypeEntity querySelectToRevision = queryTypeService
+						.getQueryTypeById(QueryTypeBusiness.QUERY_TYPE_SELECT_EXTARCHIVO_REVISION);
+
+				QueryTypeEntity queryUpdateToRevision = queryTypeService
+						.getQueryTypeById(QueryTypeBusiness.QUERY_TYPE_UPDATE_EXTARCHIVO_REVISION);
 
 				ConceptEntity conceptOperator = conceptService.getConceptById(ConceptBusiness.CONCEPT_OPERATION);
 				ConceptEntity conceptIntegration = conceptService.getConceptById(ConceptBusiness.CONCEPT_INTEGRATION);
@@ -214,21 +238,33 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 						"select count(*) from {dbschema}.gc_prediocatastro"));
 				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountMatch,
 						"select count(*) from {dbschema}.ini_predioinsumos"));
-				querys30.add(new QueryEntity(versionConceptIntegration30, queryRegistralToRevision, "select "
-						+ "	p.t_id, f.t_id as cabidalindero_id, f.ciudad_emisora, "
-						+ "	f.ente_emisor, f.fecha_documento, f.numero_documento, "
-						+ "	ft.dispname as tipo_documento, (select e.t_id from {dbschema}.extarchivo e where "
-						+ "	e.snr_fuentecabidalndros_archivo = f.t_id ) as archivo, "
-						+ "	p.numero_predial_nuevo_en_fmi, p.numero_predial_anterior_en_fmi, "
-						+ "	p.codigo_orip, p.matricula_inmobiliaria, p.nomenclatura_registro, "
-						+ "	p.cabida_linderos from {dbschema}.snr_predioregistro p "
-						+ " join {dbschema}.snr_fuentecabidalinderos f on f.t_id = p.snr_fuente_cabidalinderos "
-						+ " join {dbschema}.snr_fuentetipo ft on ft.t_id = f.tipo_documento order by "
-						+ "	p.t_id limit {limit} offset ({page} * {limit})"));
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryRegistralToRevision,
+						"select " + "	p.t_id, f.t_id as cabidalindero_id, f.ciudad_emisora, "
+								+ "	f.ente_emisor, f.fecha_documento, f.numero_documento, "
+								+ "	ft.dispname as tipo_documento, (select e.t_id from {dbschema}.extarchivo e where "
+								+ "	e.snr_fuentecabidalndros_archivo = f.t_id ) as archivo, "
+								+ "	p.numero_predial_nuevo_en_fmi, p.numero_predial_anterior_en_fmi, "
+								+ "	p.codigo_orip, p.matricula_inmobiliaria, p.nomenclatura_registro, "
+								+ "	p.cabida_linderos from {dbschema}.snr_predioregistro p "
+								+ " join {dbschema}.snr_fuentecabidalinderos f on f.t_id = p.snr_fuente_cabidalinderos "
+								+ " join {dbschema}.snr_fuentetipo ft on ft.t_id = f.tipo_documento order by "
+								+ "	p.t_id limit {limit} offset ({page} * {limit})"));
 				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountRegistralToRevision,
-						"select count(*) from {dbschema}.snr_predioregistro p join {dbschema}.snr_fuentecabidalinderos f on " + 
-						" f.t_id = p.snr_fuente_cabidalinderos " + 
-						" join {dbschema}.snr_fuentetipo ft on ft.t_id = f.tipo_documento "));
+						"select count(*) from {dbschema}.snr_predioregistro p join {dbschema}.snr_fuentecabidalinderos f on "
+								+ " f.t_id = p.snr_fuente_cabidalinderos "
+								+ " join {dbschema}.snr_fuentetipo ft on ft.t_id = f.tipo_documento "));
+				versionConceptIntegration30.setQuerys(querys30);
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryInsertToRevision,
+						"INSERT INTO {dbschema}.extarchivo "
+								+ " (datos, fecha_entrega, espacio_de_nombres, local_id, snr_fuentecabidalndros_archivo) "
+								+ " VALUES('{url}', now(), '{namespace}', {entityId}, {boundaryId})"));
+				versionConceptIntegration30.setQuerys(querys30);
+				querys30.add(new QueryEntity(versionConceptIntegration30, querySelectToRevision,
+						"select e.* from {dbschema}.extarchivo e where e.snr_fuentecabidalndros_archivo = {boundaryId}"));
+				querys30.add(new QueryEntity(versionConceptIntegration30, queryUpdateToRevision,
+						"UPDATE {dbschema}.extarchivo "
+								+ "SET datos='{url}', fecha_entrega=now(), espacio_de_nombres='{namespace}', local_id={entityId} "
+								+ "WHERE snr_fuentecabidalndros_archivo = {boundaryId}"));
 
 				versionConceptIntegration30.setQuerys(querys30);
 

@@ -159,8 +159,8 @@ public class Ili2pgService {
 					.orElse(null);
 
 			QueryEntity queryMatchIntegrationEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_MATCH_INTEGRATION)).findAny()
-					.orElse(null);
+					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_MATCH_INTEGRATION))
+					.findAny().orElse(null);
 
 			PostgresDriver connection = new PostgresDriver();
 			String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
@@ -177,8 +177,8 @@ public class Ili2pgService {
 					String snr = resultsetObjects.getString("snr_predio_juridico");
 					String gc = resultsetObjects.getString("gc_predio_catastro");
 
-					QueryEntity queryInsertEntity = versionConcept.getQuerys().stream()
-							.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
+					QueryEntity queryInsertEntity = versionConcept.getQuerys().stream().filter(
+							q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
 							.findAny().orElse(null);
 
 					String sqlInsert = queryInsertEntity.getQuery().replace("{dbschema}", databaseSchema)
@@ -228,8 +228,8 @@ public class Ili2pgService {
 			String sqlCountSNR = queryCountSnrEntity.getQuery().replace("{dbschema}", databaseSchema);
 			long countSNR = connection.count(sqlCountSNR);
 
-			QueryEntity queryCountCadastreEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
+			QueryEntity queryCountCadastreEntity = versionConcept.getQuerys().stream().filter(
+					q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
 					.findAny().orElse(null);
 			String sqlCountGC = queryCountCadastreEntity.getQuery().replace("{dbschema}", databaseSchema);
 			long countGC = connection.count(sqlCountGC);
@@ -286,7 +286,7 @@ public class Ili2pgService {
 			Ili2db.run(config, null);
 			result = true;
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error("Error export to xtf: " + e.getMessage());
 			result = false;
 		}
 

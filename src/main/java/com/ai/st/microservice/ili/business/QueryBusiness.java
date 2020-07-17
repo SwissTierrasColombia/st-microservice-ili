@@ -163,4 +163,80 @@ public class QueryBusiness {
 
 	}
 
+	public void executeQueryUpdateToRevision(String modelVersion, Long conceptId, String host, String database,
+			String port, String schema, String username, String password, String namespace, String fileUrl,
+			Long entityId, Long boundaryId) {
+
+		VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
+		if (versionEntity instanceof VersionEntity) {
+
+			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
+					.filter(vC -> vC.getConcept().getId().equals(conceptId)).findAny().orElse(null);
+
+			if (versionConcept != null) {
+
+				PostgresDriver connection = new PostgresDriver();
+
+				String urlConnection = "jdbc:postgresql://" + host + ":" + port + "/" + database;
+				connection.connect(urlConnection, username, password, "org.postgresql.Driver");
+
+				QueryEntity querySelect = versionConcept.getQuerys().stream().filter(
+						q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_SELECT_EXTARCHIVO_REVISION))
+						.findAny().orElse(null);
+
+				if (querySelect != null) {
+
+					String sqlObjects = querySelect.getQuery().replace("{dbschema}", schema).replace("{boundaryId}",
+							boundaryId.toString());
+
+					ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
+
+					Boolean existFile = false;
+
+					try {
+						while (resultsetObjects.next()) {
+							existFile = true;
+						}
+					} catch (SQLException e) {
+						System.out.println("Error with query: " + e.getMessage());
+					}
+
+					if (existFile) {
+
+						QueryEntity queryUpdate = versionConcept.getQuerys().stream()
+								.filter(q -> q.getQueryType().getId()
+										.equals(QueryTypeBusiness.QUERY_TYPE_UPDATE_EXTARCHIVO_REVISION))
+								.findAny().orElse(null);
+
+						String sqlUpdate = queryUpdate.getQuery().replace("{dbschema}", schema)
+								.replace("{url}", fileUrl).replace("{namespace}", namespace)
+								.replace("{entityId}", entityId.toString())
+								.replace("{boundaryId}", boundaryId.toString());
+
+						connection.insert(sqlUpdate);
+
+					} else {
+
+						QueryEntity queryInsert = versionConcept.getQuerys().stream()
+								.filter(q -> q.getQueryType().getId()
+										.equals(QueryTypeBusiness.QUERY_TYPE_INSERT_EXTARCHIVO_REVISION))
+								.findAny().orElse(null);
+
+						String sqlInsert = queryInsert.getQuery().replace("{dbschema}", schema)
+								.replace("{url}", fileUrl).replace("{namespace}", namespace)
+								.replace("{entityId}", entityId.toString())
+								.replace("{boundaryId}", boundaryId.toString());
+
+						connection.insert(sqlInsert);
+					}
+
+					connection.disconnect();
+				}
+
+			}
+
+		}
+
+	}
+
 }
