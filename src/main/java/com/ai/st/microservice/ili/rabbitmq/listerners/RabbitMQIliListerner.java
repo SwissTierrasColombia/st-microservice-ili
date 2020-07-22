@@ -123,7 +123,7 @@ public class RabbitMQIliListerner {
 					pathFileXTF = data.getPathFile();
 				}
 
-				if (pathFileXTF.isBlank() || pathFileXTF.isEmpty()) {
+				if (pathFileXTF.isEmpty()) {
 					log.error("there is not file xtf.");
 				} else {
 
