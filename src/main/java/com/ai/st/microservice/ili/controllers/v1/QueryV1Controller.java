@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ai.st.microservice.ili.business.QueryBusiness;
 import com.ai.st.microservice.ili.dto.BasicResponseDto;
+import com.ai.st.microservice.ili.dto.ExecuteQueryUpdateToRevisionDto;
 import com.ai.st.microservice.ili.dto.QueryResultRegistralRevisionDto;
 
 import io.swagger.annotations.Api;
@@ -55,6 +57,36 @@ public class QueryV1Controller {
 
 		} catch (Exception e) {
 			log.error("Error QueryV1Controller@executeQueryRegistralToRevision#General ---> " + e.getMessage());
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			responseDto = new BasicResponseDto(e.getMessage(), 3);
+		}
+
+		return new ResponseEntity<>(responseDto, httpStatus);
+	}
+
+	@RequestMapping(value = "execute/update-to-revision", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Execute query")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Execute query", response = QueryResultRegistralRevisionDto.class),
+			@ApiResponse(code = 500, message = "Error Server", response = String.class) })
+	@ResponseBody
+	public ResponseEntity<?> executeQueryUpdateToRevision(@RequestBody ExecuteQueryUpdateToRevisionDto executeDto) {
+
+		HttpStatus httpStatus = null;
+		Object responseDto = null;
+
+		try {
+
+			queryBusiness.executeQueryUpdateToRevision(executeDto.getVersionModel(), executeDto.getConceptId(),
+					executeDto.getDatabaseHost(), executeDto.getDatabaseName(), executeDto.getDatabasePort(),
+					executeDto.getDatabaseSchema(), executeDto.getDatabaseUsername(), executeDto.getDatabasePassword(),
+					executeDto.getNamespace(), executeDto.getUrlFile(), executeDto.getEntityId(),
+					executeDto.getBoundarySpaceId());
+			responseDto = new BasicResponseDto("Registro actualizado", 7);
+			httpStatus = HttpStatus.OK;
+
+		} catch (Exception e) {
+			log.error("Error QueryV1Controller@executeQueryUpdateToRevision#General ---> " + e.getMessage());
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 			responseDto = new BasicResponseDto(e.getMessage(), 3);
 		}

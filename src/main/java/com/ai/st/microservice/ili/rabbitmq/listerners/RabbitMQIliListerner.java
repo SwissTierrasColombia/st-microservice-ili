@@ -18,12 +18,14 @@ import org.springframework.stereotype.Component;
 import com.ai.st.microservice.ili.business.ConceptBusiness;
 import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.Ili2pgExportDto;
+import com.ai.st.microservice.ili.dto.Ili2pgExportReferenceDto;
 import com.ai.st.microservice.ili.dto.Ili2pgImportReferenceDto;
 import com.ai.st.microservice.ili.dto.Ili2pgIntegrationCadastreRegistrationWithoutFilesDto;
 import com.ai.st.microservice.ili.dto.IliExportResultDto;
 import com.ai.st.microservice.ili.dto.IliProcessQueueDto;
 import com.ai.st.microservice.ili.dto.IlivalidatorBackgroundDto;
 import com.ai.st.microservice.ili.dto.IntegrationStatDto;
+import com.ai.st.microservice.ili.dto.ResultExportDto;
 import com.ai.st.microservice.ili.dto.ResultImportDto;
 import com.ai.st.microservice.ili.dto.ValidationDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
@@ -82,6 +84,10 @@ public class RabbitMQIliListerner {
 			this.importReference(data.getImportReferenceData());
 		}
 
+		if (data.getType().equals(IliProcessQueueDto.EXPORT_REFERENCE)) {
+			this.exportReference(data.getExportReferenceData());
+		}
+
 	}
 
 	public void ilivalidator(IlivalidatorBackgroundDto data) {
@@ -117,7 +123,7 @@ public class RabbitMQIliListerner {
 					pathFileXTF = data.getPathFile();
 				}
 
-				if (pathFileXTF.isBlank() || pathFileXTF.isEmpty()) {
+				if (pathFileXTF.isEmpty()) {
 					log.error("there is not file xtf.");
 				} else {
 
@@ -341,6 +347,53 @@ public class RabbitMQIliListerner {
 			rabbitService.sendResultToImport(resultImportDto);
 		} catch (Exception e) {
 			log.error("Error sending result from import: " + e.getMessage());
+		}
+
+	}
+
+	public void exportReference(Ili2pgExportReferenceDto data) {
+
+		log.info("export reference started #" + data.getReference());
+
+		ResultExportDto resultExportDto = new ResultExportDto();
+		resultExportDto.setResult(false);
+		resultExportDto.setPathFile(data.getPathFileXTF());
+		resultExportDto.setReference(data.getReference());
+
+		try {
+
+			VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(), data.getConceptId());
+			if (versionData instanceof VersionDataDto) {
+
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+				String logExport = Paths.get(tmpDirectory.toString(), "export.log").toString();
+
+				Boolean result = ili2pgService.exportToXtf(data.getPathFileXTF(), logExport, versionData.getUrl(),
+						srsDefault, versionData.getModels(), data.getDatabaseHost(), data.getDatabasePort(),
+						data.getDatabaseName(), data.getDatabaseSchema(), data.getDatabaseUsername(),
+						data.getDatabasePassword());
+
+				resultExportDto.setResult(result);
+
+				log.info("Export reference finished with result: " + result);
+
+				try {
+					FileUtils.deleteDirectory(tmpDirectory.toFile());
+				} catch (Exception e) {
+					log.error("It has not been possible delete the directory: " + e.getMessage());
+				}
+
+			}
+
+		} catch (Exception e) {
+			log.error("Export reference failed # " + data.getReference());
+			log.error("Export reference error  " + e.getMessage());
+		}
+
+		try {
+			rabbitService.sendResultToExport(resultExportDto);
+		} catch (Exception e) {
+			log.error("Error sending result from export: " + e.getMessage());
 		}
 
 	}
