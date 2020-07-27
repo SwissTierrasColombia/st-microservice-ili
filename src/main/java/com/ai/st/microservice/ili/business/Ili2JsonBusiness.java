@@ -2,6 +2,7 @@ package com.ai.st.microservice.ili.business;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -17,6 +18,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,7 @@ import com.ai.st.microservice.ili.exceptions.BusinessException;
 import com.ai.st.microservice.ili.services.Ili2JsonService;
 
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import net.bytebuddy.utility.RandomString;
 
 @Component
 public class Ili2JsonBusiness {
@@ -144,13 +147,10 @@ public class Ili2JsonBusiness {
 			HashMap items = ili2json.checkGenerateFile(outFiles);
 
 			// get output to write
-			out += ili2json.writeOutIli2Json(tmpDirectory.getFileName().getName(0).toString(), fileXTF, items);
+			out += ili2json.writeOutIli2Json2(tmpDirectory.getFileName().getName(0).toString(), fileXTF, items);
 
 		}
 
-		if (out.lastIndexOf(",") != -1) {
-			out = out.substring(0, out.lastIndexOf(","));
-		}
 		return out;
 	}
 
@@ -237,7 +237,12 @@ public class Ili2JsonBusiness {
 									ConceptBusiness.CONCEPT_OPERATION);
 							if (versionData instanceof VersionDataDto) {
 								ArrayList<String> rsp = new ArrayList<String>();
-								rsp.add(this.ili2Json(uf, new ArrayList<File>(), Paths.get(path), versionData.getUrl()));
+								String jsonstr = this.ili2Json(uf, new ArrayList<File>(), Paths.get(path), versionData.getUrl());
+								String returnFile = "/tmp/resp"+RandomStringUtils.random(10,true, false)+".json";
+								FileWriter myWriter = new FileWriter(returnFile);
+								myWriter.write(jsonstr);
+								myWriter.close();
+								rsp.add(returnFile);
 								return rsp;
 							}
 						} catch (BusinessException e) {

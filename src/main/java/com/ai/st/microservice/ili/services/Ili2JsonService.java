@@ -16,6 +16,9 @@ import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ilirepository.IliManager;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.IoxUtility;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -326,7 +329,7 @@ public class Ili2JsonService {
 		parameters.add("-skipfailures");
 		parameters.add("-f");
 		parameters.add(format);
-		parameters.add(outName + "_3116.json");
+		parameters.add(outName + ".json");
 		parameters.add(pathXTF);
 
 		if (!model.isEmpty()) {
@@ -336,7 +339,7 @@ public class Ili2JsonService {
 
 		parameters.add(table);
 		executeCommand(parameters);
-
+/*
 		parameters = new ArrayList();
 		parameters.add(getOgrDirPath() + File.separator + "ogr2ogr");
 		parameters.add("-s_srs");
@@ -347,7 +350,7 @@ public class Ili2JsonService {
 		parameters.add(outName + "_3116.json");
 
 		executeCommand(parameters);
-
+*/
 		// Convertion without models
 		// Alert: This can generate data loss
 		return outName + ".json";
@@ -430,7 +433,7 @@ public class Ili2JsonService {
 	}
 
 	public String writeOutIli2Json(String dirOutput, String filenameInput, HashMap items) {
-
+		
 		String out = "";
 
 		out += "{\"result_id\":\"" + dirOutput + "\",\"transfer\":\"" + filenameInput + "\"";
@@ -492,6 +495,36 @@ public class Ili2JsonService {
 
 		out = out + "]";
 		out = out + "},";
+
+		return out;
+	}
+	
+	public String writeOutIli2Json2(String dirOutput, String filenameInput, HashMap items) {
+				
+		String out = "[";
+		String sep = "";
+
+		for (Iterator it = items.entrySet().iterator(); it.hasNext();) {
+
+			Map.Entry entry = (Map.Entry) it.next();
+
+			String key = (String) entry.getKey();
+			File fileKey = new File(key);
+
+			Map.Entry entryProperties = (Map.Entry) entry.getValue();
+
+			if (!"Table".equals((String) entryProperties.getValue())) {
+				try {
+					out +=  sep + Files.toString(fileKey, Charsets.UTF_8);
+					sep = ",";
+				} catch (IOException e) {
+					System.out.println("Error getting content from file: " + e.getMessage());
+				}
+				
+			}
+		}
+
+		out = out + "]";
 
 		return out;
 	}
