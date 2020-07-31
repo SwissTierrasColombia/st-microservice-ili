@@ -141,7 +141,7 @@ public class xtf2jsonV1Controller {
 	@RequestMapping(value = "supply2json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Convert Supply to GeoJSON")
 	@ResponseBody
-	public ResponseEntity<InputStreamResource> convertSupply2Json(
+	public ResponseEntity<?> convertSupply2Json(
 			@RequestParam("url") String uploadfiles, 
 			@RequestParam(name = "version", required = false) String version) {
 		
