@@ -110,6 +110,7 @@ public class Ili2pgService {
 				config.setDefaultSrsCode(srsCode); // --defaultSrsCode
 				config.setModels(models); // --models
 				config.setLogfile(logFileImport); // --log
+				config.setValidation(false);
 				config.setXtffile(fileXTF);
 				if (fileXTF != null && Ili2db.isItfFilename(fileXTF)) {
 					config.setItfTransferfile(true);
@@ -267,13 +268,15 @@ public class Ili2pgService {
 
 		try {
 
-			Config config = getDefaultConfig();
+			Config config = new Config();
+			new ch.ehi.ili2pg.PgMain().initConfig(config);
 
 			config.setFunction(Config.FC_EXPORT); // --schemaimport
-			config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
-			config.setDefaultSrsCode(srsCode); // --defaultSrsCode
+			config.setModeldir(iliDirectory); // -- modeldir
 			config.setModels(models); // --models
 			config.setLogfile(logFileExport); // --log
+			// config.setDefaultSrsCode(srsCode); // --defaultSrsCode
+			config.setValidation(false);
 
 			config.setXtffile(filePath);
 
@@ -284,6 +287,7 @@ public class Ili2pgService {
 
 			Ili2db.readSettingsFromDb(config);
 			Ili2db.run(config, null);
+
 			result = true;
 		} catch (Exception e) {
 			log.error("Error export to xtf: " + e.getMessage());
