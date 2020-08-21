@@ -1,11 +1,13 @@
-FROM osgeo/gdal:ubuntu-full-latest
+FROM openjdk:12
+
+ARG XMX=1024m
+
+ENV XMX=$XMX
 
 VOLUME /tmp
 
 ADD ./build/libs/st-microservice-ili-0.0.1-SNAPSHOT.jar st-microservice-ili.jar
 
-RUN apt-get update && apt-get install -y openjdk-13-jdk
+EXPOSE 9005
 
-EXPOSE 8080
-
-ENTRYPOINT java -jar /st-microservice-ili.jar
+ENTRYPOINT java -Xmx$XMX -jar /st-microservice-ili.jar
