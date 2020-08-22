@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ZipService {
 
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
+	private final static Logger log = LoggerFactory.getLogger(ZipService.class);
 
 	public String zipDirectory(String dir, String fileName) throws IOException {
 		String zipFileName = FilenameUtils.getFullPath(fileName) + FilenameUtils.getBaseName(fileName) + ".zip";
@@ -116,6 +117,52 @@ public class ZipService {
 		}
 
 		return destFile;
+	}
+	
+	public static String zipping(File file, String zipName, String fileName, String namespace) {
+
+		try {
+
+			String path = namespace + File.separatorChar + zipName + ".zip";
+
+			new File(namespace).mkdirs();
+			File f = new File(path);
+			if (f.exists()) {
+				f.delete();
+			}
+			ZipOutputStream o = new ZipOutputStream(new FileOutputStream(f));
+			ZipEntry e = new ZipEntry(fileName);
+			o.putNextEntry(e);
+			byte[] data = Files.readAllBytes(file.toPath());
+			o.write(data, 0, data.length);
+			o.closeEntry();
+			o.close();
+
+			return path;
+
+		} catch (IOException e) {
+			log.error("Error zipping archive: " + e.getMessage());
+		}
+
+		return null;
+	}
+	
+	public static String removeAccents(String str) {
+
+		final String original = "ÁáÉéÍíÓóÚúÑñÜü";
+		final String replace = "AaEeIiOoUuNnUu";
+
+		if (str == null) {
+			return null;
+		}
+		char[] array = str.toCharArray();
+		for (int indice = 0; indice < array.length; indice++) {
+			int pos = original.indexOf(array[indice]);
+			if (pos > -1) {
+				array[indice] = replace.charAt(pos);
+			}
+		}
+		return new String(array);
 	}
 
 }
