@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -59,6 +60,9 @@ public class RabbitMQIliListerner {
 
 	@Value("${iliProcesses.uploadedFiles}")
 	private String uploadedFiles;
+
+	@Value("${st.filesDirectory}")
+	private String stFilesDirectory;
 
 	@Value("${iliProcesses.srs}")
 	private String srsDefault;
@@ -250,8 +254,23 @@ public class RabbitMQIliListerner {
 						data.getDatabaseName(), data.getDatabaseSchema(), data.getDatabaseUsername(),
 						data.getDatabasePassword());
 
+				if (result) {
+					log.info("zipping export file");
+					String zipName = RandomStringUtils.random(20, true, false);
+					Path path = Paths.get(data.getPathFileXTF());
+					String originalFilename = path.getFileName().toString();
+					String fileExtension = FilenameUtils.getExtension(originalFilename);
+					String fileName = RandomStringUtils.random(20, true, false) + "." + fileExtension;
+					String urlBase = path.getParent().toString();
+					urlBase = ZipService.removeAccents(urlBase);
+					String urlZipFile = ZipService.zipping(new File(data.getPathFileXTF()), zipName, fileName, urlBase);
+					resultDto.setPathFile(urlZipFile);
+					log.info("export file zipped");
+				} else {
+					resultDto.setPathFile(null);
+				}
+
 				resultDto.setStatus(result);
-				resultDto.setPathFile(data.getPathFileXTF());
 				resultDto.setStats(stats);
 				resultDto.setModelVersion(data.getVersionModel());
 
@@ -357,7 +376,6 @@ public class RabbitMQIliListerner {
 
 		ResultExportDto resultExportDto = new ResultExportDto();
 		resultExportDto.setResult(false);
-		resultExportDto.setPathFile(data.getPathFileXTF());
 		resultExportDto.setReference(data.getReference());
 
 		try {
@@ -372,6 +390,22 @@ public class RabbitMQIliListerner {
 						srsDefault, versionData.getModels(), data.getDatabaseHost(), data.getDatabasePort(),
 						data.getDatabaseName(), data.getDatabaseSchema(), data.getDatabaseUsername(),
 						data.getDatabasePassword());
+
+				if (result) {
+					log.info("zipping export file");
+					String zipName = RandomStringUtils.random(20, true, false);
+					Path path = Paths.get(data.getPathFileXTF());
+					String originalFilename = path.getFileName().toString();
+					String fileExtension = FilenameUtils.getExtension(originalFilename);
+					String fileName = RandomStringUtils.random(20, true, false) + "." + fileExtension;
+					String urlBase = path.getParent().toString();
+					urlBase = ZipService.removeAccents(urlBase);
+					String urlZipFile = ZipService.zipping(new File(data.getPathFileXTF()), zipName, fileName, urlBase);
+					resultExportDto.setPathFile(urlZipFile);
+					log.info("export file zipped");
+				} else {
+					resultExportDto.setPathFile(null);
+				}
 
 				resultExportDto.setResult(result);
 
