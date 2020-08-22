@@ -118,7 +118,7 @@ public class ZipService {
 
 		return destFile;
 	}
-	
+
 	public static String zipping(File file, String zipName, String fileName, String namespace) {
 
 		try {
@@ -130,23 +130,39 @@ public class ZipService {
 			if (f.exists()) {
 				f.delete();
 			}
-			ZipOutputStream o = new ZipOutputStream(new FileOutputStream(f));
+
+			byte[] buffer = new byte[1024];
+			
+			FileOutputStream fos = new FileOutputStream(f);
+
+			ZipOutputStream o = new ZipOutputStream(fos);
 			ZipEntry e = new ZipEntry(fileName);
 			o.putNextEntry(e);
-			byte[] data = Files.readAllBytes(file.toPath());
-			o.write(data, 0, data.length);
+
+			FileInputStream in = new FileInputStream(file.getAbsolutePath());
+
+			int len;
+			while ((len = in.read(buffer)) > 0) {
+				o.write(buffer, 0, len);
+			}
+
+			in.close();
 			o.closeEntry();
+			
 			o.close();
+			fos.close();
 
 			return path;
 
 		} catch (IOException e) {
-			log.error("Error zipping archive: " + e.getMessage());
+			log.error("Error zipping archive (I): " + e.getMessage());
+		} catch (Exception e) {
+			log.error("Error zipping archive (II): " + e.getMessage());
 		}
 
 		return null;
 	}
-	
+
 	public static String removeAccents(String str) {
 
 		final String original = "ÁáÉéÍíÓóÚúÑñÜü";
