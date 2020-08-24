@@ -10,7 +10,7 @@ VOLUME /tmp
 
 ADD ./build/libs/st-microservice-ili-0.0.1-SNAPSHOT.jar st-microservice-ili.jar
 
-RUN apt-get update && apt-get install -y openjdk-13-jdk
+RUN apt-get update && apt-get install -y openjdk-11-jdk
 
 EXPOSE 8080
 
