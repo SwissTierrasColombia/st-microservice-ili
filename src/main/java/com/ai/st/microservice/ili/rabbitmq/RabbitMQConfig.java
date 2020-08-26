@@ -17,15 +17,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-	@Value("${st.rabbitmq.queueIntegrations.queue}")
-	public String queueIntegrationsName;
-
-	@Value("${st.rabbitmq.queueIntegrations.exchange}")
-	public String exchangeIntegrationsName;
-
-	@Value("${st.rabbitmq.queueIntegrations.routingkey}")
-	public String routingkeyIntegrationsName;
-
 	@Value("${st.rabbitmq.queueUpdateIntegration.queue}")
 	public String queueUpdateIntegrationsName;
 
@@ -35,15 +26,6 @@ public class RabbitMQConfig {
 	@Value("${st.rabbitmq.queueUpdateIntegration.routingkey}")
 	public String routingkeyUpdateIntegrationsName;
 
-	@Value("${st.rabbitmq.queueExports.queue}")
-	public String queueExportsName;
-
-	@Value("${st.rabbitmq.queueExports.exchange}")
-	public String exchangeExportsName;
-
-	@Value("${st.rabbitmq.queueExports.routingkey}")
-	public String routingkeyExportsName;
-
 	@Value("${st.rabbitmq.queueUpdateExport.queue}")
 	public String queueUpdateExportName;
 
@@ -52,15 +34,6 @@ public class RabbitMQConfig {
 
 	@Value("${st.rabbitmq.queueUpdateExport.routingkey}")
 	public String routingkeyUpdateExportName;
-
-	@Value("${st.rabbitmq.queueIlivalidator.queue}")
-	public String queueIlivalidatorName;
-
-	@Value("${st.rabbitmq.queueIlivalidator.exchange}")
-	public String exchangeIlivalidatorName;
-
-	@Value("${st.rabbitmq.queueIlivalidator.routingkey}")
-	public String routingkeyIlivalidatorName;
 
 	@Value("${st.rabbitmq.queueUpdateStateSupply.queue}")
 	public String queueUpdateStateSupplyName;
@@ -98,23 +71,6 @@ public class RabbitMQConfig {
 	@Value("${st.rabbitmq.queueResultExport.routingkey}")
 	public String routingkeyResultExportName;
 
-	// queue integrations
-
-	@Bean
-	public Queue queueIntegrations() {
-		return new Queue(queueIntegrationsName, false);
-	}
-
-	@Bean
-	public DirectExchange exchangeIntegrations() {
-		return new DirectExchange(exchangeIntegrationsName);
-	}
-
-	@Bean
-	public Binding bindingQueueIntegrations() {
-		return BindingBuilder.bind(queueIntegrations()).to(exchangeIntegrations()).with(routingkeyIntegrationsName);
-	}
-
 	// queue update integrations
 
 	@Bean
@@ -133,23 +89,6 @@ public class RabbitMQConfig {
 				.with(routingkeyUpdateIntegrationsName);
 	}
 
-	// queue exports
-
-	@Bean
-	public Queue queueExports() {
-		return new Queue(queueExportsName, false);
-	}
-
-	@Bean
-	public DirectExchange exchangeExports() {
-		return new DirectExchange(exchangeExportsName);
-	}
-
-	@Bean
-	public Binding bindingQueueExports() {
-		return BindingBuilder.bind(queueExports()).to(exchangeExports()).with(routingkeyExportsName);
-	}
-
 	// queue update exports
 
 	@Bean
@@ -165,23 +104,6 @@ public class RabbitMQConfig {
 	@Bean
 	public Binding bindingQueueUpdateExports() {
 		return BindingBuilder.bind(queueUpdateExports()).to(exchangeUpdateExports()).with(routingkeyUpdateExportName);
-	}
-
-	// queue ilivalidator
-
-	@Bean
-	public Queue queueIlivalidator() {
-		return new Queue(queueIlivalidatorName, false);
-	}
-
-	@Bean
-	public DirectExchange exchangeIlivalidator() {
-		return new DirectExchange(exchangeIlivalidatorName);
-	}
-
-	@Bean
-	public Binding bindingQueueIlivalidator() {
-		return BindingBuilder.bind(queueIlivalidator()).to(exchangeIlivalidator()).with(routingkeyIlivalidatorName);
 	}
 
 	// queue update state supply

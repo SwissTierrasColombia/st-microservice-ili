@@ -34,26 +34,20 @@ import net.bytebuddy.utility.RandomString;
 @Component
 public class Ili2JsonBusiness {
 
-	@Value("${iliProcesses.uploadedFiles}")
-	private String uploadedFiles;
-
-	@Value("${iliProcesses.downloadedFiles}")
-	private String downloadedFiles;
-
-	@Value("${iliProcesses.iliDirectoryPlugins}")
-	private String iliDirectoryPlugins;
-
 	@Value("${iliProcesses.ogrPath}")
 	private String ogrPath;
-
-	@Value("${iliProcesses.temporalDirectoryPrefix}")
-	private String temporalDirectoryPrefix;
+	
+	@Value("${st.temporalDirectory}")
+	private String stTemporalDirectory;
 	
 	@Autowired
 	private VersionBusiness versionBusiness;
 	
 	public String ili2Json(MultipartFile[] uploadfiles, MultipartFile[] iliFiles, String realIliDirectory) throws IOException {
-		Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+		
+		String nameDirectory = "ili_process_" + RandomStringUtils.random(7, false, true);
+		Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
+		
 		return ili2Json(multipartFileTArray(uploadfiles, tmpDirectory), multipartFileTArray(iliFiles, tmpDirectory),
 				tmpDirectory, realIliDirectory);
 	}
@@ -73,7 +67,7 @@ public class Ili2JsonBusiness {
 			throws IOException {
 
 		Ili2JsonService ili2json = new Ili2JsonService();
-		ili2json.setEnv(uploadedFiles, downloadedFiles, realIliDirectory, iliDirectoryPlugins, ogrPath);
+		ili2json.setEnv(stTemporalDirectory, stTemporalDirectory, realIliDirectory, "", ogrPath);
 
 		// Create temporal directory
 
@@ -165,14 +159,15 @@ public class Ili2JsonBusiness {
 	}
 
 	public ArrayList<String> shp2Json(MultipartFile[] uploadfiles) throws IOException {
-		Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+		String nameDirectory = "ili_process_" + RandomStringUtils.random(7, false, true);
+		Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 		return shp2Json(multipartFileTArray(uploadfiles, tmpDirectory), tmpDirectory);
 	}
 
 	public ArrayList<String> shp2Json(ArrayList<File> uploadfiles, Path tmpDirectory) throws IOException {
 		ArrayList<String> resp = new ArrayList<>();
 		Ili2JsonService ili2json = new Ili2JsonService();
-		ili2json.setEnv(uploadedFiles, downloadedFiles, "", iliDirectoryPlugins, ogrPath);
+		ili2json.setEnv(stTemporalDirectory, stTemporalDirectory, "", "", ogrPath);
 		for (File uploadfile : uploadfiles) {
 			resp.add(ili2json.shp2json(uploadfile));
 		}
@@ -180,14 +175,15 @@ public class Ili2JsonBusiness {
 	}
 
 	public ArrayList<String> gpkg2Json(MultipartFile[] uploadfiles) throws IOException {
-		Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+		String nameDirectory = "ili_process_" + RandomStringUtils.random(7, false, true);
+		Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 		return gpkg2Json(multipartFileTArray(uploadfiles, tmpDirectory), tmpDirectory);
 	}
 
 	public ArrayList<String> gpkg2Json(ArrayList<File> uploadfiles, Path tmpDirectory) throws IOException {
 		ArrayList<String> resp = new ArrayList<>();
 		Ili2JsonService ili2json = new Ili2JsonService();
-		ili2json.setEnv(uploadedFiles, downloadedFiles, "", iliDirectoryPlugins, ogrPath);
+		ili2json.setEnv(stTemporalDirectory, stTemporalDirectory, "", "", ogrPath);
 		for (File uploadfile : uploadfiles) {
 			resp.add(ili2json.gpkg2json(uploadfile));
 		}
@@ -195,14 +191,15 @@ public class Ili2JsonBusiness {
 	}
 
 	public ArrayList<String> kml2Json(MultipartFile[] uploadfiles) throws IOException {
-		Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+		String nameDirectory = "ili_process_" + RandomStringUtils.random(7, false, true);
+		Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 		return kml2Json(multipartFileTArray(uploadfiles, tmpDirectory), tmpDirectory);
 	}
 
 	public ArrayList<String> kml2Json(ArrayList<File> uploadfiles, Path tmpDirectory) throws IOException {
 		ArrayList<String> resp = new ArrayList<>();
 		Ili2JsonService ili2json = new Ili2JsonService();
-		ili2json.setEnv(uploadedFiles, downloadedFiles, "", iliDirectoryPlugins, ogrPath);
+		ili2json.setEnv(stTemporalDirectory, stTemporalDirectory, "", "", ogrPath);
 		for (File uploadfile : uploadfiles) {
 			resp.add(ili2json.kml2json(uploadfile));
 		}

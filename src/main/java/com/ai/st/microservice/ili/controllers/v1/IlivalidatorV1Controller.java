@@ -3,7 +3,6 @@ package com.ai.st.microservice.ili.controllers.v1;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
+import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.ai.st.microservice.ili.business.ConceptBusiness;
 import com.ai.st.microservice.ili.business.Ili2JsonBusiness;
@@ -64,15 +62,6 @@ public class IlivalidatorV1Controller {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@Value("${iliProcesses.uploadedFiles}")
-	private String uploadedFiles;
-
-	@Value("${iliProcesses.downloadedFiles}")
-	private String downloadedFiles;
-
-	@Value("${iliProcesses.temporalDirectoryPrefix}")
-	private String temporalDirectoryPrefix;
-
 	@Autowired
 	private RabbitMQSenderService rabbitSenderService;
 
@@ -81,6 +70,9 @@ public class IlivalidatorV1Controller {
 
 	@Autowired
 	private Ili2JsonBusiness ili2jsonBusiness;
+	
+	@Value("${st.temporalDirectory}")
+	private String stTemporalDirectory;
 
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -115,9 +107,9 @@ public class IlivalidatorV1Controller {
 				throw new InputValidationException(
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
-
-			String tmpDirectoryPrefix = temporalDirectoryPrefix;
-			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+			
+			String nameDirectory = "ili_process_validation_" + RandomStringUtils.random(7, false, true);
+			Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 
 			// Upload model files
 			for (MultipartFile iliFile : iliFiles) {
