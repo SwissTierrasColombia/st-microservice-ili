@@ -55,14 +55,11 @@ public class RabbitMQIliListerner {
 	@Autowired
 	private VersionBusiness versionBusiness;
 
-	@Value("${iliProcesses.temporalDirectoryPrefix}")
-	private String temporalDirectoryPrefix;
-
-	@Value("${iliProcesses.uploadedFiles}")
-	private String uploadedFiles;
-
 	@Value("${st.filesDirectory}")
 	private String stFilesDirectory;
+
+	@Value("${st.temporalDirectory}")
+	private String stTemporalDirectory;
 
 	@Value("${iliProcesses.srs}")
 	private String srsDefault;
@@ -112,16 +109,13 @@ public class RabbitMQIliListerner {
 
 				String pathFileXTF = "";
 
-				File unzipFile = null;
+				String nameDirectory = "ili_process_validation_" + RandomStringUtils.random(7, false, true);
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 
 				if (fileExtension.equalsIgnoreCase("zip")) {
 
-					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
-
 					List<String> paths = zipService.unzip(data.getPathFile(), new File(tmpDirectory.toString()));
 					pathFileXTF = tmpDirectory.toString() + File.separator + paths.get(0);
-
-					unzipFile = tmpDirectory.toFile();
 
 				} else if (fileExtension.equalsIgnoreCase("xtf")) {
 					pathFileXTF = data.getPathFile();
@@ -130,8 +124,6 @@ public class RabbitMQIliListerner {
 				if (pathFileXTF.isEmpty()) {
 					log.error("there is not file xtf.");
 				} else {
-
-					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
 
 					String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
 					String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
@@ -142,9 +134,6 @@ public class RabbitMQIliListerner {
 
 					try {
 						FileUtils.deleteDirectory(tmpDirectory.toFile());
-						if (unzipFile != null) {
-							FileUtils.deleteDirectory(unzipFile);
-						}
 					} catch (Exception e) {
 						log.error("It has not been possible delete the directory: " + e.getMessage());
 					}
@@ -180,7 +169,8 @@ public class RabbitMQIliListerner {
 					ConceptBusiness.CONCEPT_INTEGRATION);
 			if (versionData instanceof VersionDataDto) {
 
-				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+				String nameDirectory = "ili_process_import_" + RandomStringUtils.random(7, false, true);
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 
 				List<String> pathsCadastre = zipService.unzip(data.getCadastrePathXTF(),
 						new File(tmpDirectory.toString()));
@@ -245,7 +235,8 @@ public class RabbitMQIliListerner {
 							data.getDatabaseSchema(), data.getVersionModel());
 				}
 
-				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+				String nameDirectory = "ili_process_export_" + RandomStringUtils.random(7, false, true);
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 
 				String logExport = Paths.get(tmpDirectory.toString(), "export.log").toString();
 
@@ -266,6 +257,13 @@ public class RabbitMQIliListerner {
 					String urlZipFile = ZipService.zipping(new File(data.getPathFileXTF()), zipName, fileName, urlBase);
 					resultDto.setPathFile(urlZipFile);
 					log.info("export file zipped");
+					
+					try {
+						FileUtils.deleteQuietly(new File(data.getPathFileXTF()));
+					} catch (Exception e) {
+						log.error("It has not been possible delete the file exported: " + e.getMessage());
+					}
+					
 				} else {
 					resultDto.setPathFile(null);
 				}
@@ -313,16 +311,14 @@ public class RabbitMQIliListerner {
 				String fileExtension = FilenameUtils.getExtension(fileName);
 
 				String pathFileXTF = "";
-				File unzipFile = null;
+				
+				String nameDirectory = "ili_process_import_" + RandomStringUtils.random(7, false, true);
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 
 				if (fileExtension.equalsIgnoreCase("zip")) {
 
-					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
-
 					List<String> paths = zipService.unzip(data.getPathXTF(), new File(tmpDirectory.toString()));
 					pathFileXTF = tmpDirectory.toString() + File.separator + paths.get(0);
-
-					unzipFile = tmpDirectory.toFile();
 
 				} else if (fileExtension.equalsIgnoreCase("xtf")) {
 					pathFileXTF = data.getPathXTF();
@@ -331,8 +327,6 @@ public class RabbitMQIliListerner {
 				if (pathFileXTF.isEmpty()) {
 					log.error("No existe archivo xtf para realizar el proceso.");
 				} else {
-
-					Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
 
 					String logFileSchemaImport = tmpDirectory.toString() + File.separator + "schema_import.log";
 					String logFileImport = tmpDirectory.toString() + File.separator + "import.log";
@@ -344,9 +338,6 @@ public class RabbitMQIliListerner {
 
 					try {
 						FileUtils.deleteDirectory(tmpDirectory.toFile());
-						if (unzipFile != null) {
-							FileUtils.deleteDirectory(unzipFile);
-						}
 					} catch (Exception e) {
 						log.error("It has not been possible delete the directory: " + e.getMessage());
 					}
@@ -383,7 +374,8 @@ public class RabbitMQIliListerner {
 			VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(), data.getConceptId());
 			if (versionData instanceof VersionDataDto) {
 
-				Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), temporalDirectoryPrefix);
+				String nameDirectory = "ili_process_export_" + RandomStringUtils.random(7, false, true);
+				Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 				String logExport = Paths.get(tmpDirectory.toString(), "export.log").toString();
 
 				Boolean result = ili2pgService.exportToXtf(data.getPathFileXTF(), logExport, versionData.getUrl(),
@@ -403,6 +395,13 @@ public class RabbitMQIliListerner {
 					String urlZipFile = ZipService.zipping(new File(data.getPathFileXTF()), zipName, fileName, urlBase);
 					resultExportDto.setPathFile(urlZipFile);
 					log.info("export file zipped");
+					
+					try {
+						FileUtils.deleteDirectory(new File(data.getPathFileXTF()));
+					} catch (Exception e) {
+						log.error("It has not been possible delete the file exported: " + e.getMessage());
+					}
+					
 				} else {
 					resultExportDto.setPathFile(null);
 				}
@@ -412,7 +411,7 @@ public class RabbitMQIliListerner {
 				log.info("Export reference finished with result: " + result);
 
 				try {
-					FileUtils.deleteDirectory(tmpDirectory.toFile());
+					FileUtils.deleteQuietly(new File(data.getPathFileXTF()));
 				} catch (Exception e) {
 					log.error("It has not been possible delete the directory: " + e.getMessage());
 				}

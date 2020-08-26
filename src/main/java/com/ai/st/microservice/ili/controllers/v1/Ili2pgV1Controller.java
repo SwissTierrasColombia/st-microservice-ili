@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Api(value = "Ili2pg", description = "Import and export file XTF to databases posgresql", tags = { "ili2pg" })
+@Api(value = "Ili2pg", tags = { "ili2pg" })
 @RestController
 @RequestMapping("api/ili/ili2pg/v1")
 public class Ili2pgV1Controller {
@@ -58,11 +59,8 @@ public class Ili2pgV1Controller {
 	@Autowired
 	private VersionBusiness versionBusiness;
 
-	@Value("${iliProcesses.temporalDirectoryPrefix}")
-	private String temporalDirectoryPrefix;
-
-	@Value("${iliProcesses.uploadedFiles}")
-	private String uploadedFiles;
+	@Value("${st.temporalDirectory}")
+	private String stTemporalDirectory;
 
 	@Value("${iliProcesses.srs}")
 	private String srsDefault;
@@ -125,8 +123,8 @@ public class Ili2pgV1Controller {
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
 
-			String tmpDirectoryPrefix = temporalDirectoryPrefix;
-			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+			String nameDirectory = "ili_process_" + RandomStringUtils.random(7, false, true);
+			Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 
 			String logFileSchemaImport = tmpDirectory.toString() + File.separator + "schema_import.log";
 
@@ -220,8 +218,8 @@ public class Ili2pgV1Controller {
 
 			MultipartFile uploadFile = ili2pgImportDto.getFileXTF();
 
-			String tmpDirectoryPrefix = temporalDirectoryPrefix;
-			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+			String nameDirectory = "ili_process_" + RandomStringUtils.random(7, false, true);
+			Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 
 			String filename = uploadFile.getOriginalFilename();
 			String filepath = Paths.get(tmpDirectory.toString(), filename).toString();
@@ -315,8 +313,8 @@ public class Ili2pgV1Controller {
 				throw new InputValidationException("El puerto de base de datos es requerido.");
 			}
 
-			String tmpDirectoryPrefix = temporalDirectoryPrefix;
-			Path tmpDirectory = Files.createTempDirectory(Paths.get(uploadedFiles), tmpDirectoryPrefix);
+			String nameDirectory = "ili_process_" + RandomStringUtils.random(7, false, true);
+			Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
 
 			// upload cadastre file
 			MultipartFile uploadFileCadastre = requestIntegrationDto.getCadastreFileXTF();
