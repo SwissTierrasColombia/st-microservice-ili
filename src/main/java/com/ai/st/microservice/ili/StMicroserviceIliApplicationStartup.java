@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,9 @@ import com.ai.st.microservice.ili.services.IVersionService;
 public class StMicroserviceIliApplicationStartup implements ApplicationListener<ContextRefreshedEvent> {
 
 	private static final Logger log = LoggerFactory.getLogger(StMicroserviceIliApplicationStartup.class);
+
+	@Value("${iliProcesses.modelsDirectory}")
+	private String modelsDirectory;
 
 	@Autowired
 	private IVersionService versionService;
@@ -190,7 +194,7 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 				versionService.createVersion(version30);
 
 				VersionConceptEntity versionConceptOperation30 = new VersionConceptEntity();
-				versionConceptOperation30.setUrl("/opt/storage-microservice-ili/ladm-col/models/3.0");
+				versionConceptOperation30.setUrl(modelsDirectory + "3.0");
 				versionConceptOperation30.setVersion(version30);
 				versionConceptOperation30.setConcept(conceptOperator);
 
@@ -212,7 +216,7 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 				versionConceptService.createVersionConcept(versionConceptOperation30);
 
 				VersionConceptEntity versionConceptIntegration30 = new VersionConceptEntity();
-				versionConceptIntegration30.setUrl("/opt/storage-microservice-ili/ladm-col/models/3.0");
+				versionConceptIntegration30.setUrl(modelsDirectory + "3.0");
 				versionConceptIntegration30.setVersion(version30);
 				versionConceptIntegration30.setConcept(conceptIntegration);
 
