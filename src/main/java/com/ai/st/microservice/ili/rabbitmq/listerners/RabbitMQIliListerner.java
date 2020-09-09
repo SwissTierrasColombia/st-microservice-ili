@@ -397,7 +397,7 @@ public class RabbitMQIliListerner {
 					log.info("export file zipped");
 					
 					try {
-						FileUtils.deleteDirectory(new File(data.getPathFileXTF()));
+						FileUtils.deleteQuietly(new File(data.getPathFileXTF()));
 					} catch (Exception e) {
 						log.error("It has not been possible delete the file exported: " + e.getMessage());
 					}

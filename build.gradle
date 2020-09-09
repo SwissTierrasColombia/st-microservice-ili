@@ -53,7 +53,7 @@ dependencies {
 	implementation group: 'commons-io', name: 'commons-io', version: '2.5'
 	
 	implementation group: 'ch.interlis', name: 'ilivalidator', version: '1.11.1'
-	implementation group: 'ch.interlis', name: 'ili2pg', version: '4.3.2'
+	implementation group: 'ch.interlis', name: 'ili2pg', version: '4.4.4-SNAPSHOT'
 	implementation group: 'ch.interlis', name: 'iox-ili', version: '1.20.14'
   	implementation group: 'ch.interlis', name: 'ili2c-tool', version: '5.0.2'
   	implementation group: 'ch.interlis', name: 'ili2c-core', version: '5.0.2'
