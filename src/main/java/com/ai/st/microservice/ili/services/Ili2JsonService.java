@@ -134,7 +134,7 @@ public class Ili2JsonService {
 	public ArrayList getIliModels(String pathXTF) {
 
 		ArrayList listIliFiles = new ArrayList();
-		EhiLogger.getInstance().setTraceFilter(false);
+		/*EhiLogger.getInstance().setTraceFilter(false);
 		IliManager m = new IliManager();
 
 		// get models and repositories
@@ -144,7 +144,7 @@ public class Ili2JsonService {
 		// Set repositories
 		// m.setRepositories(new String[]{ILI_DIR,
 		// "https://repositorio.proadmintierra.info/"});
-		m.setRepositories(requiredRepositories);
+		//m.setRepositories(requiredRepositories);
 
 		try {
 			Configuration config = m.getConfig(requiredModels, 0.0);
@@ -162,7 +162,7 @@ public class Ili2JsonService {
 			}
 		} catch (Ili2cException e) {
 			EhiLogger.logError(e);
-		}
+		}*/
 
 		return listIliFiles;
 	}
