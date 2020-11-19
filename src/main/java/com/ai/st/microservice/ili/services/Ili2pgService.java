@@ -73,6 +73,7 @@ public class Ili2pgService {
 			config.setDefaultSrsCode(srsCode); // --defaultSrsCode
 			config.setModels(models); // --models
 			config.setLogfile(logFileSchemaImport); // --log
+			config.setPreScript(getClass().getResource("/ctm12/insert_ctm12_pg.sql").getPath());
 
 			config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
 			config.setDbschema(databaseSchema);
@@ -167,10 +168,30 @@ public class Ili2pgService {
 			String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
 			connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
 
+			String pairingTypeId = null;
+			try {
+
+				QueryEntity queryGetPairingTypeIntegrationEntity = versionConcept.getQuerys().stream().filter(
+						q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION))
+						.findAny().orElse(null);
+				String sqlObjects = queryGetPairingTypeIntegrationEntity.getQuery()
+						.replace("{pairingTypeCode}", String.valueOf(4)).replace("{dbschema}", databaseSchema);
+
+				ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
+
+				while (resultsetObjects.next()) {
+					pairingTypeId = resultsetObjects.getString("t_id");
+				}
+
+			} catch (SQLException e) {
+				log.error("Error getting pairing type: " + e.getMessage());
+				pairingTypeId = null;
+			}
+
+			log.info("EMPAREJAMIENTO: " + pairingTypeId);
+
 			String sqlObjects = queryMatchIntegrationEntity.getQuery().replace("{dbschema}", databaseSchema);
-
 			ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
-
 			try {
 
 				while (resultsetObjects.next()) {
@@ -183,7 +204,7 @@ public class Ili2pgService {
 							.findAny().orElse(null);
 
 					String sqlInsert = queryInsertEntity.getQuery().replace("{dbschema}", databaseSchema)
-							.replace("{cadastre}", gc).replace("{snr}", snr);
+							.replace("{cadastre}", gc).replace("{snr}", snr).replace("{pairingType}", pairingTypeId);
 
 					connection.insert(sqlInsert);
 

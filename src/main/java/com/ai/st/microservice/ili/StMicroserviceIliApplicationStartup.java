@@ -138,6 +138,11 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 				typeUpdateToRevision.setName("UPDATE EN TABLA EXTARCHIVO");
 				queryTypeService.createQueryType(typeUpdateToRevision);
 
+				QueryTypeEntity typeGetPairingTypeIntegration = new QueryTypeEntity();
+				typeGetPairingTypeIntegration.setId(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION);
+				typeGetPairingTypeIntegration.setName("OBTENER EL TIPO DE EMPAREJAMIENTO POR ITFCODE");
+				queryTypeService.createQueryType(typeGetPairingTypeIntegration);
+
 				log.info("The domains 'queries types' have been loaded!");
 			} catch (Exception e) {
 				log.error("Failed to load 'queries types' domains");
@@ -183,6 +188,9 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 
 				QueryTypeEntity queryUpdateToRevision = queryTypeService
 						.getQueryTypeById(QueryTypeBusiness.QUERY_TYPE_UPDATE_EXTARCHIVO_REVISION);
+
+				QueryTypeEntity typeGetPairingTypeIntegration = queryTypeService
+						.getQueryTypeById(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION);
 
 				ConceptEntity conceptOperator = conceptService.getConceptById(ConceptBusiness.CONCEPT_OPERATION);
 				ConceptEntity conceptIntegration = conceptService.getConceptById(ConceptBusiness.CONCEPT_INTEGRATION);
@@ -235,7 +243,7 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 								+ "join {dbschema}.gc_prediocatastro as gc on snr_p.numero_predial_nuevo_en_fmi=gc.numero_predial_anterior "
 								+ "and ltrim(snr_p.matricula_inmobiliaria,'0')=trim(gc.matricula_inmobiliaria_catastro) and snr_p.codigo_orip = gc.circulo_registral"));
 				querys30.add(new QueryEntity(versionConceptIntegration30, queryInsertIntegration,
-						"insert into {dbschema}.ini_predioinsumos (gc_predio_catastro, snr_predio_juridico) values ( {cadastre}, {snr})"));
+						"insert into {dbschema}.ini_predioinsumos (gc_predio_catastro, snr_predio_juridico, tipo_emparejamiento) values ( {cadastre}, {snr}, {pairingType})"));
 				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountSnr,
 						"select count(*) from {dbschema}.snr_predioregistro"));
 				querys30.add(new QueryEntity(versionConceptIntegration30, queryCountCadastre,
@@ -269,6 +277,8 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 						"UPDATE {dbschema}.extarchivo "
 								+ "SET datos='{url}', fecha_entrega=now(), espacio_de_nombres='{namespace}', local_id={entityId} "
 								+ "WHERE snr_fuentecabidalndros_archivo = {boundaryId}"));
+				querys30.add(new QueryEntity(versionConceptIntegration30, typeGetPairingTypeIntegration,
+						"select * from {dbschema}.ini_emparejamientotipo where itfcode = {pairingTypeCode}"));
 
 				versionConceptIntegration30.setQuerys(querys30);
 
