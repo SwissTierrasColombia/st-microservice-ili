@@ -1,5 +1,11 @@
 package com.ai.st.microservice.ili.services;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -73,7 +79,44 @@ public class Ili2pgService {
 			config.setDefaultSrsCode(srsCode); // --defaultSrsCode
 			config.setModels(models); // --models
 			config.setLogfile(logFileSchemaImport); // --log
-			config.setPreScript(getClass().getResource("/ctm12/insert_ctm12_pg.sql").getPath());
+
+			try {
+				final Path path = Files.createTempFile("myTempFile", ".sql");
+				System.out.println("Temp file : " + path);
+				
+				String dataFile = "INSERT into spatial_ref_sys (\r\n" + 
+						"  srid, auth_name, auth_srid, proj4text, srtext\r\n" + 
+						")\r\n" + 
+						"values\r\n" + 
+						"  (\r\n" + 
+						"    9377,\r\n" + 
+						"    'EPSG',\r\n" + 
+						"    9377,\r\n" + 
+						"    '+proj=tmerc +lat_0=4.0 +lon_0=-73.0 +k=0.9992 +x_0=5000000 +y_0=2000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',\r\n" + 
+						"    'PROJCRS[\"MAGNA-SIRGAS / Origen-Nacional\", BASEGEOGCRS[\"MAGNA-SIRGAS\", DATUM[\"Marco Geocentrico Nacional de Referencia\", ELLIPSOID[\"GRS 1980\",6378137,298.257222101, LENGTHUNIT[\"metre\",1]]], PRIMEM[\"Greenwich\",0, ANGLEUNIT[\"degree\",0.0174532925199433]], ID[\"EPSG\",4686]], CONVERSION[\"Colombia Transverse Mercator\", METHOD[\"Transverse Mercator\", ID[\"EPSG\",9807]], PARAMETER[\"Latitude of natural origin\",4, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8801]], PARAMETER[\"Longitude of natural origin\",-73, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8802]], PARAMETER[\"Scale factor at natural origin\",0.9992, SCALEUNIT[\"unity\",1], ID[\"EPSG\",8805]], PARAMETER[\"False easting\",5000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8806]], PARAMETER[\"False northing\",2000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8807]]], CS[Cartesian,2], AXIS[\"northing (N)\",north, ORDER[1], LENGTHUNIT[\"metre\",1]], AXIS[\"easting (E)\",east, ORDER[2], LENGTHUNIT[\"metre\",1]], USAGE[ SCOPE[\"unknown\"], AREA[\"Colombia\"], BBOX[-4.23,-84.77,15.51,-66.87]], ID[\"EPSG\",9377]]'\r\n" + 
+						"  ) ON CONFLICT (srid) DO NOTHING;";
+
+				// Writing data here
+				byte[] buf = dataFile.getBytes();
+				Files.write(path, buf);
+				
+				log.info("PATH" + path.toFile().getAbsolutePath());
+
+				// For appending to the existing file
+				// Files.write(path, buf, StandardOpenOption.APPEND);
+
+				// Delete file on exit
+				path.toFile().deleteOnExit();
+				
+				config.setPreScript(path.toFile().getAbsolutePath());
+
+			} catch (IOException e) {
+				log.error("ERROR 1 " + e.getMessage());
+			}
+			
+			
+
+			
 
 			config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
 			config.setDbschema(databaseSchema);
