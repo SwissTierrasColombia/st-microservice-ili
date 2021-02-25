@@ -28,337 +28,342 @@ import ch.ehi.ili2db.gui.Config;
 @Service
 public class Ili2pgService {
 
-	@Autowired
-	private IVersionService versionService;
-
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-	private static final String MODELS_INTERLIS_CH = "http://models.interlis.ch";
-
-	public Config getDefaultConfig() {
-
-		Config config = new Config();
-		new ch.ehi.ili2pg.PgMain().initConfig(config);
-
-		config.setCreateFk(Config.CREATE_FK_YES); // --createFk
-		config.setCatalogueRefTrafo(Config.CATALOGUE_REF_TRAFO_COALESCE); // --coalesceCatalogueRef
-		config.setMultiSurfaceTrafo(Config.MULTISURFACE_TRAFO_COALESCE); // --coalesceMultiSurface
-		config.setInheritanceTrafo(Config.INHERITANCE_TRAFO_SMART2); // --smart2Inheritance
-		config.setSetupPgExt(true); // --setupPgExt
-		config.setMultiLineTrafo(Config.MULTILINE_TRAFO_COALESCE); // --coalesceMultiLine
-		config.setCreateUniqueConstraints(true); // --createUnique
-		config.setBeautifyEnumDispName(Config.BEAUTIFY_ENUM_DISPNAME_UNDERSCORE); // --beautifyEnumDispName
-		config.setCreateFkIdx(Config.CREATE_FKIDX_YES); // --createFkIdx
-		config.setCreateEnumDefs(Config.CREATE_ENUM_DEFS_MULTI_WITH_ID); // --createEnumTabsWithId
-		config.setCreateNumChecks(true); // --createNumChecks
-		config.setValue(Config.CREATE_GEOM_INDEX, Config.TRUE); // --createGeomIdx
-		config.setCreateMetaInfo(true); // --createMetaInfo
-		Config.setStrokeArcs(config, Config.STROKE_ARCS_ENABLE); // --strokeArcs
-
-		// config.setTidHandling(Config.TID_HANDLING_PROPERTY); // --createTidCol
-		// config.setBasketHandling(Config.BASKET_HANDLING_READWRITE); //
-		// --createBasketCol
-		// config.setMultilingualTrafo(Config.MULTILINGUAL_TRAFO_EXPAND); //
-		// --expandMultilingual
-
-		return config;
-	}
-
-	public Boolean generateSchema(String logFileSchemaImport, String iliDirectory, String srsCode, String models,
-			String databaseHost, String databasePort, String databaseName, String databaseSchema,
-			String databaseUsername, String databasePassword) {
-
-		Boolean result = false;
-
-		try {
-
-			Config config = getDefaultConfig();
-
-			config.setFunction(Config.FC_SCHEMAIMPORT); // --schemaimport
-			config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
-			config.setDefaultSrsCode(srsCode); // --defaultSrsCode
-			config.setModels(models); // --models
-			config.setLogfile(logFileSchemaImport); // --log
-
-			try {
-				final Path path = Files.createTempFile("myTempFile", ".sql");
-				System.out.println("Temp file : " + path);
-				
-				String dataFile = "INSERT into spatial_ref_sys (\r\n" + 
-						"  srid, auth_name, auth_srid, proj4text, srtext\r\n" + 
-						")\r\n" + 
-						"values\r\n" + 
-						"  (\r\n" + 
-						"    9377,\r\n" + 
-						"    'EPSG',\r\n" + 
-						"    9377,\r\n" + 
-						"    '+proj=tmerc +lat_0=4.0 +lon_0=-73.0 +k=0.9992 +x_0=5000000 +y_0=2000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',\r\n" + 
-						"    'PROJCRS[\"MAGNA-SIRGAS / Origen-Nacional\", BASEGEOGCRS[\"MAGNA-SIRGAS\", DATUM[\"Marco Geocentrico Nacional de Referencia\", ELLIPSOID[\"GRS 1980\",6378137,298.257222101, LENGTHUNIT[\"metre\",1]]], PRIMEM[\"Greenwich\",0, ANGLEUNIT[\"degree\",0.0174532925199433]], ID[\"EPSG\",4686]], CONVERSION[\"Colombia Transverse Mercator\", METHOD[\"Transverse Mercator\", ID[\"EPSG\",9807]], PARAMETER[\"Latitude of natural origin\",4, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8801]], PARAMETER[\"Longitude of natural origin\",-73, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8802]], PARAMETER[\"Scale factor at natural origin\",0.9992, SCALEUNIT[\"unity\",1], ID[\"EPSG\",8805]], PARAMETER[\"False easting\",5000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8806]], PARAMETER[\"False northing\",2000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8807]]], CS[Cartesian,2], AXIS[\"northing (N)\",north, ORDER[1], LENGTHUNIT[\"metre\",1]], AXIS[\"easting (E)\",east, ORDER[2], LENGTHUNIT[\"metre\",1]], USAGE[ SCOPE[\"unknown\"], AREA[\"Colombia\"], BBOX[-4.23,-84.77,15.51,-66.87]], ID[\"EPSG\",9377]]'\r\n" + 
-						"  ) ON CONFLICT (srid) DO NOTHING;";
-
-				// Writing data here
-				byte[] buf = dataFile.getBytes();
-				Files.write(path, buf);
-				
-				log.info("PATH" + path.toFile().getAbsolutePath());
-
-				// For appending to the existing file
-				// Files.write(path, buf, StandardOpenOption.APPEND);
-
-				// Delete file on exit
-				path.toFile().deleteOnExit();
-				
-				config.setPreScript(path.toFile().getAbsolutePath());
-
-			} catch (IOException e) {
-				log.error("ERROR 1 " + e.getMessage());
-			}
-			
-			
-
-			
-
-			config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
-			config.setDbschema(databaseSchema);
-			config.setDbusr(databaseUsername);
-			config.setDbpwd(databasePassword);
-
-			Ili2db.readSettingsFromDb(config);
-			Ili2db.run(config, null);
-			result = true;
-		} catch (Exception e) {
-			log.error("ERROR generating schema: " + e.getMessage());
-			result = false;
-		}
-
-		return result;
-	}
+    @Autowired
+    private IVersionService versionService;
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    private static final String MODELS_INTERLIS_CH = "http://models.interlis.ch";
+
+    public Config getDefaultConfig() {
+
+        Config config = new Config();
+        new ch.ehi.ili2pg.PgMain().initConfig(config);
+
+        config.setCreateFk(Config.CREATE_FK_YES); // --createFk
+        config.setCatalogueRefTrafo(Config.CATALOGUE_REF_TRAFO_COALESCE); // --coalesceCatalogueRef
+        config.setMultiSurfaceTrafo(Config.MULTISURFACE_TRAFO_COALESCE); // --coalesceMultiSurface
+        config.setInheritanceTrafo(Config.INHERITANCE_TRAFO_SMART2); // --smart2Inheritance
+        config.setSetupPgExt(true); // --setupPgExt
+        config.setMultiLineTrafo(Config.MULTILINE_TRAFO_COALESCE); // --coalesceMultiLine
+        config.setCreateUniqueConstraints(true); // --createUnique
+        config.setBeautifyEnumDispName(Config.BEAUTIFY_ENUM_DISPNAME_UNDERSCORE); // --beautifyEnumDispName
+        config.setCreateFkIdx(Config.CREATE_FKIDX_YES); // --createFkIdx
+        config.setCreateEnumDefs(Config.CREATE_ENUM_DEFS_MULTI_WITH_ID); // --createEnumTabsWithId
+        config.setCreateNumChecks(true); // --createNumChecks
+        config.setValue(Config.CREATE_GEOM_INDEX, Config.TRUE); // --createGeomIdx
+        config.setCreateMetaInfo(true); // --createMetaInfo
+        Config.setStrokeArcs(config, Config.STROKE_ARCS_ENABLE); // --strokeArcs
+
+        // config.setTidHandling(Config.TID_HANDLING_PROPERTY); // --createTidCol
+        // config.setBasketHandling(Config.BASKET_HANDLING_READWRITE); //
+        // --createBasketCol
+        // config.setMultilingualTrafo(Config.MULTILINGUAL_TRAFO_EXPAND); //
+        // --expandMultilingual
+
+        return config;
+    }
+
+    public Boolean generateSchema(String logFileSchemaImport, String iliDirectory, String srsCode, String models,
+                                  String databaseHost, String databasePort, String databaseName, String databaseSchema,
+                                  String databaseUsername, String databasePassword) {
+
+        Boolean result = false;
+
+        try {
+
+            Config config = getDefaultConfig();
+
+            config.setFunction(Config.FC_SCHEMAIMPORT); // --schemaimport
+            config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
+            config.setDefaultSrsCode(srsCode); // --defaultSrsCode
+            config.setModels(models); // --models
+            config.setLogfile(logFileSchemaImport); // --log
+
+            try {
+                final Path path = Files.createTempFile("myTempFile", ".sql");
+                System.out.println("Temp file : " + path);
+
+                String dataFile = "INSERT into spatial_ref_sys (\r\n" +
+                        "  srid, auth_name, auth_srid, proj4text, srtext\r\n" +
+                        ")\r\n" +
+                        "values\r\n" +
+                        "  (\r\n" +
+                        "    9377,\r\n" +
+                        "    'EPSG',\r\n" +
+                        "    9377,\r\n" +
+                        "    '+proj=tmerc +lat_0=4.0 +lon_0=-73.0 +k=0.9992 +x_0=5000000 +y_0=2000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',\r\n" +
+                        "    'PROJCRS[\"MAGNA-SIRGAS / Origen-Nacional\", BASEGEOGCRS[\"MAGNA-SIRGAS\", DATUM[\"Marco Geocentrico Nacional de Referencia\", ELLIPSOID[\"GRS 1980\",6378137,298.257222101, LENGTHUNIT[\"metre\",1]]], PRIMEM[\"Greenwich\",0, ANGLEUNIT[\"degree\",0.0174532925199433]], ID[\"EPSG\",4686]], CONVERSION[\"Colombia Transverse Mercator\", METHOD[\"Transverse Mercator\", ID[\"EPSG\",9807]], PARAMETER[\"Latitude of natural origin\",4, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8801]], PARAMETER[\"Longitude of natural origin\",-73, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8802]], PARAMETER[\"Scale factor at natural origin\",0.9992, SCALEUNIT[\"unity\",1], ID[\"EPSG\",8805]], PARAMETER[\"False easting\",5000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8806]], PARAMETER[\"False northing\",2000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8807]]], CS[Cartesian,2], AXIS[\"northing (N)\",north, ORDER[1], LENGTHUNIT[\"metre\",1]], AXIS[\"easting (E)\",east, ORDER[2], LENGTHUNIT[\"metre\",1]], USAGE[ SCOPE[\"unknown\"], AREA[\"Colombia\"], BBOX[-4.23,-84.77,15.51,-66.87]], ID[\"EPSG\",9377]]'\r\n" +
+                        "  ) ON CONFLICT (srid) DO NOTHING;";
+
+                // Writing data here
+                byte[] buf = dataFile.getBytes();
+                Files.write(path, buf);
+
+                log.info("PATH" + path.toFile().getAbsolutePath());
+
+                // For appending to the existing file
+                // Files.write(path, buf, StandardOpenOption.APPEND);
 
-	public Boolean import2pg(String fileXTF, String logFileSchemaImport, String logFileImport, String iliDirectory,
-			String srsCode, String models, String databaseHost, String databasePort, String databaseName,
-			String databaseSchema, String databaseUsername, String databasePassword) {
+                // Delete file on exit
+                path.toFile().deleteOnExit();
 
-		Boolean result = false;
+                config.setPreScript(path.toFile().getAbsolutePath());
+
+            } catch (IOException e) {
+                log.error("ERROR 1 " + e.getMessage());
+            }
+
 
-		Boolean generateSchema = generateSchema(logFileSchemaImport, iliDirectory, srsCode, models, databaseHost,
-				databasePort, databaseName, databaseSchema, databaseUsername, databasePassword);
+            config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
+            config.setDbschema(databaseSchema);
+            config.setDbusr(databaseUsername);
+            config.setDbpwd(databasePassword);
 
-		if (generateSchema) {
+            Ili2db.readSettingsFromDb(config);
+            Ili2db.run(config, null);
+            result = true;
+        } catch (Exception e) {
+            log.error("ERROR generating schema: " + e.getMessage());
+            result = false;
+        }
 
-			try {
+        return result;
+    }
 
-				Config config = getDefaultConfig();
+    public Boolean import2pg(String fileXTF, String logFileSchemaImport, String logFileImport, String iliDirectory,
+                             String srsCode, String models, String databaseHost, String databasePort, String databaseName,
+                             String databaseSchema, String databaseUsername, String databasePassword) {
 
-				config.setFunction(Config.FC_IMPORT); // --schemaimport
-				config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
-				config.setDefaultSrsCode(srsCode); // --defaultSrsCode
-				config.setModels(models); // --models
-				config.setLogfile(logFileImport); // --log
-				config.setValidation(false);
-				config.setXtffile(fileXTF);
-				if (fileXTF != null && Ili2db.isItfFilename(fileXTF)) {
-					config.setItfTransferfile(true);
-				}
+        Boolean result = false;
 
-				config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
-				config.setDbschema(databaseSchema);
-				config.setDbusr(databaseUsername);
-				config.setDbpwd(databasePassword);
+        Boolean generateSchema = generateSchema(logFileSchemaImport, iliDirectory, srsCode, models, databaseHost,
+                databasePort, databaseName, databaseSchema, databaseUsername, databasePassword);
 
-				Ili2db.readSettingsFromDb(config);
-				Ili2db.run(config, null);
-				result = true;
-			} catch (Exception e) {
-				log.error(e.getMessage());
-				result = false;
-			}
-		}
+        if (generateSchema) {
 
-		return result;
-	}
+            try {
 
-	public IntegrationStatDto integration(String cadastreFileXTF, String cadastreLogFileSchemaImport,
-			String cadastreLogFileImport, String registrationFileXTF, String registrationLogFileSchemaImport,
-			String registrationLogFileImport, String iliDirectory, String srsCode, String models, String databaseHost,
-			String databasePort, String databaseName, String databaseSchema, String databaseUsername,
-			String databasePassword, String modelVersion) {
+                Config config = getDefaultConfig();
 
-		IntegrationStatDto integrationStat = new IntegrationStatDto();
+                config.setFunction(Config.FC_IMPORT); // --schemaimport
+                config.setModeldir(MODELS_INTERLIS_CH + ";" + iliDirectory); // -- modeldir
+                config.setDefaultSrsCode(srsCode); // --defaultSrsCode
+                config.setModels(models); // --models
+                config.setLogfile(logFileImport); // --log
+                config.setValidation(false);
+                config.setXtffile(fileXTF);
+                if (fileXTF != null && Ili2db.isItfFilename(fileXTF)) {
+                    config.setItfTransferfile(true);
+                }
 
-		// load cadastral information
-		Boolean loadCadastral = this.import2pg(cadastreFileXTF, cadastreLogFileSchemaImport, cadastreLogFileImport,
-				iliDirectory, srsCode, models, databaseHost, databasePort, databaseName, databaseSchema,
-				databaseUsername, databasePassword);
+                config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
+                config.setDbschema(databaseSchema);
+                config.setDbusr(databaseUsername);
+                config.setDbpwd(databasePassword);
 
-		// load registration information
-		Boolean loadRegistration = this.import2pg(registrationFileXTF, registrationLogFileSchemaImport,
-				registrationLogFileImport, iliDirectory, srsCode, models, databaseHost, databasePort, databaseName,
-				databaseSchema, databaseUsername, databasePassword);
+                Ili2db.readSettingsFromDb(config);
+                Ili2db.run(config, null);
+                result = true;
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                result = false;
+            }
+        }
 
-		VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
+        return result;
+    }
 
-		if (loadCadastral && loadRegistration && versionEntity instanceof VersionEntity) {
+    public IntegrationStatDto integration(String cadastreFileXTF, String cadastreLogFileSchemaImport,
+                                          String cadastreLogFileImport, String registrationFileXTF, String registrationLogFileSchemaImport,
+                                          String registrationLogFileImport, String iliDirectory, String srsCode, String models, String databaseHost,
+                                          String databasePort, String databaseName, String databaseSchema, String databaseUsername,
+                                          String databasePassword, String modelVersion) {
 
-			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
-					.filter(vC -> vC.getConcept().getId().equals(ConceptBusiness.CONCEPT_INTEGRATION)).findAny()
-					.orElse(null);
+        IntegrationStatDto integrationStat = new IntegrationStatDto();
 
-			QueryEntity queryMatchIntegrationEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_MATCH_INTEGRATION))
-					.findAny().orElse(null);
+        // load cadastral information
+        Boolean loadCadastral = this.import2pg(cadastreFileXTF, cadastreLogFileSchemaImport, cadastreLogFileImport,
+                iliDirectory, srsCode, models, databaseHost, databasePort, databaseName, databaseSchema,
+                databaseUsername, databasePassword);
 
-			PostgresDriver connection = new PostgresDriver();
-			String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
-			connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
+        log.info("Se han importado los datos de Catastro ...");
 
-			String pairingTypeId = null;
-			try {
+        // load registration information
+        Boolean loadRegistration = this.import2pg(registrationFileXTF, registrationLogFileSchemaImport,
+                registrationLogFileImport, iliDirectory, srsCode, models, databaseHost, databasePort, databaseName,
+                databaseSchema, databaseUsername, databasePassword);
 
-				QueryEntity queryGetPairingTypeIntegrationEntity = versionConcept.getQuerys().stream().filter(
-						q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION))
-						.findAny().orElse(null);
-				String sqlObjects = queryGetPairingTypeIntegrationEntity.getQuery()
-						.replace("{pairingTypeCode}", String.valueOf(4)).replace("{dbschema}", databaseSchema);
+        log.info("Se han importado los datos de Registro ...");
 
-				ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
+        VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
 
-				while (resultsetObjects.next()) {
-					pairingTypeId = resultsetObjects.getString("t_id");
-				}
+        log.info("Se han importado los datos de Catastro y Registro ...");
 
-			} catch (SQLException e) {
-				log.error("Error getting pairing type: " + e.getMessage());
-				pairingTypeId = null;
-			}
+        if (loadCadastral && loadRegistration && versionEntity != null) {
 
-			log.info("EMPAREJAMIENTO: " + pairingTypeId);
+            VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
+                    .filter(vC -> vC.getConcept().getId().equals(ConceptBusiness.CONCEPT_INTEGRATION)).findAny()
+                    .orElse(null);
 
-			String sqlObjects = queryMatchIntegrationEntity.getQuery().replace("{dbschema}", databaseSchema);
-			ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
-			try {
+            QueryEntity queryMatchIntegrationEntity = versionConcept.getQuerys().stream()
+                    .filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_MATCH_INTEGRATION))
+                    .findAny().orElse(null);
 
-				while (resultsetObjects.next()) {
+            PostgresDriver connection = new PostgresDriver();
+            String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
+            connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
 
-					String snr = resultsetObjects.getString("snr_predio_juridico");
-					String gc = resultsetObjects.getString("gc_predio_catastro");
+            log.info("Conexión establecida para iniciar integración catastro-registro ...");
 
-					QueryEntity queryInsertEntity = versionConcept.getQuerys().stream().filter(
-							q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
-							.findAny().orElse(null);
+            String pairingTypeId = null;
+            try {
 
-					String sqlInsert = queryInsertEntity.getQuery().replace("{dbschema}", databaseSchema)
-							.replace("{cadastre}", gc).replace("{snr}", snr).replace("{pairingType}", pairingTypeId);
+                QueryEntity queryGetPairingTypeIntegrationEntity = versionConcept.getQuerys().stream().filter(
+                        q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION))
+                        .findAny().orElse(null);
+                String sqlObjects = queryGetPairingTypeIntegrationEntity.getQuery()
+                        .replace("{pairingTypeCode}", String.valueOf(4)).replace("{dbschema}", databaseSchema);
 
-					connection.insert(sqlInsert);
+                ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
 
-				}
-				connection.disconnect();
+                while (resultsetObjects.next()) {
+                    pairingTypeId = resultsetObjects.getString("t_id");
+                }
 
-				integrationStat = this.getIntegrationStats(databaseHost, databasePort, databaseName, databaseUsername,
-						databasePassword, databaseSchema, modelVersion);
-				integrationStat.setStatus(true);
+            } catch (SQLException e) {
+                log.error("Error getting pairing type: " + e.getMessage());
+                pairingTypeId = null;
+            }
 
-			} catch (SQLException e) {
-				integrationStat.setStatus(false);
-				connection.disconnect();
-			}
+            log.info("EMPAREJAMIENTO: " + pairingTypeId);
 
-		} else {
-			integrationStat.setStatus(false);
-		}
+            String sqlObjects = queryMatchIntegrationEntity.getQuery().replace("{dbschema}", databaseSchema);
+            ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
+            try {
 
-		return integrationStat;
-	}
+                while (resultsetObjects.next()) {
 
-	public IntegrationStatDto getIntegrationStats(String databaseHost, String databasePort, String databaseName,
-			String databaseUsername, String databasePassword, String databaseSchema, String modelVersion) {
+                    String snr = resultsetObjects.getString("snr_predio_juridico");
+                    String gc = resultsetObjects.getString("gc_predio_catastro");
 
-		IntegrationStatDto integrationStat = new IntegrationStatDto();
+                    QueryEntity queryInsertEntity = versionConcept.getQuerys().stream().filter(
+                            q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
+                            .findAny().orElse(null);
 
-		VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
-		if (versionEntity instanceof VersionEntity) {
+                    String sqlInsert = queryInsertEntity.getQuery().replace("{dbschema}", databaseSchema)
+                            .replace("{cadastre}", gc).replace("{snr}", snr).replace("{pairingType}", pairingTypeId);
 
-			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
-					.filter(vC -> vC.getConcept().getId().equals(ConceptBusiness.CONCEPT_INTEGRATION)).findAny()
-					.orElse(null);
+                    connection.insert(sqlInsert);
 
-			PostgresDriver connection = new PostgresDriver();
+                }
+                connection.disconnect();
 
-			String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
-			connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
+                integrationStat = this.getIntegrationStats(databaseHost, databasePort, databaseName, databaseUsername,
+                        databasePassword, databaseSchema, modelVersion);
+                integrationStat.setStatus(true);
 
-			QueryEntity queryCountSnrEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_SNR_INTEGRATION))
-					.findAny().orElse(null);
-			String sqlCountSNR = queryCountSnrEntity.getQuery().replace("{dbschema}", databaseSchema);
-			long countSNR = connection.count(sqlCountSNR);
+            } catch (SQLException e) {
+                integrationStat.setStatus(false);
+                connection.disconnect();
+            }
 
-			QueryEntity queryCountCadastreEntity = versionConcept.getQuerys().stream().filter(
-					q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
-					.findAny().orElse(null);
-			String sqlCountGC = queryCountCadastreEntity.getQuery().replace("{dbschema}", databaseSchema);
-			long countGC = connection.count(sqlCountGC);
+        } else {
+            integrationStat.setStatus(false);
+        }
 
-			QueryEntity queryCountMatchEntity = versionConcept.getQuerys().stream()
-					.filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_MATCH_INTEGRATION))
-					.findAny().orElse(null);
-			String sqlCountMatch = queryCountMatchEntity.getQuery().replace("{dbschema}", databaseSchema);
-			long countMatch = connection.count(sqlCountMatch);
+        return integrationStat;
+    }
 
-			double percentage = 0.0;
+    public IntegrationStatDto getIntegrationStats(String databaseHost, String databasePort, String databaseName,
+                                                  String databaseUsername, String databasePassword, String databaseSchema, String modelVersion) {
 
-			if (countSNR >= countGC) {
-				percentage = (double) (countMatch * 100) / countSNR;
-			} else {
-				percentage = (double) (countMatch * 100) / countGC;
-			}
+        IntegrationStatDto integrationStat = new IntegrationStatDto();
 
-			connection.disconnect();
+        VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
+        if (versionEntity instanceof VersionEntity) {
 
-			integrationStat.setCountGC(countGC);
-			integrationStat.setCountSNR(countSNR);
-			integrationStat.setCountMatch(countMatch);
-			integrationStat.setPercentage(percentage);
-		}
+            VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
+                    .filter(vC -> vC.getConcept().getId().equals(ConceptBusiness.CONCEPT_INTEGRATION)).findAny()
+                    .orElse(null);
 
-		return integrationStat;
-	}
+            PostgresDriver connection = new PostgresDriver();
 
-	public Boolean exportToXtf(String filePath, String logFileExport, String iliDirectory, String srsCode,
-			String models, String databaseHost, String databasePort, String databaseName, String databaseSchema,
-			String databaseUsername, String databasePassword) {
+            String urlConnection = "jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName;
+            connection.connect(urlConnection, databaseUsername, databasePassword, "org.postgresql.Driver");
 
-		Boolean result = false;
+            QueryEntity queryCountSnrEntity = versionConcept.getQuerys().stream()
+                    .filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_SNR_INTEGRATION))
+                    .findAny().orElse(null);
+            String sqlCountSNR = queryCountSnrEntity.getQuery().replace("{dbschema}", databaseSchema);
+            long countSNR = connection.count(sqlCountSNR);
 
-		try {
+            QueryEntity queryCountCadastreEntity = versionConcept.getQuerys().stream().filter(
+                    q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
+                    .findAny().orElse(null);
+            String sqlCountGC = queryCountCadastreEntity.getQuery().replace("{dbschema}", databaseSchema);
+            long countGC = connection.count(sqlCountGC);
 
-			Config config = new Config();
-			new ch.ehi.ili2pg.PgMain().initConfig(config);
+            QueryEntity queryCountMatchEntity = versionConcept.getQuerys().stream()
+                    .filter(q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_MATCH_INTEGRATION))
+                    .findAny().orElse(null);
+            String sqlCountMatch = queryCountMatchEntity.getQuery().replace("{dbschema}", databaseSchema);
+            long countMatch = connection.count(sqlCountMatch);
 
-			config.setFunction(Config.FC_EXPORT); // --schemaimport
-			config.setModeldir(iliDirectory); // -- modeldir
-			config.setModels(models); // --models
-			config.setLogfile(logFileExport); // --log
-			// config.setDefaultSrsCode(srsCode); // --defaultSrsCode
-			config.setValidation(false);
+            double percentage = 0.0;
 
-			config.setXtffile(filePath);
+            if (countSNR >= countGC) {
+                percentage = (double) (countMatch * 100) / countSNR;
+            } else {
+                percentage = (double) (countMatch * 100) / countGC;
+            }
 
-			config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
-			config.setDbschema(databaseSchema);
-			config.setDbusr(databaseUsername);
-			config.setDbpwd(databasePassword);
+            connection.disconnect();
 
-			Ili2db.readSettingsFromDb(config);
-			Ili2db.run(config, null);
+            integrationStat.setCountGC(countGC);
+            integrationStat.setCountSNR(countSNR);
+            integrationStat.setCountMatch(countMatch);
+            integrationStat.setPercentage(percentage);
+        }
 
-			result = true;
-		} catch (Exception e) {
-			log.error("Error export to xtf: " + e.getMessage());
-			result = false;
-		}
+        return integrationStat;
+    }
 
-		return result;
-	}
+    public Boolean exportToXtf(String filePath, String logFileExport, String iliDirectory, String srsCode,
+                               String models, String databaseHost, String databasePort, String databaseName, String databaseSchema,
+                               String databaseUsername, String databasePassword) {
+
+        Boolean result = false;
+
+        try {
+
+            Config config = new Config();
+            new ch.ehi.ili2pg.PgMain().initConfig(config);
+
+            config.setFunction(Config.FC_EXPORT); // --schemaimport
+            config.setModeldir(iliDirectory); // -- modeldir
+            config.setModels(models); // --models
+            config.setLogfile(logFileExport); // --log
+            // config.setDefaultSrsCode(srsCode); // --defaultSrsCode
+            config.setValidation(false);
+
+            config.setXtffile(filePath);
+
+            config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
+            config.setDbschema(databaseSchema);
+            config.setDbusr(databaseUsername);
+            config.setDbpwd(databasePassword);
+
+            Ili2db.readSettingsFromDb(config);
+            Ili2db.run(config, null);
+
+            result = true;
+        } catch (Exception e) {
+            log.error("Error export to xtf: " + e.getMessage());
+            result = false;
+        }
+
+        return result;
+    }
 
 }
