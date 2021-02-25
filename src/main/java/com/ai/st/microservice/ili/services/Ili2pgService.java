@@ -232,7 +232,10 @@ public class Ili2pgService {
                 }
 
             } catch (SQLException e) {
-                log.error("Error getting pairing type: " + e.getMessage());
+                log.error("Error getting pairing type I: " + e.getMessage());
+                pairingTypeId = null;
+            } catch (Exception e) {
+                log.error("Error getting pairing type II: " + e.getMessage());
                 pairingTypeId = null;
             }
 
