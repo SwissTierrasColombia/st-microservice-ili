@@ -1,152 +1,161 @@
 package com.ai.st.microservice.ili.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "ValidationModel", description = "Response validation")
+@ApiModel(value = "ValidationModel")
 public class ValidationDto implements Serializable {
 
-	private static final long serialVersionUID = -1404342333733043427L;
+    private static final long serialVersionUID = -1404342333733043427L;
 
-	private String resultId;
-	private String transfer;
-	private Boolean isValid;
-	private Boolean log;
-	private Boolean xtfLog;
-	private Long requestId;
-	private Long supplyRequestedId;
-	private String filenameTemporal;
-	private Long userCode;
-	private String observations;
-	private List<String> fullLog;
-	private String geom;
+    private String resultId;
+    private String transfer;
+    private Boolean isValid;
+    private Boolean log;
+    private Boolean xtfLog;
+    private Long requestId;
+    private Long supplyRequestedId;
+    private String filenameTemporal;
+    private Long userCode;
+    private String observations;
+    private List<String> fullLog;
+    private List<String> errors;
+    private String geom;
 
-	public String getGeom() {
-		return geom;
-	}
+    public ValidationDto() {
+        this.errors = new ArrayList<>();
+    }
 
-	public void setGeom(String geom) {
-		this.geom = geom;
-	}
+    public ValidationDto(String resultId, String transfer, Boolean isValid, Boolean log, Boolean xtfLog) {
+        super();
+        this.resultId = resultId;
+        this.transfer = transfer;
+        this.isValid = isValid;
+        this.log = log;
+        this.xtfLog = xtfLog;
+    }
 
-	public ValidationDto() {
+    public ValidationDto(String resultId, String transfer, Boolean isValid, Boolean log, Boolean xtfLog, List<String> fullLog, String geom) {
+        super();
+        this.resultId = resultId;
+        this.transfer = transfer;
+        this.isValid = isValid;
+        this.log = log;
+        this.xtfLog = xtfLog;
+        this.fullLog = fullLog;
+        this.geom = geom;
+    }
 
-	}
+    @ApiModelProperty(required = true, notes = "Result ID")
+    public String getResultId() {
+        return resultId;
+    }
 
-	public ValidationDto(String resultId, String transfer, Boolean isValid, Boolean log, Boolean xtfLog) {
-		super();
-		this.resultId = resultId;
-		this.transfer = transfer;
-		this.isValid = isValid;
-		this.log = log;
-		this.xtfLog = xtfLog;
-	}
-	
-	public ValidationDto(String resultId, String transfer, Boolean isValid, Boolean log, Boolean xtfLog, List<String> fullLog, String geom) {
-		super();
-		this.resultId = resultId;
-		this.transfer = transfer;
-		this.isValid = isValid;
-		this.log = log;
-		this.xtfLog = xtfLog;
-		this.fullLog = fullLog;
-		this.geom = geom;
-	}
+    public void setResultId(String resultId) {
+        this.resultId = resultId;
+    }
 
-	@ApiModelProperty(required = true, notes = "Result ID")
-	public String getResultId() {
-		return resultId;
-	}
+    @ApiModelProperty(required = true, notes = "Transfer")
+    public String getTransfer() {
+        return transfer;
+    }
 
-	public void setResultId(String resultId) {
-		this.resultId = resultId;
-	}
+    public void setTransfer(String transfer) {
+        this.transfer = transfer;
+    }
 
-	@ApiModelProperty(required = true, notes = "Transfer")
-	public String getTransfer() {
-		return transfer;
-	}
+    @ApiModelProperty(required = true, notes = "Is valid xtf ?")
+    public Boolean getIsValid() {
+        return isValid;
+    }
 
-	public void setTransfer(String transfer) {
-		this.transfer = transfer;
-	}
+    public void setIsValid(Boolean isValid) {
+        this.isValid = isValid;
+    }
 
-	@ApiModelProperty(required = true, notes = "Is valid xtf ?")
-	public Boolean getIsValid() {
-		return isValid;
-	}
+    @ApiModelProperty(required = true, notes = "Has log ?")
+    public Boolean getLog() {
+        return log;
+    }
 
-	public void setIsValid(Boolean isValid) {
-		this.isValid = isValid;
-	}
+    public void setLog(Boolean log) {
+        this.log = log;
+    }
 
-	@ApiModelProperty(required = true, notes = "Has log ?")
-	public Boolean getLog() {
-		return log;
-	}
+    @ApiModelProperty(required = true, notes = "Has xtf log ?")
+    public Boolean getXtfLog() {
+        return xtfLog;
+    }
 
-	public void setLog(Boolean log) {
-		this.log = log;
-	}
+    public void setXtfLog(Boolean xtfLog) {
+        this.xtfLog = xtfLog;
+    }
 
-	@ApiModelProperty(required = true, notes = "Has xtf log ?")
-	public Boolean getXtfLog() {
-		return xtfLog;
-	}
+    public Long getRequestId() {
+        return requestId;
+    }
 
-	public void setXtfLog(Boolean xtfLog) {
-		this.xtfLog = xtfLog;
-	}
+    public void setRequestId(Long requestId) {
+        this.requestId = requestId;
+    }
 
-	public Long getRequestId() {
-		return requestId;
-	}
+    public Long getSupplyRequestedId() {
+        return supplyRequestedId;
+    }
 
-	public void setRequestId(Long requestId) {
-		this.requestId = requestId;
-	}
+    public void setSupplyRequestedId(Long supplyRequestedId) {
+        this.supplyRequestedId = supplyRequestedId;
+    }
 
-	public Long getSupplyRequestedId() {
-		return supplyRequestedId;
-	}
+    public String getFilenameTemporal() {
+        return filenameTemporal;
+    }
 
-	public void setSupplyRequestedId(Long supplyRequestedId) {
-		this.supplyRequestedId = supplyRequestedId;
-	}
+    public void setFilenameTemporal(String filenameTemporal) {
+        this.filenameTemporal = filenameTemporal;
+    }
 
-	public String getFilenameTemporal() {
-		return filenameTemporal;
-	}
+    public Long getUserCode() {
+        return userCode;
+    }
 
-	public void setFilenameTemporal(String filenameTemporal) {
-		this.filenameTemporal = filenameTemporal;
-	}
+    public void setUserCode(Long userCode) {
+        this.userCode = userCode;
+    }
 
-	public Long getUserCode() {
-		return userCode;
-	}
+    public String getObservations() {
+        return observations;
+    }
 
-	public void setUserCode(Long userCode) {
-		this.userCode = userCode;
-	}
+    public void setObservations(String observations) {
+        this.observations = observations;
+    }
 
-	public String getObservations() {
-		return observations;
-	}
+    public List<String> getFullLog() {
+        return fullLog;
+    }
 
-	public void setObservations(String observations) {
-		this.observations = observations;
-	}
+    public void setFullLog(List<String> fullLog) {
+        this.fullLog = fullLog;
+    }
 
-	public List<String> getFullLog() {
-		return fullLog;
-	}
+    public String getGeom() {
+        return geom;
+    }
 
-	public void setFullLog(List<String> fullLog) {
-		this.fullLog = fullLog;
-	}
+    public void setGeom(String geom) {
+        this.geom = geom;
+    }
 
+    public List<String> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
+    }
 }

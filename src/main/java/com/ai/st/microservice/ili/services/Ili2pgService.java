@@ -68,7 +68,7 @@ public class Ili2pgService {
                                   String databaseHost, String databasePort, String databaseName, String databaseSchema,
                                   String databaseUsername, String databasePassword) {
 
-        Boolean result = false;
+        boolean result;
 
         try {
 
@@ -82,7 +82,6 @@ public class Ili2pgService {
 
             try {
                 final Path path = Files.createTempFile("myTempFile", ".sql");
-                System.out.println("Temp file : " + path);
 
                 String dataFile = "INSERT into spatial_ref_sys (\r\n" +
                         "  srid, auth_name, auth_srid, proj4text, srtext\r\n" +
@@ -100,18 +99,13 @@ public class Ili2pgService {
                 byte[] buf = dataFile.getBytes();
                 Files.write(path, buf);
 
-                log.info("PATH" + path.toFile().getAbsolutePath());
-
-                // For appending to the existing file
-                // Files.write(path, buf, StandardOpenOption.APPEND);
-
                 // Delete file on exit
                 path.toFile().deleteOnExit();
 
                 config.setPreScript(path.toFile().getAbsolutePath());
 
             } catch (IOException e) {
-                log.error("ERROR 1 " + e.getMessage());
+                log.error("Error executing pre script: " + e.getMessage());
             }
 
 
@@ -135,7 +129,7 @@ public class Ili2pgService {
                              String srsCode, String models, String databaseHost, String databasePort, String databaseName,
                              String databaseSchema, String databaseUsername, String databasePassword) {
 
-        Boolean result = false;
+        boolean result = false;
 
         Boolean generateSchema = generateSchema(logFileSchemaImport, iliDirectory, srsCode, models, databaseHost,
                 databasePort, databaseName, databaseSchema, databaseUsername, databasePassword);
