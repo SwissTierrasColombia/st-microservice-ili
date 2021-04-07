@@ -330,7 +330,7 @@ public class Ili2pgService {
                                String models, String databaseHost, String databasePort, String databaseName, String databaseSchema,
                                String databaseUsername, String databasePassword) {
 
-        Boolean result = false;
+        Boolean result;
 
         try {
 

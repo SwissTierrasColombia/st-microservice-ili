@@ -1,6 +1,8 @@
 package com.ai.st.microservice.ili.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IntegrationStatDto implements Serializable {
 
@@ -11,6 +13,7 @@ public class IntegrationStatDto implements Serializable {
 	private long countMatch;
 	private double percentage;
 	private boolean status;
+	private List<String> errors;
 	private Long integrationId;
 
 	public IntegrationStatDto() {
@@ -18,6 +21,7 @@ public class IntegrationStatDto implements Serializable {
 		this.countSNR = 0;
 		this.countMatch = 0;
 		this.percentage = 0.0;
+		this.errors = new ArrayList<>();
 	}
 
 	public long getCountSNR() {
@@ -68,4 +72,11 @@ public class IntegrationStatDto implements Serializable {
 		this.integrationId = integrationId;
 	}
 
+	public List<String> getErrors() {
+		return errors;
+	}
+
+	public void setErrors(List<String> errors) {
+		this.errors = errors;
+	}
 }

@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -178,7 +177,7 @@ public class RabbitMQIliListerner {
 
             VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
                     ConceptBusiness.CONCEPT_INTEGRATION);
-            if (versionData instanceof VersionDataDto) {
+            if (versionData != null) {
 
                 String nameDirectory = "ili_process_import_" + RandomStringUtils.random(7, false, true);
                 Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
@@ -206,6 +205,12 @@ public class RabbitMQIliListerner {
                         data.getDatabaseSchema(), data.getDatabaseUsername(), data.getDatabasePassword(),
                         data.getVersionModel());
 
+                if (!integrationStatDto.isStatus()) {
+                    List<String> errorsList = new ArrayList<>(searchErrors(cadastreLogFileImport));
+                    errorsList.addAll(searchErrors(registrationLogFileImport));
+                    integrationStatDto.setErrors(errorsList);
+                }
+
                 try {
                     FileUtils.deleteDirectory(tmpDirectory.toFile());
                 } catch (Exception e) {
@@ -218,6 +223,7 @@ public class RabbitMQIliListerner {
         } catch (Exception e) {
             log.error("Integration failed # " + data.getIntegrationId());
             log.error("Integration error  " + e.getMessage());
+            integrationStatDto.setErrors(new ArrayList<>(Collections.singletonList(e.getMessage())));
 
             integrationStatDto = new IntegrationStatDto();
             integrationStatDto.setStatus(false);
@@ -237,7 +243,7 @@ public class RabbitMQIliListerner {
 
             VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
                     ConceptBusiness.CONCEPT_INTEGRATION);
-            if (versionData instanceof VersionDataDto) {
+            if (versionData != null) {
 
                 IntegrationStatDto stats = null;
                 if (data.getWithStats()) {
@@ -255,6 +261,10 @@ public class RabbitMQIliListerner {
                         srsDefault, versionData.getModels(), data.getDatabaseHost(), data.getDatabasePort(),
                         data.getDatabaseName(), data.getDatabaseSchema(), data.getDatabaseUsername(),
                         data.getDatabasePassword());
+
+                if (!result) {
+                    resultDto.setErrors(searchErrors(logExport));
+                }
 
                 if (result) {
                     log.info("zipping export file");
@@ -316,7 +326,7 @@ public class RabbitMQIliListerner {
         try {
 
             VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(), data.getConceptId());
-            if (versionData instanceof VersionDataDto) {
+            if (versionData != null) {
                 Path path = Paths.get(data.getPathXTF());
                 String fileName = path.getFileName().toString();
                 String fileExtension = FilenameUtils.getExtension(fileName);
