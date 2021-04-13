@@ -113,6 +113,7 @@ public class Ili2pgService {
             config.setDbschema(databaseSchema);
             config.setDbusr(databaseUsername);
             config.setDbpwd(databasePassword);
+            config.setSkipGeometryErrors(true);
 
             Ili2db.readSettingsFromDb(config);
             Ili2db.run(config, null);
@@ -146,6 +147,7 @@ public class Ili2pgService {
                 config.setModels(models); // --models
                 config.setLogfile(logFileImport); // --log
                 config.setValidation(false);
+                config.setSkipGeometryErrors(true);
                 config.setXtffile(fileXTF);
                 if (fileXTF != null && Ili2db.isItfFilename(fileXTF)) {
                     config.setItfTransferfile(true);

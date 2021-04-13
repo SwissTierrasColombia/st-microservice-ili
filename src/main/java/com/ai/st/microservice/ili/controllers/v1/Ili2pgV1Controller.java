@@ -75,8 +75,8 @@ public class Ili2pgV1Controller {
 
 		Ili2pgService ili2pg = new Ili2pgService();
 
-		HttpStatus httpStatus = null;
-		Object responseDto = null;
+		HttpStatus httpStatus;
+		Object responseDto;
 
 		try {
 
@@ -211,7 +211,7 @@ public class Ili2pgV1Controller {
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(ili2pgImportDto.getVersionModel(),
 					ConceptBusiness.CONCEPT_OPERATION);
-			if (!(versionData instanceof VersionDataDto)) {
+			if (versionData == null) {
 				throw new InputValidationException(
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
@@ -328,7 +328,7 @@ public class Ili2pgV1Controller {
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(requestIntegrationDto.getVersionModel(),
 					ConceptBusiness.CONCEPT_INTEGRATION);
-			if (!(versionData instanceof VersionDataDto)) {
+			if (versionData == null) {
 				throw new InputValidationException(
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
@@ -442,7 +442,7 @@ public class Ili2pgV1Controller {
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(requestIntegrationDto.getVersionModel(),
 					ConceptBusiness.CONCEPT_INTEGRATION);
-			if (!(versionData instanceof VersionDataDto)) {
+			if (versionData == null) {
 				throw new InputValidationException(
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
@@ -538,7 +538,7 @@ public class Ili2pgV1Controller {
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(requestExportDto.getVersionModel(),
 					ConceptBusiness.CONCEPT_INTEGRATION);
-			if (!(versionData instanceof VersionDataDto)) {
+			if (versionData == null) {
 				throw new InputValidationException(
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}

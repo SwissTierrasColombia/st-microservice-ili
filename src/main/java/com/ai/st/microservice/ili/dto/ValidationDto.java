@@ -24,6 +24,7 @@ public class ValidationDto implements Serializable {
     private String observations;
     private List<String> fullLog;
     private List<String> errors;
+    private Boolean isGeometryValidated;
     private String geom;
 
     public ValidationDto() {
@@ -37,6 +38,7 @@ public class ValidationDto implements Serializable {
         this.isValid = isValid;
         this.log = log;
         this.xtfLog = xtfLog;
+        this.errors = new ArrayList<>();
     }
 
     public ValidationDto(String resultId, String transfer, Boolean isValid, Boolean log, Boolean xtfLog, List<String> fullLog, String geom) {
@@ -48,6 +50,7 @@ public class ValidationDto implements Serializable {
         this.xtfLog = xtfLog;
         this.fullLog = fullLog;
         this.geom = geom;
+        this.errors = new ArrayList<>();
     }
 
     @ApiModelProperty(required = true, notes = "Result ID")
@@ -157,5 +160,13 @@ public class ValidationDto implements Serializable {
 
     public void setErrors(List<String> errors) {
         this.errors = errors;
+    }
+
+    public Boolean getGeometryValidated() {
+        return isGeometryValidated;
+    }
+
+    public void setGeometryValidated(Boolean geometryValidated) {
+        isGeometryValidated = geometryValidated;
     }
 }

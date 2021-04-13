@@ -133,8 +133,33 @@ public class RabbitMQIliListerner {
                     String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
                     String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
 
+                    String pathTomlFile = null;
+                    if (!data.getHasGeometryValidation()) {
+
+                        try {
+                            final Path pathToml = Files.createTempFile("myTomlFile", ".toml");
+
+                            String dataFile = "[\"PARAMETER\"]\n" +
+                                    "defaultGeometryTypeValidation=\"off\"";
+
+                            // Writing data here
+                            byte[] buf = dataFile.getBytes();
+                            Files.write(pathToml, buf);
+
+                            // Delete file on exit
+                            pathToml.toFile().deleteOnExit();
+
+                            pathTomlFile = pathToml.toFile().getAbsolutePath();
+
+                        } catch (IOException e) {
+                            log.error("Error creating toml file: " + e.getMessage());
+                        }
+
+                    }
+
                     validation = ilivalidatorService.validate(pathFileXTF, versionData.getUrl(),
-                            versionData.getModels(), null, logFileValidation, logFileValidationXTF, null);
+                            versionData.getModels(), null, logFileValidation, logFileValidationXTF, pathTomlFile);
+
                     log.info("validation successful with result: " + validation);
 
                     if (!validation) {
@@ -163,6 +188,7 @@ public class RabbitMQIliListerner {
         validationDto.setFilenameTemporal(data.getFilenameTemporal());
         validationDto.setUserCode(data.getUserCode());
         validationDto.setObservations(data.getObservations());
+        validationDto.setGeometryValidated(data.getHasGeometryValidation());
 
         rabbitService.sendStatsValidation(validationDto);
     }
