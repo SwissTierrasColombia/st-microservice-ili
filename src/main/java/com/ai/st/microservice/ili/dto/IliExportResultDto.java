@@ -1,6 +1,7 @@
 package com.ai.st.microservice.ili.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class IliExportResultDto implements Serializable {
@@ -15,7 +16,7 @@ public class IliExportResultDto implements Serializable {
     private List<String> errors;
 
     public IliExportResultDto() {
-
+        this.errors = new ArrayList<>();
     }
 
     public boolean isStatus() {

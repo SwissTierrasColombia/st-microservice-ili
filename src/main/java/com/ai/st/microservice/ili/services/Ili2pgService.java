@@ -332,7 +332,7 @@ public class Ili2pgService {
                                String models, String databaseHost, String databasePort, String databaseName, String databaseSchema,
                                String databaseUsername, String databasePassword) {
 
-        Boolean result;
+        boolean result;
 
         try {
 
@@ -345,6 +345,7 @@ public class Ili2pgService {
             config.setLogfile(logFileExport); // --log
             // config.setDefaultSrsCode(srsCode); // --defaultSrsCode
             config.setValidation(false);
+            config.setSkipGeometryErrors(true);
 
             config.setXtffile(filePath);
 
