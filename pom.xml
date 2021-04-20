@@ -14,7 +14,7 @@
 
 	<groupId>com.ai.st.microservice.ili</groupId>
 	<artifactId>st-microservice-ili</artifactId>
-	<version>1.8.5</version>
+	<version>1.10.0</version>
 	<name>st-microservice-ili</name>
 	<description>Microservice ILI</description>
 
