@@ -2,7 +2,7 @@ spring:
   application:
     name: st-microservice-ili
   profiles:
-    active: "develop"
+    active: "production"
   cloud:
     config:
       enabled: true
