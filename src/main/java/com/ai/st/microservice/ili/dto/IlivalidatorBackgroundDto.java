@@ -13,10 +13,13 @@ public class IlivalidatorBackgroundDto implements Serializable {
     private Long userCode;
     private String observations;
     private String versionModel;
-    private Boolean hasGeometryValidation;
+    private Boolean skipGeometryValidation;
+    private Boolean skipErrors;
 
     public IlivalidatorBackgroundDto() {
         this.versionModel = "2.9.4";
+        this.skipErrors = false;
+        this.skipGeometryValidation = false;
     }
 
     public String getPathFile() {
@@ -75,11 +78,19 @@ public class IlivalidatorBackgroundDto implements Serializable {
         this.versionModel = versionModel;
     }
 
-    public Boolean getHasGeometryValidation() {
-        return hasGeometryValidation;
+    public Boolean getSkipErrors() {
+        return skipErrors;
     }
 
-    public void setHasGeometryValidation(Boolean hasGeometryValidation) {
-        this.hasGeometryValidation = hasGeometryValidation;
+    public void setSkipErrors(Boolean skipErrors) {
+        this.skipErrors = skipErrors;
+    }
+
+    public Boolean getSkipGeometryValidation() {
+        return skipGeometryValidation;
+    }
+
+    public void setSkipGeometryValidation(Boolean skipGeometryValidation) {
+        this.skipGeometryValidation = skipGeometryValidation;
     }
 }

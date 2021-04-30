@@ -116,6 +116,7 @@ public class RabbitMQIliListerner {
 
                 String nameDirectory = "ili_process_validation_" + RandomStringUtils.random(7, false, true);
                 Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
+                Path tmpDirectoryLog = Files.createTempDirectory(Paths.get(stTemporalDirectory), RandomStringUtils.random(7, false, true));
 
                 if (fileExtension.equalsIgnoreCase("zip")) {
 
@@ -130,11 +131,11 @@ public class RabbitMQIliListerner {
                     log.error("there is not file xtf.");
                 } else {
 
-                    String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
+                    String logFileValidation = Paths.get(tmpDirectoryLog.toString(), "ilivalidator.log").toString();
                     String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
 
                     String pathTomlFile = null;
-                    if (!data.getHasGeometryValidation()) {
+                    if (data.getSkipGeometryValidation()) {
 
                         try {
                             final Path pathToml = Files.createTempFile("myTomlFile", ".toml");
@@ -164,6 +165,13 @@ public class RabbitMQIliListerner {
 
                     if (!validation) {
                         validationDto.setErrors(searchErrors(logFileValidation));
+                        validationDto.setLog(logFileValidation);
+                    } else {
+                        try {
+                            FileUtils.deleteDirectory(tmpDirectoryLog.toFile());
+                        } catch (Exception e) {
+                            log.error("It has not been possible delete the directory (log): " + e.getMessage());
+                        }
                     }
 
                     try {
@@ -188,7 +196,8 @@ public class RabbitMQIliListerner {
         validationDto.setFilenameTemporal(data.getFilenameTemporal());
         validationDto.setUserCode(data.getUserCode());
         validationDto.setObservations(data.getObservations());
-        validationDto.setGeometryValidated(data.getHasGeometryValidation());
+        validationDto.setGeometryValidated(!data.getSkipGeometryValidation());
+        validationDto.setSkipErrors(data.getSkipErrors());
 
         rabbitService.sendStatsValidation(validationDto);
     }
