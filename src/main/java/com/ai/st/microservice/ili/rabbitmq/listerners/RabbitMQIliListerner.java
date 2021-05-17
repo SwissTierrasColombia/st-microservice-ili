@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.ai.st.microservice.ili.business.QueueResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
@@ -104,8 +105,7 @@ public class RabbitMQIliListerner {
 
         try {
 
-            VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
-                    ConceptBusiness.CONCEPT_OPERATION);
+            VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(), data.getConceptId());
             if (versionData != null) {
 
                 Path path = Paths.get(data.getPathFile());
@@ -189,17 +189,28 @@ public class RabbitMQIliListerner {
             validationDto.setErrors(new ArrayList<>(Collections.singletonList(e.getMessage())));
         }
 
-
         validationDto.setIsValid(validation);
-        validationDto.setRequestId(data.getRequestId());
-        validationDto.setSupplyRequestedId(data.getSupplyRequestedId());
-        validationDto.setFilenameTemporal(data.getFilenameTemporal());
-        validationDto.setUserCode(data.getUserCode());
-        validationDto.setObservations(data.getObservations());
+        validationDto.setFilenameTemporal(data.getPathFile());
         validationDto.setGeometryValidated(!data.getSkipGeometryValidation());
         validationDto.setSkipErrors(data.getSkipErrors());
+        validationDto.setReferenceId(data.getReferenceId());
 
-        rabbitService.sendStatsValidation(validationDto);
+        validationDto.setUserCode(data.getUserCode());
+        validationDto.setObservations(data.getObservations());
+
+        validationDto.setRequestId(data.getRequestId());
+        validationDto.setSupplyRequestedId(data.getSupplyRequestedId());
+
+        switch (data.getQueueResponse().toUpperCase()) {
+            case QueueResponse.QUEUE_UPDATE_STATE_XTF_PRODUCTS:
+                rabbitService.sendStatsValidationQueueProducts(validationDto);
+                break;
+            case QueueResponse.QUEUE_UPDATE_STATE_XTF_SUPPLIES:
+            default:
+                rabbitService.sendStatsValidationQueueSupplies(validationDto);
+                break;
+        }
+
     }
 
     public void integration(Ili2pgIntegrationCadastreRegistrationWithoutFilesDto data) {

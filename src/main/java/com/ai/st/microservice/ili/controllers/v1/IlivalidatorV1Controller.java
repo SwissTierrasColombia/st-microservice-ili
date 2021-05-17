@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Api(value = "Ilivalidator", description = "Validations XTF files", tags = {"ilivalidator"})
+@Api(value = "Ilivalidator", tags = {"ilivalidator"})
 @RestController
 @RequestMapping("api/ili/ilivalidator/v1")
 public class IlivalidatorV1Controller {
@@ -47,7 +47,7 @@ public class IlivalidatorV1Controller {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Integration done", response = ResponseImportDto.class),
             @ApiResponse(code = 500, message = "Error Server", response = String.class)})
     @ResponseBody
-    public ResponseEntity<?> validateBackground(@RequestBody IlivalidatorBackgroundDto requestIlivadatorDto) {
+    public ResponseEntity<?> validateBackground(@RequestBody IlivalidatorBackgroundDto request) {
 
         HttpStatus httpStatus;
         Object responseDto;
@@ -55,13 +55,13 @@ public class IlivalidatorV1Controller {
         try {
 
             // validation path file
-            String pathFile = requestIlivadatorDto.getPathFile();
+            String pathFile = request.getPathFile();
             if (pathFile.isEmpty()) {
                 throw new InputValidationException("La ruta del archivo a generar es requerida.");
             }
 
-            VersionDataDto versionData = versionBusiness.getDataVersion(requestIlivadatorDto.getVersionModel(),
-                    ConceptBusiness.CONCEPT_OPERATION);
+            VersionDataDto versionData = versionBusiness.getDataVersion(request.getVersionModel(),
+                    request.getConceptId());
             if (versionData == null) {
                 throw new InputValidationException(
                         "No se puede realizar la operación por falta de configuración de los modelos ILI");
@@ -69,7 +69,7 @@ public class IlivalidatorV1Controller {
 
             IliProcessQueueDto data = new IliProcessQueueDto();
             data.setType(IliProcessQueueDto.VALIDATOR);
-            data.setIlivalidatorData(requestIlivadatorDto);
+            data.setIlivalidatorData(request);
 
             rabbitSenderService.sendDataToIliProcess(data);
 

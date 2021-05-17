@@ -21,6 +21,7 @@ public class ValidationDto implements Serializable {
     private List<String> errors;
     private Boolean isGeometryValidated;
     private Boolean skipErrors;
+    private String referenceId;
 
     public ValidationDto() {
         this.errors = new ArrayList<>();
@@ -105,4 +106,13 @@ public class ValidationDto implements Serializable {
     public void setLog(String log) {
         this.log = log;
     }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
 }
