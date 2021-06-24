@@ -1,5 +1,8 @@
 package com.ai.st.microservice.ili.dto;
 
+import com.ai.st.microservice.ili.business.ConceptBusiness;
+import com.ai.st.microservice.ili.business.QueueResponse;
+
 import java.io.Serializable;
 
 public class IlivalidatorBackgroundDto implements Serializable {
@@ -7,19 +10,23 @@ public class IlivalidatorBackgroundDto implements Serializable {
     private static final long serialVersionUID = -5774043946431854011L;
 
     private String pathFile;
-    private Long requestId;
-    private Long supplyRequestedId;
-    private String filenameTemporal;
     private Long userCode;
-    private String observations;
     private String versionModel;
     private Boolean skipGeometryValidation;
     private Boolean skipErrors;
+    private Long conceptId;
+    private String queueResponse;
+    private String referenceId;
+    private Long requestId;
+    private Long supplyRequestedId;
+    private String observations;
 
     public IlivalidatorBackgroundDto() {
-        this.versionModel = "2.9.4";
+        this.versionModel = "3.0";
         this.skipErrors = false;
         this.skipGeometryValidation = false;
+        this.conceptId = ConceptBusiness.CONCEPT_OPERATION;
+        this.queueResponse = QueueResponse.QUEUE_UPDATE_STATE_XTF_SUPPLIES;
     }
 
     public String getPathFile() {
@@ -44,14 +51,6 @@ public class IlivalidatorBackgroundDto implements Serializable {
 
     public void setSupplyRequestedId(Long supplyRequestedId) {
         this.supplyRequestedId = supplyRequestedId;
-    }
-
-    public String getFilenameTemporal() {
-        return filenameTemporal;
-    }
-
-    public void setFilenameTemporal(String filenameTemporal) {
-        this.filenameTemporal = filenameTemporal;
     }
 
     public Long getUserCode() {
@@ -92,5 +91,29 @@ public class IlivalidatorBackgroundDto implements Serializable {
 
     public void setSkipGeometryValidation(Boolean skipGeometryValidation) {
         this.skipGeometryValidation = skipGeometryValidation;
+    }
+
+    public Long getConceptId() {
+        return conceptId;
+    }
+
+    public void setConceptId(Long conceptId) {
+        this.conceptId = conceptId;
+    }
+
+    public String getQueueResponse() {
+        return queueResponse;
+    }
+
+    public void setQueueResponse(String queueResponse) {
+        this.queueResponse = queueResponse;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 }

@@ -24,7 +24,7 @@ public class ConceptEntity {
 	private String name;
 
 	@OneToMany(mappedBy = "concept")
-	private List<VersionConceptEntity> versionsConcepts = new ArrayList<VersionConceptEntity>();
+	private List<VersionConceptEntity> versionsConcepts = new ArrayList<>();
 
 	public ConceptEntity() {
 
