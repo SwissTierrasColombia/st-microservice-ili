@@ -45,6 +45,15 @@ public class RabbitMQIliListerner {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    @Value("${st.filesDirectory}")
+    private String stFilesDirectory;
+
+    @Value("${st.temporalDirectory}")
+    private String stTemporalDirectory;
+
+    @Value("${iliProcesses.srs}")
+    private String srsDefault;
+
     @Autowired
     private Ili2pgService ili2pgService;
 
@@ -60,14 +69,6 @@ public class RabbitMQIliListerner {
     @Autowired
     private VersionBusiness versionBusiness;
 
-    @Value("${st.filesDirectory}")
-    private String stFilesDirectory;
-
-    @Value("${st.temporalDirectory}")
-    private String stTemporalDirectory;
-
-    @Value("${iliProcesses.srs}")
-    private String srsDefault;
 
     @RabbitListener(queues = "${st.rabbitmq.queueIli.queue}", concurrency = "${st.rabbitmq.queueIli.concurrency}")
     public void iliProcess(IliProcessQueueDto data) {

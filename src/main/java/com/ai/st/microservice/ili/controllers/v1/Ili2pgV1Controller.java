@@ -118,7 +118,7 @@ public class Ili2pgV1Controller {
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(ili2pgImportDto.getVersionModel(),
 					ConceptBusiness.CONCEPT_OPERATION);
-			if (!(versionData instanceof VersionDataDto)) {
+			if (versionData == null) {
 				throw new InputValidationException(
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}
@@ -272,8 +272,8 @@ public class Ili2pgV1Controller {
 
 		Ili2pgService ili2pg = new Ili2pgService();
 
-		HttpStatus httpStatus = null;
-		Object responseDto = null;
+		HttpStatus httpStatus;
+		Object responseDto;
 
 		try {
 
@@ -338,7 +338,7 @@ public class Ili2pgV1Controller {
 			String registrationFilename = uploadFileRegistration.getOriginalFilename();
 			String registrationFilepath = Paths.get(tmpDirectory.toString(), registrationFilename).toString();
 			try (BufferedOutputStream stream = new BufferedOutputStream(
-					new FileOutputStream(new File(registrationFilepath)))) {
+					new FileOutputStream(registrationFilepath))) {
 				stream.write(uploadFileRegistration.getBytes());
 			}
 
@@ -387,8 +387,8 @@ public class Ili2pgV1Controller {
 	public ResponseEntity<?> integrationCadestreRegistrationWithoutFiles(
 			@RequestBody Ili2pgIntegrationCadastreRegistrationWithoutFilesDto requestIntegrationDto) {
 
-		HttpStatus httpStatus = null;
-		Object responseDto = null;
+		HttpStatus httpStatus;
+		Object responseDto;
 
 		try {
 
@@ -483,8 +483,8 @@ public class Ili2pgV1Controller {
 	@ResponseBody
 	public ResponseEntity<?> exportToXtf(@RequestBody Ili2pgExportDto requestExportDto) {
 
-		HttpStatus httpStatus = null;
-		Object responseDto = null;
+		HttpStatus httpStatus;
+		Object responseDto;
 
 		try {
 
@@ -521,7 +521,7 @@ public class Ili2pgV1Controller {
 			// validation database password
 			String databasePassword = requestExportDto.getDatabasePassword();
 			if (databasePassword.isEmpty()) {
-				throw new InputValidationException("La constraseña de la base de datos es requerida.");
+				throw new InputValidationException("La contraseña de la base de datos es requerida.");
 			}
 
 			// validation database port
@@ -533,7 +533,7 @@ public class Ili2pgV1Controller {
 			// validation with stats
 			Boolean requiredStats = requestExportDto.getWithStats();
 			if (requiredStats == null) {
-				throw new InputValidationException("Se debe especificar si se requiren estadisticas.");
+				throw new InputValidationException("Se debe especificar si se requieren estadísticas.");
 			}
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(requestExportDto.getVersionModel(),
@@ -576,8 +576,8 @@ public class Ili2pgV1Controller {
 	@ResponseBody
 	public ResponseEntity<?> importPerReference(@RequestBody Ili2pgImportReferenceDto importReferenceDto) {
 
-		HttpStatus httpStatus = null;
-		Object responseDto = null;
+		HttpStatus httpStatus;
+		Object responseDto;
 
 		try {
 
