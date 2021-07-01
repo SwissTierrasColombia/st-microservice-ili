@@ -213,6 +213,12 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 version10.setCreatedAt(new Date());
                 versionService.createVersion(version10);
 
+                // version 1.1
+                VersionEntity version11 = new VersionEntity();
+                version11.setName("1.1");
+                version11.setCreatedAt(new Date());
+                versionService.createVersion(version11);
+
                 // version 3.0 - concept operation
 
                 VersionConceptEntity versionConceptOperation30 = new VersionConceptEntity();
@@ -321,6 +327,28 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 
                 versionConceptService.createVersionConcept(versionConceptBPM10);
 
+                // version 1.1 - concept BPM
+
+                VersionConceptEntity versionConceptBPM11 = new VersionConceptEntity();
+                versionConceptBPM11.setUrl(modelsDirectory + "levantamiento/1.1");
+                versionConceptBPM11.setVersion(version11);
+                versionConceptBPM11.setConcept(conceptBPM);
+
+                List<ModelEntity> models11BPM = new ArrayList<>();
+
+                models11BPM.add(new ModelEntity("Captura_Geo_V0_1", versionConceptBPM11));
+                models11BPM.add(new ModelEntity("ISO19107_PLANAS_V3_0", versionConceptBPM11));
+                models11BPM.add(new ModelEntity("LADM_COL_V3_0", versionConceptBPM11));
+                models11BPM.add(new ModelEntity("Modelo_Aplicacion_LADMCOL_Lev_Cat_V1_1", versionConceptBPM11));
+                models11BPM.add(new ModelEntity("Submodelo_Avaluos_V1_1", versionConceptBPM11));
+                models11BPM.add(new ModelEntity("Submodelo_Cartografia_Catastral_V1_1", versionConceptBPM11));
+                models11BPM.add(new ModelEntity("Submodelo_Insumos_Gestor_Catastral_V1_0", versionConceptBPM11));
+                models11BPM.add(new ModelEntity("Submodelo_Insumos_SNR_V1_0", versionConceptBPM11));
+                models11BPM.add(new ModelEntity("Submodelo_Integracion_Insumos_V1_0", versionConceptBPM11));
+
+                versionConceptBPM11.setModels(models11BPM);
+
+                versionConceptService.createVersionConcept(versionConceptBPM11);
 
                 log.info("The domains 'versions' have been loaded!");
             } catch (Exception e) {
