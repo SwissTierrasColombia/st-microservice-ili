@@ -60,6 +60,12 @@ public class RabbitMQSenderService {
     @Value("${st.rabbitmq.queueResultValidationProducts.routingkey}")
     public String routingKeyResultValidationName;
 
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.exchange}")
+    public String exchangeResultValidationSinicFilesName;
+
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.routingkey}")
+    public String routingKeyResultValidationSinicFilesName;
+
 
     public void sendStats(IntegrationStatDto integrationStats) {
         rabbitTemplate.convertSendAndReceive(exchangeUpdateIntegrationsName, routingkeyUpdateIntegrationsName,
@@ -76,6 +82,10 @@ public class RabbitMQSenderService {
 
     public void sendStatsValidationQueueProducts(ValidationDto data) {
         rabbitTemplate.convertAndSend(exchangeResultValidationName, routingKeyResultValidationName, data);
+    }
+
+    public void sendStatsValidationQueueSinicFiles(ValidationDto data) {
+        rabbitTemplate.convertAndSend(exchangeResultValidationSinicFilesName, routingKeyResultValidationSinicFilesName, data);
     }
 
     public void sendDataToIliProcess(IliProcessQueueDto data) {

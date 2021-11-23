@@ -206,6 +206,9 @@ public class RabbitMQIliListerner {
             case QueueResponse.QUEUE_UPDATE_STATE_XTF_PRODUCTS:
                 rabbitService.sendStatsValidationQueueProducts(validationDto);
                 break;
+            case QueueResponse.QUEUE_UPDATE_STATE_XTF_SINIC_FILES:
+                rabbitService.sendStatsValidationQueueSinicFiles(validationDto);
+                break;
             case QueueResponse.QUEUE_UPDATE_STATE_XTF_SUPPLIES:
             default:
                 rabbitService.sendStatsValidationQueueSupplies(validationDto);

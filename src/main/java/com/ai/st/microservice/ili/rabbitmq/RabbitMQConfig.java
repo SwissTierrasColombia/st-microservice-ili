@@ -175,7 +175,7 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queueResultExport()).to(exchangeResultExport()).with(routingkeyResultExportName);
     }
 
-    // queue result validation
+    // queue result validation products
 
     @Value("${st.rabbitmq.queueResultValidationProducts.queue}")
     public String queueResultValidation;
@@ -200,6 +200,33 @@ public class RabbitMQConfig {
     public Binding bindingQueueResultValidation() {
         return BindingBuilder.bind(QueueResultValidation()).to(exchangeResultValidation())
                 .with(routingKeyResultValidation);
+    }
+
+    // queue result validation sinic files
+
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.queue}")
+    public String queueResultValidationSinicFiles;
+
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.exchange}")
+    public String exchangeResultValidationSinicFiles;
+
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.routingkey}")
+    public String routingKeyResultValidationSinicFiles;
+
+    @Bean
+    public Queue QueueResultValidationSinicFiles() {
+        return new Queue(queueResultValidationSinicFiles, false);
+    }
+
+    @Bean
+    public DirectExchange exchangeResultValidationSinicFiles() {
+        return new DirectExchange(exchangeResultValidationSinicFiles);
+    }
+
+    @Bean
+    public Binding bindingQueueResultValidationSinicFiles() {
+        return BindingBuilder.bind(QueueResultValidationSinicFiles()).to(exchangeResultValidationSinicFiles())
+                .with(routingKeyResultValidationSinicFiles);
     }
 
     // Setup

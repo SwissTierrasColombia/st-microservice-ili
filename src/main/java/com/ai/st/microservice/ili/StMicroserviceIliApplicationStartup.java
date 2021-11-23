@@ -75,6 +75,11 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 conceptBPM.setName("RECEPCIÓN DE PRODUCTOS A PARTIR DEL BPM");
                 conceptService.createConcept(conceptBPM);
 
+                ConceptEntity conceptSinic = new ConceptEntity();
+                conceptSinic.setId(ConceptBusiness.CONCEPT_SINIC);
+                conceptSinic.setName("SINIC");
+                conceptService.createConcept(conceptSinic);
+
                 log.info("The domains 'concepts' have been loaded!");
             } catch (Exception e) {
                 log.error("Failed to load 'concepts' domains");
@@ -200,6 +205,7 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 ConceptEntity conceptOperator = conceptService.getConceptById(ConceptBusiness.CONCEPT_OPERATION);
                 ConceptEntity conceptIntegration = conceptService.getConceptById(ConceptBusiness.CONCEPT_INTEGRATION);
                 ConceptEntity conceptBPM = conceptService.getConceptById(ConceptBusiness.CONCEPT_RECEIPT_FROM_BPM);
+                ConceptEntity conceptSINIC = conceptService.getConceptById(ConceptBusiness.CONCEPT_SINIC);
 
                 // version 3.0
                 VersionEntity version30 = new VersionEntity();
@@ -349,6 +355,27 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 versionConceptBPM11.setModels(models11BPM);
 
                 versionConceptService.createVersionConcept(versionConceptBPM11);
+
+                // version 1.0 - concept SINIC
+
+                VersionConceptEntity versionConceptSINIC10 = new VersionConceptEntity();
+                versionConceptSINIC10.setUrl(modelsDirectory + "sinic/1.0");
+                versionConceptSINIC10.setVersion(version10);
+                versionConceptSINIC10.setConcept(conceptSINIC);
+
+                List<ModelEntity> models10SINIC = new ArrayList<>();
+                models10SINIC.add(new ModelEntity("Submodelo_Cartografia_Catastral_V1_0", versionConceptSINIC10));
+                models10SINIC.add(new ModelEntity("Sumodelo_Avaluos_V1_0", versionConceptSINIC10));
+                models10SINIC.add(new ModelEntity("LADM_COL_V3_0", versionConceptSINIC10));
+                models10SINIC.add(new ModelEntity("Modelo_Aplicacion_LADMCOL_Lev_Cat_V1_0", versionConceptSINIC10));
+                models10SINIC.add(new ModelEntity("ISO19107_PLANAS_V3_0", versionConceptSINIC10));
+                models10SINIC.add(new ModelEntity("Submodelo_Insumos_Gestor_Catastral_V1_0", versionConceptSINIC10));
+                models10SINIC.add(new ModelEntity("Submodelo_Insumos_SNR_V1_0", versionConceptSINIC10));
+                models10SINIC.add(new ModelEntity("Submodelo_Integracion_Insumos_V1_0", versionConceptSINIC10));
+
+                versionConceptSINIC10.setModels(models10SINIC);
+
+                versionConceptService.createVersionConcept(versionConceptSINIC10);
 
                 log.info("The domains 'versions' have been loaded!");
             } catch (Exception e) {
