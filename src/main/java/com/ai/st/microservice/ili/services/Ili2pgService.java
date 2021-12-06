@@ -132,8 +132,19 @@ public class Ili2pgService {
 
         boolean result = false;
 
+        log.warn("AQUII 3: " + models + " srccode: " + srsCode);
+        log.warn("AQUII 3.1: " + databaseHost);
+        log.warn("AQUII 3.1: " + databasePort);
+        log.warn("AQUII 3.1: " + databaseName);
+        log.warn("AQUII 3.1: " + databaseHost);
+        log.warn("AQUII 3.1: " + databaseSchema);
+        log.warn("AQUII 3.1: " + databaseUsername);
+        log.warn("AQUII 3.1: " + databasePassword);
+
         Boolean generateSchema = generateSchema(logFileSchemaImport, iliDirectory, srsCode, models, databaseHost,
                 databasePort, databaseName, databaseSchema, databaseUsername, databasePassword);
+
+        log.warn("AQUII 4: ");
 
         if (generateSchema) {
 
@@ -163,7 +174,6 @@ public class Ili2pgService {
                 result = true;
             } catch (Exception e) {
                 log.error(e.getMessage());
-                result = false;
             }
         }
 
@@ -216,7 +226,7 @@ public class Ili2pgService {
             try {
 
                 QueryEntity queryGetPairingTypeIntegrationEntity = versionConcept.getQuerys().stream().filter(
-                        q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION))
+                                q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION))
                         .findAny().orElse(null);
                 String sqlObjects = queryGetPairingTypeIntegrationEntity.getQuery()
                         .replace("{pairingTypeCode}", String.valueOf(4)).replace("{dbschema}", databaseSchema);
@@ -247,7 +257,7 @@ public class Ili2pgService {
                     String gc = resultsetObjects.getString("gc_predio_catastro");
 
                     QueryEntity queryInsertEntity = versionConcept.getQuerys().stream().filter(
-                            q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
+                                    q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
                             .findAny().orElse(null);
 
                     String sqlInsert = queryInsertEntity.getQuery().replace("{dbschema}", databaseSchema)
@@ -298,7 +308,7 @@ public class Ili2pgService {
             long countSNR = connection.count(sqlCountSNR);
 
             QueryEntity queryCountCadastreEntity = versionConcept.getQuerys().stream().filter(
-                    q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
+                            q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
                     .findAny().orElse(null);
             String sqlCountGC = queryCountCadastreEntity.getQuery().replace("{dbschema}", databaseSchema);
             long countGC = connection.count(sqlCountGC);

@@ -733,7 +733,7 @@ public class Ili2pgV1Controller {
 			}
 
 			VersionDataDto versionData = versionBusiness.getDataVersion(requestExportDto.getVersionModel(), conceptId);
-			if (!(versionData instanceof VersionDataDto)) {
+			if (versionData == null) {
 				throw new InputValidationException(
 						"No se puede realizar la operación por falta de configuración de los modelos ILI");
 			}

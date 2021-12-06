@@ -229,6 +229,34 @@ public class RabbitMQConfig {
                 .with(routingKeyResultValidationSinicFiles);
     }
 
+    // queue result process sinic files
+
+    @Value("${st.rabbitmq.queueResultProcessSinicFiles.queue}")
+    public String queueResultProcessSinicFilesName;
+
+    @Value("${st.rabbitmq.queueResultProcessSinicFiles.exchange}")
+    public String queueResultProcessSinicFilesExchange;
+
+    @Value("${st.rabbitmq.queueResultProcessSinicFiles.routingkey}")
+    public String queueResultProcessSinicFilesRoutingKey;
+
+    @Bean
+    public Queue queueResultProcessSinicFilesName() {
+        return new Queue(queueResultProcessSinicFilesName, false);
+    }
+
+    @Bean
+    public DirectExchange exchangeResultProcessSinicFilesName() {
+        return new DirectExchange(queueResultProcessSinicFilesExchange);
+    }
+
+    @Bean
+    public Binding bindingResultProcessSinicFilesName() {
+        return BindingBuilder.bind(queueResultProcessSinicFilesName())
+                .to(exchangeResultProcessSinicFilesName())
+                .with(queueResultProcessSinicFilesRoutingKey);
+    }
+
     // Setup
 
     @Bean

@@ -95,6 +95,11 @@ public class RabbitMQIliListerner {
             this.exportReference(data.getExportReferenceData());
         }
 
+        if (data.getType().equals(IliProcessQueueDto.IMPORT_SINIC)) {
+            new SinicImport(ili2pgService, zipService, rabbitService, versionBusiness, stTemporalDirectory, srsDefault)
+                    .execute(data.getImportSinicDto());
+        }
+
     }
 
     public void ilivalidator(IlivalidatorBackgroundDto data) {
