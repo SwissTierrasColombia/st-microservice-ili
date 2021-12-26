@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.ai.st.microservice.ili.business.QueueResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
@@ -44,6 +45,15 @@ public class RabbitMQIliListerner {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    @Value("${st.filesDirectory}")
+    private String stFilesDirectory;
+
+    @Value("${st.temporalDirectory}")
+    private String stTemporalDirectory;
+
+    @Value("${iliProcesses.srs}")
+    private String srsDefault;
+
     @Autowired
     private Ili2pgService ili2pgService;
 
@@ -59,14 +69,6 @@ public class RabbitMQIliListerner {
     @Autowired
     private VersionBusiness versionBusiness;
 
-    @Value("${st.filesDirectory}")
-    private String stFilesDirectory;
-
-    @Value("${st.temporalDirectory}")
-    private String stTemporalDirectory;
-
-    @Value("${iliProcesses.srs}")
-    private String srsDefault;
 
     @RabbitListener(queues = "${st.rabbitmq.queueIli.queue}", concurrency = "${st.rabbitmq.queueIli.concurrency}")
     public void iliProcess(IliProcessQueueDto data) {
@@ -93,6 +95,11 @@ public class RabbitMQIliListerner {
             this.exportReference(data.getExportReferenceData());
         }
 
+        if (data.getType().equals(IliProcessQueueDto.IMPORT_SINIC)) {
+            new SinicImport(ili2pgService, zipService, rabbitService, versionBusiness, stTemporalDirectory, srsDefault)
+                    .execute(data.getImportSinicDto());
+        }
+
     }
 
     public void ilivalidator(IlivalidatorBackgroundDto data) {
@@ -104,8 +111,7 @@ public class RabbitMQIliListerner {
 
         try {
 
-            VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(),
-                    ConceptBusiness.CONCEPT_OPERATION);
+            VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(), data.getConceptId());
             if (versionData != null) {
 
                 Path path = Paths.get(data.getPathFile());
@@ -116,11 +122,12 @@ public class RabbitMQIliListerner {
 
                 String nameDirectory = "ili_process_validation_" + RandomStringUtils.random(7, false, true);
                 Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
+                Path tmpDirectoryLog = Files.createTempDirectory(Paths.get(stTemporalDirectory), RandomStringUtils.random(7, false, true));
 
                 if (fileExtension.equalsIgnoreCase("zip")) {
 
                     List<String> paths = zipService.unzip(data.getPathFile(), new File(tmpDirectory.toString()));
-                    pathFileXTF = tmpDirectory.toString() + File.separator + paths.get(0);
+                    pathFileXTF = tmpDirectory + File.separator + paths.get(0);
 
                 } else if (fileExtension.equalsIgnoreCase("xtf")) {
                     pathFileXTF = data.getPathFile();
@@ -130,11 +137,11 @@ public class RabbitMQIliListerner {
                     log.error("there is not file xtf.");
                 } else {
 
-                    String logFileValidation = Paths.get(tmpDirectory.toString(), "ilivalidator.log").toString();
-                    String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
+                    String logFileValidation = Paths.get(tmpDirectoryLog.toString(), "ilivalidator.log").toString();
+//                    String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
 
                     String pathTomlFile = null;
-                    if (!data.getHasGeometryValidation()) {
+                    if (data.getSkipGeometryValidation()) {
 
                         try {
                             final Path pathToml = Files.createTempFile("myTomlFile", ".toml");
@@ -158,12 +165,19 @@ public class RabbitMQIliListerner {
                     }
 
                     validation = ilivalidatorService.validate(pathFileXTF, versionData.getUrl(),
-                            versionData.getModels(), null, logFileValidation, logFileValidationXTF, pathTomlFile);
+                            versionData.getModels(), null, logFileValidation, null, pathTomlFile);
 
                     log.info("validation successful with result: " + validation);
 
                     if (!validation) {
                         validationDto.setErrors(searchErrors(logFileValidation));
+                        validationDto.setLog(logFileValidation);
+                    } else {
+                        try {
+                            FileUtils.deleteDirectory(tmpDirectoryLog.toFile());
+                        } catch (Exception e) {
+                            log.error("It has not been possible delete the directory (log): " + e.getMessage());
+                        }
                     }
 
                     try {
@@ -181,16 +195,31 @@ public class RabbitMQIliListerner {
             validationDto.setErrors(new ArrayList<>(Collections.singletonList(e.getMessage())));
         }
 
-
         validationDto.setIsValid(validation);
-        validationDto.setRequestId(data.getRequestId());
-        validationDto.setSupplyRequestedId(data.getSupplyRequestedId());
-        validationDto.setFilenameTemporal(data.getFilenameTemporal());
+        validationDto.setFilenameTemporal(data.getPathFile());
+        validationDto.setGeometryValidated(!data.getSkipGeometryValidation());
+        validationDto.setSkipErrors(data.getSkipErrors());
+        validationDto.setReferenceId(data.getReferenceId());
+
         validationDto.setUserCode(data.getUserCode());
         validationDto.setObservations(data.getObservations());
-        validationDto.setGeometryValidated(data.getHasGeometryValidation());
 
-        rabbitService.sendStatsValidation(validationDto);
+        validationDto.setRequestId(data.getRequestId());
+        validationDto.setSupplyRequestedId(data.getSupplyRequestedId());
+
+        switch (data.getQueueResponse().toUpperCase()) {
+            case QueueResponse.QUEUE_UPDATE_STATE_XTF_PRODUCTS:
+                rabbitService.sendStatsValidationQueueProducts(validationDto);
+                break;
+            case QueueResponse.QUEUE_UPDATE_STATE_XTF_SINIC_FILES:
+                rabbitService.sendStatsValidationQueueSinicFiles(validationDto);
+                break;
+            case QueueResponse.QUEUE_UPDATE_STATE_XTF_SUPPLIES:
+            default:
+                rabbitService.sendStatsValidationQueueSupplies(validationDto);
+                break;
+        }
+
     }
 
     public void integration(Ili2pgIntegrationCadastreRegistrationWithoutFilesDto data) {
@@ -487,7 +516,7 @@ public class RabbitMQIliListerner {
             e.printStackTrace();
         }
         try {
-            while (it.hasNext()) {
+            while (it.hasNext() && errors.size() <= 30) {
                 String line = it.nextLine();
                 boolean errorFound = line.contains("Error:");
                 if (errorFound) {

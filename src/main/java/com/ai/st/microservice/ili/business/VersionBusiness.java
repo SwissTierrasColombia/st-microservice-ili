@@ -31,13 +31,13 @@ public class VersionBusiness {
 
 	public VersionDataDto getDataVersion(String versionName, Long conceptId) throws BusinessException {
 
-		VersionDataDto versionDataDto = null;
+		VersionDataDto versionDataDto;
 
 		VersionEntity versionEntity = versionService.getVersionByName(versionName);
 
 		ConceptEntity conceptEntity = conceptService.getConceptById(conceptId);
 
-		if (versionEntity instanceof VersionEntity && conceptEntity instanceof ConceptEntity) {
+		if (versionEntity != null && conceptEntity != null) {
 
 			versionDataDto = new VersionDataDto();
 			versionDataDto.setVersion(versionName);

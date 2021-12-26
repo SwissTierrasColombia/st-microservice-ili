@@ -1,4 +1,4 @@
-FROM osgeo/gdal:ubuntu-full-latest
+FROM openjdk:11
 
 ARG XMX=1024m
 ARG PROFILE=production
@@ -11,8 +11,6 @@ ENV CLOUD_CONFIG=$CLOUD_CONFIG
 VOLUME /tmp
 
 ADD  ./target/st-microservice-ili-1.10.0.jar st-microservice-ili.jar
-
-RUN apt-get update && apt-get install -y openjdk-11-jdk
 
 EXPOSE 8080
 
