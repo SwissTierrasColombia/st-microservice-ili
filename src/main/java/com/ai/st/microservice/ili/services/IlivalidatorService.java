@@ -22,7 +22,11 @@ public class IlivalidatorService {
 
             settings.setValue(Validator.SETTING_ILIDIRS, iliDirs);
             settings.setValue(Validator.SETTING_LOGFILE, logFileValidation);
-            settings.setValue(Validator.SETTING_XTFLOG, logFileValidationXTF);
+
+            if (logFileValidationXTF != null) {
+                settings.setValue(Validator.SETTING_XTFLOG, logFileValidationXTF);
+            }
+
             if (iliPluginsDirectory != null) {
                 settings.setValue(Validator.SETTING_PLUGINFOLDER, iliPluginsDirectory);
             }

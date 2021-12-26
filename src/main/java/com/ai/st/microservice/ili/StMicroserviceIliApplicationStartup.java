@@ -225,6 +225,12 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 version11.setCreatedAt(new Date());
                 versionService.createVersion(version11);
 
+                // version 0.1
+                VersionEntity version01 = new VersionEntity();
+                version01.setName("0.1");
+                version01.setCreatedAt(new Date());
+                versionService.createVersion(version01);
+
                 // version 3.0 - concept operation
 
                 VersionConceptEntity versionConceptOperation30 = new VersionConceptEntity();
@@ -356,26 +362,22 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
 
                 versionConceptService.createVersionConcept(versionConceptBPM11);
 
-                // version 1.0 - concept SINIC
+                // version 0.1 - concept SINIC
 
-                VersionConceptEntity versionConceptSINIC10 = new VersionConceptEntity();
-                versionConceptSINIC10.setUrl(modelsDirectory + "sinic/1.0");
-                versionConceptSINIC10.setVersion(version10);
-                versionConceptSINIC10.setConcept(conceptSINIC);
+                VersionConceptEntity versionConceptSINIC01 = new VersionConceptEntity();
+                versionConceptSINIC01.setUrl(modelsDirectory + "sinic/0.1");
+                versionConceptSINIC01.setVersion(version01);
+                versionConceptSINIC01.setConcept(conceptSINIC);
 
-                List<ModelEntity> models10SINIC = new ArrayList<>();
-                models10SINIC.add(new ModelEntity("Submodelo_Cartografia_Catastral_V1_0", versionConceptSINIC10));
-                models10SINIC.add(new ModelEntity("Sumodelo_Avaluos_V1_0", versionConceptSINIC10));
-                models10SINIC.add(new ModelEntity("LADM_COL_V3_0", versionConceptSINIC10));
-                models10SINIC.add(new ModelEntity("Modelo_Aplicacion_LADMCOL_Lev_Cat_V1_0", versionConceptSINIC10));
-                models10SINIC.add(new ModelEntity("ISO19107_PLANAS_V3_0", versionConceptSINIC10));
-                models10SINIC.add(new ModelEntity("Submodelo_Insumos_Gestor_Catastral_V1_0", versionConceptSINIC10));
-                models10SINIC.add(new ModelEntity("Submodelo_Insumos_SNR_V1_0", versionConceptSINIC10));
-                models10SINIC.add(new ModelEntity("Submodelo_Integracion_Insumos_V1_0", versionConceptSINIC10));
+                List<ModelEntity> models01SINIC = new ArrayList<>();
+                models01SINIC.add(new ModelEntity("INTERLIS_TOPOLOGY", versionConceptSINIC01));
+                models01SINIC.add(new ModelEntity("ISO19107_PLANAS_V3_0", versionConceptSINIC01));
+                models01SINIC.add(new ModelEntity("LADM_COL_V3_1", versionConceptSINIC01));
+                models01SINIC.add(new ModelEntity("Modelo_Aplicacion_LADMCOL_RIC_V0_1", versionConceptSINIC01));
 
-                versionConceptSINIC10.setModels(models10SINIC);
+                versionConceptSINIC01.setModels(models01SINIC);
 
-                versionConceptService.createVersionConcept(versionConceptSINIC10);
+                versionConceptService.createVersionConcept(versionConceptSINIC01);
 
                 log.info("The domains 'versions' have been loaded!");
             } catch (Exception e) {

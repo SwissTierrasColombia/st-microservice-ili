@@ -127,7 +127,7 @@ public class RabbitMQIliListerner {
                 if (fileExtension.equalsIgnoreCase("zip")) {
 
                     List<String> paths = zipService.unzip(data.getPathFile(), new File(tmpDirectory.toString()));
-                    pathFileXTF = tmpDirectory.toString() + File.separator + paths.get(0);
+                    pathFileXTF = tmpDirectory + File.separator + paths.get(0);
 
                 } else if (fileExtension.equalsIgnoreCase("xtf")) {
                     pathFileXTF = data.getPathFile();
@@ -138,7 +138,7 @@ public class RabbitMQIliListerner {
                 } else {
 
                     String logFileValidation = Paths.get(tmpDirectoryLog.toString(), "ilivalidator.log").toString();
-                    String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
+//                    String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
 
                     String pathTomlFile = null;
                     if (data.getSkipGeometryValidation()) {
@@ -165,7 +165,7 @@ public class RabbitMQIliListerner {
                     }
 
                     validation = ilivalidatorService.validate(pathFileXTF, versionData.getUrl(),
-                            versionData.getModels(), null, logFileValidation, logFileValidationXTF, pathTomlFile);
+                            versionData.getModels(), null, logFileValidation, null, pathTomlFile);
 
                     log.info("validation successful with result: " + validation);
 
@@ -516,7 +516,7 @@ public class RabbitMQIliListerner {
             e.printStackTrace();
         }
         try {
-            while (it.hasNext()) {
+            while (it.hasNext() && errors.size() <= 30) {
                 String line = it.nextLine();
                 boolean errorFound = line.contains("Error:");
                 if (errorFound) {

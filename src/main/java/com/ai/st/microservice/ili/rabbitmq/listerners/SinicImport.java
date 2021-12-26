@@ -55,33 +55,21 @@ public final class SinicImport {
             VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(), data.getConceptId());
             if (versionData != null) {
 
-                log.warn("AQUII -1: " + data.getPathXTF());
-                log.warn("AQUII -1: " + stTemporalDirectory);
-
                 String nameDirectory = "ili_sinic_process_import_" + RandomStringUtils.random(8, false, true);
-                log.warn("AQUII -1: " + nameDirectory);
                 Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
-
-                log.warn("AQUII 0: ");
 
                 List<String> paths = zipService.unzip(data.getPathXTF(), new File(tmpDirectory.toString()));
                 String pathFileXTF = tmpDirectory + File.separator + paths.get(0);
 
-                log.warn("AQUII 1: ");
-
                 String logFileSchemaImport = tmpDirectory + File.separator + "schema_sinic_import.log";
                 String logFileImport = tmpDirectory + File.separator + "sinic_import.log";
 
-                String models = "Submodelo_Insumos_Gestor_Catastral_V1_0;Submodelo_Insumos_SNR_V1_0;Submodelo_Integracion_Insumos_V1_0;";
-//                String models = versionData.getModels();
-                log.warn("AQUII JHON: " + models + " version: " + versionData.getUrl());
+                String models = versionData.getModels();
 
                 boolean importValid = ili2pgService.import2pg(pathFileXTF, logFileSchemaImport, logFileImport,
                         versionData.getUrl(), srsDefault, models, data.getDatabaseHost(),
                         data.getDatabasePort(), data.getDatabaseName(), data.getDatabaseSchema(),
                         data.getDatabaseUsername(), data.getDatabasePassword());
-
-                log.warn("AQUII 2: ");
 
                 try {
                     FileUtils.deleteDirectory(tmpDirectory.toFile());

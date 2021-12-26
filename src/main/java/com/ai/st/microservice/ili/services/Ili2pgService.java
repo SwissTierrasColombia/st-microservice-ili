@@ -132,23 +132,14 @@ public class Ili2pgService {
 
         boolean result = false;
 
-        log.warn("AQUII 3: " + models + " srccode: " + srsCode);
-        log.warn("AQUII 3.1: " + databaseHost);
-        log.warn("AQUII 3.1: " + databasePort);
-        log.warn("AQUII 3.1: " + databaseName);
-        log.warn("AQUII 3.1: " + databaseHost);
-        log.warn("AQUII 3.1: " + databaseSchema);
-        log.warn("AQUII 3.1: " + databaseUsername);
-        log.warn("AQUII 3.1: " + databasePassword);
-
         Boolean generateSchema = generateSchema(logFileSchemaImport, iliDirectory, srsCode, models, databaseHost,
                 databasePort, databaseName, databaseSchema, databaseUsername, databasePassword);
-
-        log.warn("AQUII 4: ");
 
         if (generateSchema) {
 
             try {
+
+                log.info("Empezando importación ...");
 
                 Config config = getDefaultConfig();
 
