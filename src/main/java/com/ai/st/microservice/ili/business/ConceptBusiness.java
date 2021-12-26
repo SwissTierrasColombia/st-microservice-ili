@@ -11,4 +11,6 @@ public class ConceptBusiness {
 
     public static final Long CONCEPT_RECEIPT_FROM_BPM = (long) 3;
 
+    public static final Long CONCEPT_SINIC = (long) 4;
+
 }

@@ -175,7 +175,7 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queueResultExport()).to(exchangeResultExport()).with(routingkeyResultExportName);
     }
 
-    // queue result validation
+    // queue result validation products
 
     @Value("${st.rabbitmq.queueResultValidationProducts.queue}")
     public String queueResultValidation;
@@ -200,6 +200,61 @@ public class RabbitMQConfig {
     public Binding bindingQueueResultValidation() {
         return BindingBuilder.bind(QueueResultValidation()).to(exchangeResultValidation())
                 .with(routingKeyResultValidation);
+    }
+
+    // queue result validation sinic files
+
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.queue}")
+    public String queueResultValidationSinicFiles;
+
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.exchange}")
+    public String exchangeResultValidationSinicFiles;
+
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.routingkey}")
+    public String routingKeyResultValidationSinicFiles;
+
+    @Bean
+    public Queue QueueResultValidationSinicFiles() {
+        return new Queue(queueResultValidationSinicFiles, false);
+    }
+
+    @Bean
+    public DirectExchange exchangeResultValidationSinicFiles() {
+        return new DirectExchange(exchangeResultValidationSinicFiles);
+    }
+
+    @Bean
+    public Binding bindingQueueResultValidationSinicFiles() {
+        return BindingBuilder.bind(QueueResultValidationSinicFiles()).to(exchangeResultValidationSinicFiles())
+                .with(routingKeyResultValidationSinicFiles);
+    }
+
+    // queue result process sinic files
+
+    @Value("${st.rabbitmq.queueResultProcessSinicFiles.queue}")
+    public String queueResultProcessSinicFilesName;
+
+    @Value("${st.rabbitmq.queueResultProcessSinicFiles.exchange}")
+    public String queueResultProcessSinicFilesExchange;
+
+    @Value("${st.rabbitmq.queueResultProcessSinicFiles.routingkey}")
+    public String queueResultProcessSinicFilesRoutingKey;
+
+    @Bean
+    public Queue queueResultProcessSinicFilesName() {
+        return new Queue(queueResultProcessSinicFilesName, false);
+    }
+
+    @Bean
+    public DirectExchange exchangeResultProcessSinicFilesName() {
+        return new DirectExchange(queueResultProcessSinicFilesExchange);
+    }
+
+    @Bean
+    public Binding bindingResultProcessSinicFilesName() {
+        return BindingBuilder.bind(queueResultProcessSinicFilesName())
+                .to(exchangeResultProcessSinicFilesName())
+                .with(queueResultProcessSinicFilesRoutingKey);
     }
 
     // Setup

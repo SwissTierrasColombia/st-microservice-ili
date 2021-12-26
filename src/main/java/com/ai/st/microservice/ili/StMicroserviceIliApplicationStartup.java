@@ -75,6 +75,11 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 conceptBPM.setName("RECEPCIÓN DE PRODUCTOS A PARTIR DEL BPM");
                 conceptService.createConcept(conceptBPM);
 
+                ConceptEntity conceptSinic = new ConceptEntity();
+                conceptSinic.setId(ConceptBusiness.CONCEPT_SINIC);
+                conceptSinic.setName("SINIC");
+                conceptService.createConcept(conceptSinic);
+
                 log.info("The domains 'concepts' have been loaded!");
             } catch (Exception e) {
                 log.error("Failed to load 'concepts' domains");
@@ -200,6 +205,7 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 ConceptEntity conceptOperator = conceptService.getConceptById(ConceptBusiness.CONCEPT_OPERATION);
                 ConceptEntity conceptIntegration = conceptService.getConceptById(ConceptBusiness.CONCEPT_INTEGRATION);
                 ConceptEntity conceptBPM = conceptService.getConceptById(ConceptBusiness.CONCEPT_RECEIPT_FROM_BPM);
+                ConceptEntity conceptSINIC = conceptService.getConceptById(ConceptBusiness.CONCEPT_SINIC);
 
                 // version 3.0
                 VersionEntity version30 = new VersionEntity();
@@ -218,6 +224,12 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 version11.setName("1.1");
                 version11.setCreatedAt(new Date());
                 versionService.createVersion(version11);
+
+                // version 0.1
+                VersionEntity version01 = new VersionEntity();
+                version01.setName("0.1");
+                version01.setCreatedAt(new Date());
+                versionService.createVersion(version01);
 
                 // version 3.0 - concept operation
 
@@ -349,6 +361,23 @@ public class StMicroserviceIliApplicationStartup implements ApplicationListener<
                 versionConceptBPM11.setModels(models11BPM);
 
                 versionConceptService.createVersionConcept(versionConceptBPM11);
+
+                // version 0.1 - concept SINIC
+
+                VersionConceptEntity versionConceptSINIC01 = new VersionConceptEntity();
+                versionConceptSINIC01.setUrl(modelsDirectory + "sinic/0.1");
+                versionConceptSINIC01.setVersion(version01);
+                versionConceptSINIC01.setConcept(conceptSINIC);
+
+                List<ModelEntity> models01SINIC = new ArrayList<>();
+                models01SINIC.add(new ModelEntity("INTERLIS_TOPOLOGY", versionConceptSINIC01));
+                models01SINIC.add(new ModelEntity("ISO19107_PLANAS_V3_0", versionConceptSINIC01));
+                models01SINIC.add(new ModelEntity("LADM_COL_V3_1", versionConceptSINIC01));
+                models01SINIC.add(new ModelEntity("Modelo_Aplicacion_LADMCOL_RIC_V0_1", versionConceptSINIC01));
+
+                versionConceptSINIC01.setModels(models01SINIC);
+
+                versionConceptService.createVersionConcept(versionConceptSINIC01);
 
                 log.info("The domains 'versions' have been loaded!");
             } catch (Exception e) {

@@ -1,16 +1,10 @@
 package com.ai.st.microservice.ili.services;
 
+import com.ai.st.microservice.ili.dto.*;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.ai.st.microservice.ili.dto.IliExportResultDto;
-import com.ai.st.microservice.ili.dto.IliProcessQueueDto;
-import com.ai.st.microservice.ili.dto.IntegrationStatDto;
-import com.ai.st.microservice.ili.dto.ResultExportDto;
-import com.ai.st.microservice.ili.dto.ResultImportDto;
-import com.ai.st.microservice.ili.dto.ValidationDto;
 
 @Service
 public class RabbitMQSenderService {
@@ -60,6 +54,18 @@ public class RabbitMQSenderService {
     @Value("${st.rabbitmq.queueResultValidationProducts.routingkey}")
     public String routingKeyResultValidationName;
 
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.exchange}")
+    public String exchangeResultValidationSinicFilesName;
+
+    @Value("${st.rabbitmq.queueResultValidationSinicFiles.routingkey}")
+    public String routingKeyResultValidationSinicFilesName;
+
+    @Value("${st.rabbitmq.queueResultProcessSinicFiles.exchange}")
+    public String queueResultProcessSinicFilesExchange;
+
+    @Value("${st.rabbitmq.queueResultProcessSinicFiles.routingkey}")
+    public String queueResultProcessSinicFilesRoutingKey;
+
 
     public void sendStats(IntegrationStatDto integrationStats) {
         rabbitTemplate.convertSendAndReceive(exchangeUpdateIntegrationsName, routingkeyUpdateIntegrationsName,
@@ -78,6 +84,10 @@ public class RabbitMQSenderService {
         rabbitTemplate.convertAndSend(exchangeResultValidationName, routingKeyResultValidationName, data);
     }
 
+    public void sendStatsValidationQueueSinicFiles(ValidationDto data) {
+        rabbitTemplate.convertAndSend(exchangeResultValidationSinicFilesName, routingKeyResultValidationSinicFilesName, data);
+    }
+
     public void sendDataToIliProcess(IliProcessQueueDto data) {
         rabbitTemplate.convertAndSend(exchangeIliName, routingkeyIliName, data);
     }
@@ -88,6 +98,10 @@ public class RabbitMQSenderService {
 
     public void sendResultToExport(ResultExportDto data) {
         rabbitTemplate.convertAndSend(exchangeResultExportName, routingkeyResultExportName, data);
+    }
+
+    public void sendResultImportSinicFile(ResultSinicImportFile data) {
+        rabbitTemplate.convertAndSend(queueResultProcessSinicFilesExchange, queueResultProcessSinicFilesRoutingKey, data);
     }
 
 }

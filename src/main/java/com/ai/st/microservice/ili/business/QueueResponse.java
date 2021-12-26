@@ -7,5 +7,6 @@ public final class QueueResponse {
 
     public final static String QUEUE_UPDATE_STATE_XTF_SUPPLIES = "QUEUE_UPDATE_STATE_XTF_SUPPLIES";
     public final static String QUEUE_UPDATE_STATE_XTF_PRODUCTS = "QUEUE_UPDATE_STATE_XTF_PRODUCTS";
+    public final static String QUEUE_UPDATE_STATE_XTF_SINIC_FILES = "QUEUE_UPDATE_STATE_XTF_SINIC_FILES";
 
 }
