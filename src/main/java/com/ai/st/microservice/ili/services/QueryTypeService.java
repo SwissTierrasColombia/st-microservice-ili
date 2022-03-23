@@ -11,23 +11,23 @@ import com.ai.st.microservice.ili.repositories.QueryTypeRepository;
 @Service
 public class QueryTypeService implements IQueryTypeService {
 
-	@Autowired
-	private QueryTypeRepository queryTypeRepository;
+    @Autowired
+    private QueryTypeRepository queryTypeRepository;
 
-	@Override
-	public Long getCount() {
-		return queryTypeRepository.count();
-	}
+    @Override
+    public Long getCount() {
+        return queryTypeRepository.count();
+    }
 
-	@Override
-	@Transactional
-	public QueryTypeEntity createQueryType(QueryTypeEntity queryType) {
-		return queryTypeRepository.save(queryType);
-	}
+    @Override
+    @Transactional
+    public QueryTypeEntity createQueryType(QueryTypeEntity queryType) {
+        return queryTypeRepository.save(queryType);
+    }
 
-	@Override
-	public QueryTypeEntity getQueryTypeById(Long id) {
-		return queryTypeRepository.findById(id).orElse(null);
-	}
+    @Override
+    public QueryTypeEntity getQueryTypeById(Long id) {
+        return queryTypeRepository.findById(id).orElse(null);
+    }
 
 }

@@ -23,68 +23,68 @@ import com.ai.st.microservice.ili.services.IVersionService;
 @Component
 public class VersionBusiness {
 
-	@Autowired
-	private IVersionService versionService;
+    @Autowired
+    private IVersionService versionService;
 
-	@Autowired
-	private IConceptService conceptService;
+    @Autowired
+    private IConceptService conceptService;
 
-	public VersionDataDto getDataVersion(String versionName, Long conceptId) throws BusinessException {
+    public VersionDataDto getDataVersion(String versionName, Long conceptId) throws BusinessException {
 
-		VersionDataDto versionDataDto;
+        VersionDataDto versionDataDto;
 
-		VersionEntity versionEntity = versionService.getVersionByName(versionName);
+        VersionEntity versionEntity = versionService.getVersionByName(versionName);
 
-		ConceptEntity conceptEntity = conceptService.getConceptById(conceptId);
+        ConceptEntity conceptEntity = conceptService.getConceptById(conceptId);
 
-		if (versionEntity != null && conceptEntity != null) {
+        if (versionEntity != null && conceptEntity != null) {
 
-			versionDataDto = new VersionDataDto();
-			versionDataDto.setVersion(versionName);
+            versionDataDto = new VersionDataDto();
+            versionDataDto.setVersion(versionName);
 
-			VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
-					.filter(vC -> vC.getConcept().getId().equals(conceptId)).findAny().orElse(null);
+            VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
+                    .filter(vC -> vC.getConcept().getId().equals(conceptId)).findAny().orElse(null);
 
-			String models = "";
-			for (ModelEntity modelEntity : versionConcept.getModels()) {
-				models += modelEntity.getName() + ";";
-			}
+            String models = "";
+            for (ModelEntity modelEntity : versionConcept.getModels()) {
+                models += modelEntity.getName() + ";";
+            }
 
-			for (QueryEntity queryEntity : versionConcept.getQuerys()) {
-				QueryDto queryDto = new QueryDto();
-				queryDto.setId(queryEntity.getId());
-				queryDto.setQuery(queryEntity.getQuery());
-				QueryTypeEntity queryTypeEntity = queryEntity.getQueryType();
-				queryDto.setQueryType(new QueryTypeDto(queryTypeEntity.getId(), queryTypeEntity.getName()));
-				versionDataDto.getQueries().add(queryDto);
-			}
+            for (QueryEntity queryEntity : versionConcept.getQuerys()) {
+                QueryDto queryDto = new QueryDto();
+                queryDto.setId(queryEntity.getId());
+                queryDto.setQuery(queryEntity.getQuery());
+                QueryTypeEntity queryTypeEntity = queryEntity.getQueryType();
+                queryDto.setQueryType(new QueryTypeDto(queryTypeEntity.getId(), queryTypeEntity.getName()));
+                versionDataDto.getQueries().add(queryDto);
+            }
 
-			versionDataDto.setUrl(versionConcept.getUrl());
-			versionDataDto.setModels(models);
+            versionDataDto.setUrl(versionConcept.getUrl());
+            versionDataDto.setModels(models);
 
-		} else {
-			throw new BusinessException("No se ha encontrado la versión");
-		}
+        } else {
+            throw new BusinessException("No se ha encontrado la versión");
+        }
 
-		return versionDataDto;
-	}
+        return versionDataDto;
+    }
 
-	public List<VersionDto> getAvailableVersions() throws BusinessException {
+    public List<VersionDto> getAvailableVersions() throws BusinessException {
 
-		List<VersionDto> versionsDto = new ArrayList<>();
+        List<VersionDto> versionsDto = new ArrayList<>();
 
-		List<VersionEntity> versionsEntity = versionService.getVersions();
+        List<VersionEntity> versionsEntity = versionService.getVersions();
 
-		for (VersionEntity versionEntity : versionsEntity) {
-			VersionDto versionDataDto = new VersionDto();
-			versionDataDto.setId(versionEntity.getId());
-			versionDataDto.setName(versionEntity.getName());
-			versionDataDto.setCreatedAt(versionEntity.getCreatedAt());
+        for (VersionEntity versionEntity : versionsEntity) {
+            VersionDto versionDataDto = new VersionDto();
+            versionDataDto.setId(versionEntity.getId());
+            versionDataDto.setName(versionEntity.getName());
+            versionDataDto.setCreatedAt(versionEntity.getCreatedAt());
 
-			versionsDto.add(versionDataDto);
-		}
+            versionsDto.add(versionDataDto);
+        }
 
-		return versionsDto;
-	}
+        return versionsDto;
+    }
 
 }

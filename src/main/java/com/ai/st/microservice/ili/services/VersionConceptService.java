@@ -11,13 +11,13 @@ import com.ai.st.microservice.ili.repositories.VersionConceptRepository;
 @Service
 public class VersionConceptService implements IVersionConceptService {
 
-	@Autowired
-	private VersionConceptRepository versionConceptRepository;
+    @Autowired
+    private VersionConceptRepository versionConceptRepository;
 
-	@Override
-	@Transactional
-	public VersionConceptEntity createVersionConcept(VersionConceptEntity versionConcept) {
-		return versionConceptRepository.save(versionConcept);
-	}
+    @Override
+    @Transactional
+    public VersionConceptEntity createVersionConcept(VersionConceptEntity versionConcept) {
+        return versionConceptRepository.save(versionConcept);
+    }
 
 }

@@ -4,38 +4,38 @@ import java.io.Serializable;
 
 public class ResultExportDto implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Boolean result;
-	private String pathFile;
-	private String reference;
+    private Boolean result;
+    private String pathFile;
+    private String reference;
 
-	public ResultExportDto() {
+    public ResultExportDto() {
 
-	}
+    }
 
-	public Boolean getResult() {
-		return result;
-	}
+    public Boolean getResult() {
+        return result;
+    }
 
-	public void setResult(Boolean result) {
-		this.result = result;
-	}
+    public void setResult(Boolean result) {
+        this.result = result;
+    }
 
-	public String getPathFile() {
-		return pathFile;
-	}
+    public String getPathFile() {
+        return pathFile;
+    }
 
-	public void setPathFile(String pathFile) {
-		this.pathFile = pathFile;
-	}
+    public void setPathFile(String pathFile) {
+        this.pathFile = pathFile;
+    }
 
-	public String getReference() {
-		return reference;
-	}
+    public String getReference() {
+        return reference;
+    }
 
-	public void setReference(String reference) {
-		this.reference = reference;
-	}
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
 
 }

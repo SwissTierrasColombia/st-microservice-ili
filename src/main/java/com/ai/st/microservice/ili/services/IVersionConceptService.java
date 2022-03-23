@@ -4,6 +4,6 @@ import com.ai.st.microservice.ili.entities.VersionConceptEntity;
 
 public interface IVersionConceptService {
 
-	public VersionConceptEntity createVersionConcept(VersionConceptEntity versionConcept);
+    public VersionConceptEntity createVersionConcept(VersionConceptEntity versionConcept);
 
 }

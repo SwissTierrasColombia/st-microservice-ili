@@ -10,98 +10,98 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "Ili2pgImportDto", description = "Ili2pg Import Dto")
 public class RequestIli2pgImportDto implements Serializable {
 
-	private static final long serialVersionUID = -6634224004229230650L;
+    private static final long serialVersionUID = -6634224004229230650L;
 
-	@ApiModelProperty(required = true, notes = "Database host")
-	private String databaseHost;
+    @ApiModelProperty(required = true, notes = "Database host")
+    private String databaseHost;
 
-	@ApiModelProperty(required = true, notes = "Database port")
-	private String databasePort;
+    @ApiModelProperty(required = true, notes = "Database port")
+    private String databasePort;
 
-	@ApiModelProperty(required = true, notes = "Database schema")
-	private String databaseSchema;
+    @ApiModelProperty(required = true, notes = "Database schema")
+    private String databaseSchema;
 
-	@ApiModelProperty(required = true, notes = "Database username")
-	private String databaseUsername;
+    @ApiModelProperty(required = true, notes = "Database username")
+    private String databaseUsername;
 
-	@ApiModelProperty(required = true, notes = "Database password")
-	private String databasePassword;
+    @ApiModelProperty(required = true, notes = "Database password")
+    private String databasePassword;
 
-	@ApiModelProperty(required = true, notes = "Database name")
-	private String databaseName;
+    @ApiModelProperty(required = true, notes = "Database name")
+    private String databaseName;
 
-	@ApiModelProperty(required = true, notes = "File XTF")
-	private MultipartFile fileXTF;
+    @ApiModelProperty(required = true, notes = "File XTF")
+    private MultipartFile fileXTF;
 
-	@ApiModelProperty(required = false, notes = "Model version")
-	private String versionModel;
+    @ApiModelProperty(required = false, notes = "Model version")
+    private String versionModel;
 
-	public RequestIli2pgImportDto() {
-		this.versionModel = "2.9.4";
-	}
+    public RequestIli2pgImportDto() {
+        this.versionModel = "2.9.4";
+    }
 
-	public String getDatabaseHost() {
-		return databaseHost;
-	}
+    public String getDatabaseHost() {
+        return databaseHost;
+    }
 
-	public void setDatabaseHost(String databaseHost) {
-		this.databaseHost = databaseHost;
-	}
+    public void setDatabaseHost(String databaseHost) {
+        this.databaseHost = databaseHost;
+    }
 
-	public String getDatabasePort() {
-		return databasePort;
-	}
+    public String getDatabasePort() {
+        return databasePort;
+    }
 
-	public void setDatabasePort(String databasePort) {
-		this.databasePort = databasePort;
-	}
+    public void setDatabasePort(String databasePort) {
+        this.databasePort = databasePort;
+    }
 
-	public String getDatabaseSchema() {
-		return databaseSchema;
-	}
+    public String getDatabaseSchema() {
+        return databaseSchema;
+    }
 
-	public void setDatabaseSchema(String databaseSchema) {
-		this.databaseSchema = databaseSchema;
-	}
+    public void setDatabaseSchema(String databaseSchema) {
+        this.databaseSchema = databaseSchema;
+    }
 
-	public String getDatabaseUsername() {
-		return databaseUsername;
-	}
+    public String getDatabaseUsername() {
+        return databaseUsername;
+    }
 
-	public void setDatabaseUsername(String databaseUsername) {
-		this.databaseUsername = databaseUsername;
-	}
+    public void setDatabaseUsername(String databaseUsername) {
+        this.databaseUsername = databaseUsername;
+    }
 
-	public String getDatabasePassword() {
-		return databasePassword;
-	}
+    public String getDatabasePassword() {
+        return databasePassword;
+    }
 
-	public void setDatabasePassword(String databasePassword) {
-		this.databasePassword = databasePassword;
-	}
+    public void setDatabasePassword(String databasePassword) {
+        this.databasePassword = databasePassword;
+    }
 
-	public String getDatabaseName() {
-		return databaseName;
-	}
+    public String getDatabaseName() {
+        return databaseName;
+    }
 
-	public void setDatabaseName(String databaseName) {
-		this.databaseName = databaseName;
-	}
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
 
-	public MultipartFile getFileXTF() {
-		return fileXTF;
-	}
+    public MultipartFile getFileXTF() {
+        return fileXTF;
+    }
 
-	public void setFileXTF(MultipartFile fileXTF) {
-		this.fileXTF = fileXTF;
-	}
+    public void setFileXTF(MultipartFile fileXTF) {
+        this.fileXTF = fileXTF;
+    }
 
-	public String getVersionModel() {
-		return versionModel;
-	}
+    public String getVersionModel() {
+        return versionModel;
+    }
 
-	public void setVersionModel(String versionModel) {
-		this.versionModel = versionModel;
-	}
+    public void setVersionModel(String versionModel) {
+        this.versionModel = versionModel;
+    }
 
 }

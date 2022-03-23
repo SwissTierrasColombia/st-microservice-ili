@@ -18,18 +18,19 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @Configuration
 public class SwaggerConfig {
 
-	@Bean
-	public Docket usersApi() {
-		return new Docket(DocumentationType.SWAGGER_2).apiInfo(usersApiInfo()).select().paths(userPaths())
-				.apis(RequestHandlerSelectors.any()).build().useDefaultResponseMessages(false);
-	}
+    @Bean
+    public Docket usersApi() {
+        return new Docket(DocumentationType.SWAGGER_2).apiInfo(usersApiInfo()).select().paths(userPaths())
+                .apis(RequestHandlerSelectors.any()).build().useDefaultResponseMessages(false);
+    }
 
-	private ApiInfo usersApiInfo() {
-		return new ApiInfoBuilder().title("Microservice Ili").version("1.0").license("GNU GENERAL PUBLIC LICENSE - Version 2").build();
-	}
+    private ApiInfo usersApiInfo() {
+        return new ApiInfoBuilder().title("Microservice Ili").version("1.0")
+                .license("GNU GENERAL PUBLIC LICENSE - Version 2").build();
+    }
 
-	private Predicate<String> userPaths() {
-		return regex("/api.*");
-	}
+    private Predicate<String> userPaths() {
+        return regex("/api.*");
+    }
 
 }

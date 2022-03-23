@@ -19,55 +19,55 @@ import javax.persistence.TemporalType;
 @Table(name = "versions", schema = "ili")
 public class VersionEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
-	@Column(name = "name", nullable = false, length = 255)
-	private String name;
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
 
-	@Column(name = "created_at", nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createdAt;
+    @Column(name = "created_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 
-	@OneToMany(mappedBy = "version", cascade = CascadeType.ALL)
-	private List<VersionConceptEntity> versionsConcepts = new ArrayList<VersionConceptEntity>();
+    @OneToMany(mappedBy = "version", cascade = CascadeType.ALL)
+    private List<VersionConceptEntity> versionsConcepts = new ArrayList<VersionConceptEntity>();
 
-	public VersionEntity() {
+    public VersionEntity() {
 
-	}
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public Date getCreatedAt() {
-		return createdAt;
-	}
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public List<VersionConceptEntity> getVersionsConcepts() {
-		return versionsConcepts;
-	}
+    public List<VersionConceptEntity> getVersionsConcepts() {
+        return versionsConcepts;
+    }
 
-	public void setVersionsConcepts(List<VersionConceptEntity> versionsConcepts) {
-		this.versionsConcepts = versionsConcepts;
-	}
+    public void setVersionsConcepts(List<VersionConceptEntity> versionsConcepts) {
+        this.versionsConcepts = versionsConcepts;
+    }
 
 }

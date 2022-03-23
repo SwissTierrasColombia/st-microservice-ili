@@ -18,74 +18,74 @@ import javax.persistence.Table;
 @Table(name = "versions_x_concepts", schema = "ili")
 public class VersionConceptEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "version_id", nullable = false)
-	private VersionEntity version;
+    @ManyToOne
+    @JoinColumn(name = "version_id", nullable = false)
+    private VersionEntity version;
 
-	@ManyToOne
-	@JoinColumn(name = "concept_id", nullable = false)
-	private ConceptEntity concept;
+    @ManyToOne
+    @JoinColumn(name = "concept_id", nullable = false)
+    private ConceptEntity concept;
 
-	@Column(name = "url", nullable = false, length = 500)
-	private String url;
+    @Column(name = "url", nullable = false, length = 500)
+    private String url;
 
-	@OneToMany(mappedBy = "versionConcept", cascade = CascadeType.ALL)
-	private List<ModelEntity> models = new ArrayList<ModelEntity>();
+    @OneToMany(mappedBy = "versionConcept", cascade = CascadeType.ALL)
+    private List<ModelEntity> models = new ArrayList<ModelEntity>();
 
-	@OneToMany(mappedBy = "versionConcept", cascade = CascadeType.ALL)
-	private List<QueryEntity> querys = new ArrayList<QueryEntity>();
+    @OneToMany(mappedBy = "versionConcept", cascade = CascadeType.ALL)
+    private List<QueryEntity> querys = new ArrayList<QueryEntity>();
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public ConceptEntity getConcept() {
-		return concept;
-	}
+    public ConceptEntity getConcept() {
+        return concept;
+    }
 
-	public void setConcept(ConceptEntity concept) {
-		this.concept = concept;
-	}
+    public void setConcept(ConceptEntity concept) {
+        this.concept = concept;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public VersionEntity getVersion() {
-		return version;
-	}
+    public VersionEntity getVersion() {
+        return version;
+    }
 
-	public void setVersion(VersionEntity version) {
-		this.version = version;
-	}
+    public void setVersion(VersionEntity version) {
+        this.version = version;
+    }
 
-	public List<ModelEntity> getModels() {
-		return models;
-	}
+    public List<ModelEntity> getModels() {
+        return models;
+    }
 
-	public void setModels(List<ModelEntity> models) {
-		this.models = models;
-	}
+    public void setModels(List<ModelEntity> models) {
+        this.models = models;
+    }
 
-	public List<QueryEntity> getQuerys() {
-		return querys;
-	}
+    public List<QueryEntity> getQuerys() {
+        return querys;
+    }
 
-	public void setQuerys(List<QueryEntity> querys) {
-		this.querys = querys;
-	}
+    public void setQuerys(List<QueryEntity> querys) {
+        this.querys = querys;
+    }
 
 }

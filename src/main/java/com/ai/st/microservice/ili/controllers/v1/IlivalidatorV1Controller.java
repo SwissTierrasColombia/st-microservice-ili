@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Api(value = "Ilivalidator", tags = {"ilivalidator"})
+@Api(value = "Ilivalidator", tags = { "ilivalidator" })
 @RestController
 @RequestMapping("api/ili/ilivalidator/v1")
 public class IlivalidatorV1Controller {
@@ -42,8 +42,8 @@ public class IlivalidatorV1Controller {
 
     @RequestMapping(value = "validate/background", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Export ")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Validation done"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Validation done"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
     public ResponseEntity<?> validateBackground(@RequestBody IlivalidatorBackgroundDto request) {
 

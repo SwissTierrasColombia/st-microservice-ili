@@ -11,23 +11,23 @@ import com.ai.st.microservice.ili.repositories.ConceptRepository;
 @Service
 public class ConceptService implements IConceptService {
 
-	@Autowired
-	private ConceptRepository conceptRepository;
+    @Autowired
+    private ConceptRepository conceptRepository;
 
-	@Override
-	public Long getCount() {
-		return conceptRepository.count();
-	}
+    @Override
+    public Long getCount() {
+        return conceptRepository.count();
+    }
 
-	@Override
-	@Transactional
-	public ConceptEntity createConcept(ConceptEntity conceptEntity) {
-		return conceptRepository.save(conceptEntity);
-	}
+    @Override
+    @Transactional
+    public ConceptEntity createConcept(ConceptEntity conceptEntity) {
+        return conceptRepository.save(conceptEntity);
+    }
 
-	@Override
-	public ConceptEntity getConceptById(Long id) {
-		return conceptRepository.findById(id).orElse(null);
-	}
+    @Override
+    public ConceptEntity getConceptById(Long id) {
+        return conceptRepository.findById(id).orElse(null);
+    }
 
 }

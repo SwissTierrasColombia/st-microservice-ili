@@ -69,7 +69,6 @@ public class RabbitMQIliListerner {
     @Autowired
     private VersionBusiness versionBusiness;
 
-
     @RabbitListener(queues = "${st.rabbitmq.queueIli.queue}", concurrency = "${st.rabbitmq.queueIli.concurrency}")
     public void iliProcess(IliProcessQueueDto data) {
 
@@ -122,7 +121,8 @@ public class RabbitMQIliListerner {
 
                 String nameDirectory = "ili_process_validation_" + RandomStringUtils.random(7, false, true);
                 Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
-                Path tmpDirectoryLog = Files.createTempDirectory(Paths.get(stTemporalDirectory), RandomStringUtils.random(7, false, true));
+                Path tmpDirectoryLog = Files.createTempDirectory(Paths.get(stTemporalDirectory),
+                        RandomStringUtils.random(7, false, true));
 
                 if (fileExtension.equalsIgnoreCase("zip")) {
 
@@ -138,7 +138,7 @@ public class RabbitMQIliListerner {
                 } else {
 
                     String logFileValidation = Paths.get(tmpDirectoryLog.toString(), "ilivalidator.log").toString();
-//                    String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
+                    // String logFileValidationXTF = Paths.get(tmpDirectory.toString(), "ilivalidator.xtf").toString();
 
                     String pathTomlFile = null;
                     if (data.getSkipGeometryValidation()) {
@@ -146,8 +146,7 @@ public class RabbitMQIliListerner {
                         try {
                             final Path pathToml = Files.createTempFile("myTomlFile", ".toml");
 
-                            String dataFile = "[\"PARAMETER\"]\n" +
-                                    "defaultGeometryTypeValidation=\"off\"";
+                            String dataFile = "[\"PARAMETER\"]\n" + "defaultGeometryTypeValidation=\"off\"";
 
                             // Writing data here
                             byte[] buf = dataFile.getBytes();
@@ -208,16 +207,16 @@ public class RabbitMQIliListerner {
         validationDto.setSupplyRequestedId(data.getSupplyRequestedId());
 
         switch (data.getQueueResponse().toUpperCase()) {
-            case QueueResponse.QUEUE_UPDATE_STATE_XTF_PRODUCTS:
-                rabbitService.sendStatsValidationQueueProducts(validationDto);
-                break;
-            case QueueResponse.QUEUE_UPDATE_STATE_XTF_SINIC_FILES:
-                rabbitService.sendStatsValidationQueueSinicFiles(validationDto);
-                break;
-            case QueueResponse.QUEUE_UPDATE_STATE_XTF_SUPPLIES:
-            default:
-                rabbitService.sendStatsValidationQueueSupplies(validationDto);
-                break;
+        case QueueResponse.QUEUE_UPDATE_STATE_XTF_PRODUCTS:
+            rabbitService.sendStatsValidationQueueProducts(validationDto);
+            break;
+        case QueueResponse.QUEUE_UPDATE_STATE_XTF_SINIC_FILES:
+            rabbitService.sendStatsValidationQueueSinicFiles(validationDto);
+            break;
+        case QueueResponse.QUEUE_UPDATE_STATE_XTF_SUPPLIES:
+        default:
+            rabbitService.sendStatsValidationQueueSupplies(validationDto);
+            break;
         }
 
     }

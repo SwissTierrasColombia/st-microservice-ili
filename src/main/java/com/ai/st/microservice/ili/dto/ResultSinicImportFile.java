@@ -5,9 +5,7 @@ import java.io.Serializable;
 public final class ResultSinicImportFile implements Serializable {
 
     public enum Status {
-        IMPORTING,
-        SUCCESS_IMPORT,
-        FAILED_IMPORT,
+        IMPORTING, SUCCESS_IMPORT, FAILED_IMPORT,
     }
 
     private Status result;

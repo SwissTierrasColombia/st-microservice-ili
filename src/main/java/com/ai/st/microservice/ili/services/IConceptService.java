@@ -4,10 +4,10 @@ import com.ai.st.microservice.ili.entities.ConceptEntity;
 
 public interface IConceptService {
 
-	public Long getCount();
+    public Long getCount();
 
-	public ConceptEntity createConcept(ConceptEntity conceptEntity);
+    public ConceptEntity createConcept(ConceptEntity conceptEntity);
 
-	public ConceptEntity getConceptById(Long id);
+    public ConceptEntity getConceptById(Long id);
 
 }

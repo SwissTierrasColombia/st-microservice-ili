@@ -14,49 +14,49 @@ import javax.persistence.Table;
 @Table(name = "models", schema = "ili")
 public class ModelEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
-	@Column(name = "name", nullable = false, length = 255)
-	private String name;
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "version_concept_id", referencedColumnName = "id", nullable = false)
-	private VersionConceptEntity versionConcept;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "version_concept_id", referencedColumnName = "id", nullable = false)
+    private VersionConceptEntity versionConcept;
 
-	public ModelEntity() {
+    public ModelEntity() {
 
-	}
+    }
 
-	public ModelEntity(String name, VersionConceptEntity versionConcept) {
-		this.name = name;
-		this.versionConcept = versionConcept;
-	}
+    public ModelEntity(String name, VersionConceptEntity versionConcept) {
+        this.name = name;
+        this.versionConcept = versionConcept;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public VersionConceptEntity getVersionConcept() {
-		return versionConcept;
-	}
+    public VersionConceptEntity getVersionConcept() {
+        return versionConcept;
+    }
 
-	public void setVersionConcept(VersionConceptEntity versionConcept) {
-		this.versionConcept = versionConcept;
-	}
+    public void setVersionConcept(VersionConceptEntity versionConcept) {
+        this.versionConcept = versionConcept;
+    }
 
 }

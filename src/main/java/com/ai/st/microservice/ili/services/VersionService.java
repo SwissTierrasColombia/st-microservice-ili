@@ -13,28 +13,28 @@ import com.ai.st.microservice.ili.repositories.VersionRepository;
 @Service
 public class VersionService implements IVersionService {
 
-	@Autowired
-	private VersionRepository versionRepository;
+    @Autowired
+    private VersionRepository versionRepository;
 
-	@Override
-	public Long getCount() {
-		return versionRepository.count();
-	}
+    @Override
+    public Long getCount() {
+        return versionRepository.count();
+    }
 
-	@Override
-	@Transactional
-	public VersionEntity createVersion(VersionEntity versionEntity) {
-		return versionRepository.save(versionEntity);
-	}
+    @Override
+    @Transactional
+    public VersionEntity createVersion(VersionEntity versionEntity) {
+        return versionRepository.save(versionEntity);
+    }
 
-	@Override
-	public VersionEntity getVersionByName(String name) {
-		return versionRepository.findByName(name);
-	}
+    @Override
+    public VersionEntity getVersionByName(String name) {
+        return versionRepository.findByName(name);
+    }
 
-	@Override
-	public List<VersionEntity> getVersions() {
-		return versionRepository.findAll();
-	}
+    @Override
+    public List<VersionEntity> getVersions() {
+        return versionRepository.findAll();
+    }
 
 }

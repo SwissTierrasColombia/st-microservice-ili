@@ -29,13 +29,8 @@ public final class SinicImport {
     private final String stTemporalDirectory;
     private final String srsDefault;
 
-    public SinicImport(
-            Ili2pgService ili2pgService,
-            ZipService zipService,
-            RabbitMQSenderService rabbitService,
-            VersionBusiness versionBusiness,
-            String stTemporalDirectory,
-            String srsDefault) {
+    public SinicImport(Ili2pgService ili2pgService, ZipService zipService, RabbitMQSenderService rabbitService,
+            VersionBusiness versionBusiness, String stTemporalDirectory, String srsDefault) {
         this.ili2pgService = ili2pgService;
         this.zipService = zipService;
         this.rabbitService = rabbitService;
@@ -67,9 +62,9 @@ public final class SinicImport {
                 String models = versionData.getModels();
 
                 boolean importValid = ili2pgService.import2pg(pathFileXTF, logFileSchemaImport, logFileImport,
-                        versionData.getUrl(), srsDefault, models, data.getDatabaseHost(),
-                        data.getDatabasePort(), data.getDatabaseName(), data.getDatabaseSchema(),
-                        data.getDatabaseUsername(), data.getDatabasePassword());
+                        versionData.getUrl(), srsDefault, models, data.getDatabaseHost(), data.getDatabasePort(),
+                        data.getDatabaseName(), data.getDatabaseSchema(), data.getDatabaseUsername(),
+                        data.getDatabasePassword());
 
                 try {
                     FileUtils.deleteDirectory(tmpDirectory.toFile());
@@ -78,8 +73,8 @@ public final class SinicImport {
                 }
 
                 log.info("SINIC IMPORT FINISHED WITH RESULT: " + importValid);
-                ResultSinicImportFile.Status status = (importValid) ? ResultSinicImportFile.Status.SUCCESS_IMPORT :
-                        ResultSinicImportFile.Status.FAILED_IMPORT;
+                ResultSinicImportFile.Status status = (importValid) ? ResultSinicImportFile.Status.SUCCESS_IMPORT
+                        : ResultSinicImportFile.Status.FAILED_IMPORT;
                 updateStatus(data, status);
 
             } else {
