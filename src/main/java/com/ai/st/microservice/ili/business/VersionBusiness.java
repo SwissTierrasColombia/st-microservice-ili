@@ -17,8 +17,8 @@ import com.ai.st.microservice.ili.entities.QueryTypeEntity;
 import com.ai.st.microservice.ili.entities.VersionConceptEntity;
 import com.ai.st.microservice.ili.entities.VersionEntity;
 import com.ai.st.microservice.ili.exceptions.BusinessException;
-import com.ai.st.microservice.ili.services.IConceptService;
-import com.ai.st.microservice.ili.services.IVersionService;
+import com.ai.st.microservice.ili.models.services.IConceptService;
+import com.ai.st.microservice.ili.models.services.IVersionService;
 
 @Component
 public class VersionBusiness {

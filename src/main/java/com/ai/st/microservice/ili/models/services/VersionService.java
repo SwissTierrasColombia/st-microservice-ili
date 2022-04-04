@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.services;
+package com.ai.st.microservice.ili.models.services;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ai.st.microservice.ili.entities.VersionEntity;
-import com.ai.st.microservice.ili.repositories.VersionRepository;
+import com.ai.st.microservice.ili.models.repositories.VersionRepository;
 
 @Service
 public class VersionService implements IVersionService {
