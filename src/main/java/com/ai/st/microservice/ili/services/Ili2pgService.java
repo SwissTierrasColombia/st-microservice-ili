@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.ai.st.microservice.ili.models.services.IVersionService;
+import com.ai.st.microservice.ili.services.tracing.SCMTracing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +99,9 @@ public class Ili2pgService {
                 config.setPreScript(path.toFile().getAbsolutePath());
 
             } catch (IOException e) {
-                log.error("Error executing pre script: " + e.getMessage());
+                String messageError = String.format("Error ejecutando el pre-script : %s", e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
             }
 
             config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
@@ -111,7 +114,9 @@ public class Ili2pgService {
             Ili2db.run(config, null);
             result = true;
         } catch (Exception e) {
-            log.error("ERROR generating schema: " + e.getMessage());
+            String messageError = String.format("Error realizando la función FC_SCHEMAIMPORT : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             result = false;
         }
 
@@ -156,7 +161,9 @@ public class Ili2pgService {
                 Ili2db.run(config, null);
                 result = true;
             } catch (Exception e) {
-                log.error(e.getMessage());
+                String messageError = String.format("Error realizando la función FC_IMPORT : %s", e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
             }
         }
 
@@ -221,23 +228,28 @@ public class Ili2pgService {
                 }
 
             } catch (SQLException e) {
-                log.error("Error getting pairing type I: " + e.getMessage());
+                String messageError = String.format("Error de SQL al obtener el tipo de emparejamiento : %s",
+                        e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
                 pairingTypeId = null;
             } catch (Exception e) {
-                log.error("Error getting pairing type II: " + e.getMessage());
+                String messageError = String.format("Error al obtener el tipo de emparejamiento : %s", e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
                 pairingTypeId = null;
             }
 
             log.info("EMPAREJAMIENTO: " + pairingTypeId);
 
             String sqlObjects = queryMatchIntegrationEntity.getQuery().replace("{dbschema}", databaseSchema);
-            ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
+            ResultSet resultSetObjects = connection.getResultSetFromSql(sqlObjects);
             try {
 
-                while (resultsetObjects.next()) {
+                while (resultSetObjects.next()) {
 
-                    String snr = resultsetObjects.getString("snr_predio_juridico");
-                    String gc = resultsetObjects.getString("gc_predio_catastro");
+                    String snr = resultSetObjects.getString("snr_predio_juridico");
+                    String gc = resultSetObjects.getString("gc_predio_catastro");
 
                     QueryEntity queryInsertEntity = versionConcept.getQuerys().stream().filter(
                             q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
@@ -256,6 +268,10 @@ public class Ili2pgService {
                 integrationStat.setStatus(true);
 
             } catch (SQLException e) {
+                String messageError = String.format("Error de SQL insertar los predios integrados : %s",
+                        e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
                 integrationStat.setStatus(false);
                 connection.disconnect();
             }
@@ -352,7 +368,9 @@ public class Ili2pgService {
 
             result = true;
         } catch (Exception e) {
-            log.error("Error export to xtf: " + e.getMessage());
+            String messageError = String.format("Error realizando la función FC_EXPORT : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             result = false;
         }
 

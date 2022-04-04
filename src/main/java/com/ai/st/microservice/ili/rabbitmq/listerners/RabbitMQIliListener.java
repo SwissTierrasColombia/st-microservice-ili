@@ -37,7 +37,7 @@ import com.ai.st.microservice.ili.dto.ResultImportDto;
 import com.ai.st.microservice.ili.dto.ValidationDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
-import com.ai.st.microservice.ili.services.IlivalidatorService;
+import com.ai.st.microservice.ili.services.IliValidatorService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
 import com.ai.st.microservice.ili.services.ZipService;
 
@@ -62,7 +62,7 @@ public class RabbitMQIliListener {
     private ZipService zipService;
 
     @Autowired
-    private IlivalidatorService ilivalidatorService;
+    private IliValidatorService ilivalidatorService;
 
     @Autowired
     private RabbitMQSenderService rabbitService;
