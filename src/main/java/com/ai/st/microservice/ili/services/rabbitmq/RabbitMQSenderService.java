@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.services;
+package com.ai.st.microservice.ili.services.rabbitmq;
 
 import com.ai.st.microservice.ili.dto.*;
 import org.springframework.amqp.core.AmqpTemplate;

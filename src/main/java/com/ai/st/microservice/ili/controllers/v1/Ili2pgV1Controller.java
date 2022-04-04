@@ -22,7 +22,7 @@ import com.ai.st.microservice.ili.dto.ResponseImportDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.exceptions.BusinessException;
 import com.ai.st.microservice.ili.exceptions.InputValidationException;
-import com.ai.st.microservice.ili.services.RabbitMQSenderService;
+import com.ai.st.microservice.ili.services.rabbitmq.RabbitMQSenderService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.rabbitmq.listerners;
+package com.ai.st.microservice.ili.services.rabbitmq.listerners;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ import com.ai.st.microservice.ili.dto.ValidationDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
 import com.ai.st.microservice.ili.services.IliValidatorService;
-import com.ai.st.microservice.ili.services.RabbitMQSenderService;
+import com.ai.st.microservice.ili.services.rabbitmq.RabbitMQSenderService;
 import com.ai.st.microservice.ili.services.ZipService;
 
 @Component

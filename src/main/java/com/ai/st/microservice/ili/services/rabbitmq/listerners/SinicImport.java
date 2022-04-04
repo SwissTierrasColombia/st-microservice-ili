@@ -1,11 +1,11 @@
-package com.ai.st.microservice.ili.rabbitmq.listerners;
+package com.ai.st.microservice.ili.services.rabbitmq.listerners;
 
 import com.ai.st.microservice.ili.business.VersionBusiness;
 import com.ai.st.microservice.ili.dto.Ili2pgImportSinicDto;
 import com.ai.st.microservice.ili.dto.ResultSinicImportFile;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
-import com.ai.st.microservice.ili.services.RabbitMQSenderService;
+import com.ai.st.microservice.ili.services.rabbitmq.RabbitMQSenderService;
 import com.ai.st.microservice.ili.services.ZipService;
 import com.ai.st.microservice.ili.services.tracing.SCMTracing;
 import org.apache.commons.io.FileUtils;
