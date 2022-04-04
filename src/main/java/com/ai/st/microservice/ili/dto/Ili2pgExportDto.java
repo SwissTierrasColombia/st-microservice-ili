@@ -124,4 +124,12 @@ public class Ili2pgExportDto implements Serializable {
         this.versionModel = versionModel;
     }
 
+    @Override
+    public String toString() {
+        return "Ili2pgExportDto{" + "databaseHost='" + databaseHost + '\'' + ", databasePort='" + databasePort + '\''
+                + ", databaseSchema='" + databaseSchema + '\'' + ", databaseUsername='" + databaseUsername + '\''
+                + ", databasePassword='" + databasePassword + '\'' + ", databaseName='" + databaseName + '\''
+                + ", pathFileXTF='" + pathFileXTF + '\'' + ", integrationId=" + integrationId + ", withStats="
+                + withStats + ", versionModel='" + versionModel + '\'' + '}';
+    }
 }

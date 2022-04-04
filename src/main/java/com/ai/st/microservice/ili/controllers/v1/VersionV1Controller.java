@@ -1,5 +1,6 @@
 package com.ai.st.microservice.ili.controllers.v1;
 
+import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ai.st.microservice.ili.business.VersionBusiness;
-import com.ai.st.microservice.ili.dto.BasicResponseDto;
 import com.ai.st.microservice.ili.dto.VersionDto;
 import com.ai.st.microservice.ili.exceptions.BusinessException;
 

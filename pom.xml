@@ -156,6 +156,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.ai.st.microservice.common</groupId>
+			<artifactId>st-common</artifactId>
+			<version>1.1.6</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.newrelic.logging</groupId>
 			<artifactId>logback</artifactId>
 			<version>2.3.2</version>

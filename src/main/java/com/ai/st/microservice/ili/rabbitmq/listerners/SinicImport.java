@@ -7,6 +7,7 @@ import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
 import com.ai.st.microservice.ili.services.RabbitMQSenderService;
 import com.ai.st.microservice.ili.services.ZipService;
+import com.ai.st.microservice.ili.services.tracing.SCMTracing;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
@@ -69,7 +70,10 @@ public final class SinicImport {
                 try {
                     FileUtils.deleteDirectory(tmpDirectory.toFile());
                 } catch (Exception e) {
-                    log.error("It has not been possible delete the directory: " + e.getMessage());
+                    String messageError = String.format(
+                            "Error eliminando el directorio de la importación del archivo SINIC : %s", e.getMessage());
+                    SCMTracing.sendError(messageError);
+                    log.error(messageError);
                 }
 
                 log.info("SINIC IMPORT FINISHED WITH RESULT: " + importValid);
@@ -83,7 +87,10 @@ public final class SinicImport {
             }
 
         } catch (Exception e) {
-            log.error("IMPORT FAILED WITH ERROR: " + e.getMessage());
+            String messageError = String.format("Error realizando la importación del archivo SINIC %s : %s",
+                    data.getReference(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             updateStatus(data, ResultSinicImportFile.Status.FAILED_IMPORT);
         }
 
@@ -103,11 +110,13 @@ public final class SinicImport {
         try {
             rabbitService.sendResultImportSinicFile(result);
         } catch (Exception e) {
-            log.error("Error sending status sinic import: " + e.getMessage());
+            String messageError = String.format("Error enviando el estado importación del archivo SINIC %s : %s",
+                    data.getReference(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
         }
 
         log.info("STATUS SENT ");
-
     }
 
 }
