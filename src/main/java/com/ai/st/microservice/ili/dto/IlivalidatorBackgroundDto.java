@@ -116,4 +116,13 @@ public class IlivalidatorBackgroundDto implements Serializable {
     public void setReferenceId(String referenceId) {
         this.referenceId = referenceId;
     }
+
+    @Override
+    public String toString() {
+        return "IlivalidatorBackgroundDto{" + "pathFile='" + pathFile + '\'' + ", userCode=" + userCode
+                + ", versionModel='" + versionModel + '\'' + ", skipGeometryValidation=" + skipGeometryValidation
+                + ", skipErrors=" + skipErrors + ", conceptId=" + conceptId + ", queueResponse='" + queueResponse + '\''
+                + ", referenceId='" + referenceId + '\'' + ", requestId=" + requestId + ", supplyRequestedId="
+                + supplyRequestedId + ", observations='" + observations + '\'' + '}';
+    }
 }
