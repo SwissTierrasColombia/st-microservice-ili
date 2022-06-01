@@ -1,14 +1,13 @@
 package com.ai.st.microservice.ili.services;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.ai.st.microservice.ili.models.services.IVersionService;
+import com.ai.st.microservice.ili.services.tracing.SCMTracing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +64,8 @@ public class Ili2pgService {
     }
 
     public Boolean generateSchema(String logFileSchemaImport, String iliDirectory, String srsCode, String models,
-                                  String databaseHost, String databasePort, String databaseName, String databaseSchema,
-                                  String databaseUsername, String databasePassword) {
+            String databaseHost, String databasePort, String databaseName, String databaseSchema,
+            String databaseUsername, String databasePassword) {
 
         boolean result;
 
@@ -83,17 +82,12 @@ public class Ili2pgService {
             try {
                 final Path path = Files.createTempFile("myTempFile", ".sql");
 
-                String dataFile = "INSERT into spatial_ref_sys (\r\n" +
-                        "  srid, auth_name, auth_srid, proj4text, srtext\r\n" +
-                        ")\r\n" +
-                        "values\r\n" +
-                        "  (\r\n" +
-                        "    9377,\r\n" +
-                        "    'EPSG',\r\n" +
-                        "    9377,\r\n" +
-                        "    '+proj=tmerc +lat_0=4.0 +lon_0=-73.0 +k=0.9992 +x_0=5000000 +y_0=2000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',\r\n" +
-                        "    'PROJCRS[\"MAGNA-SIRGAS / Origen-Nacional\", BASEGEOGCRS[\"MAGNA-SIRGAS\", DATUM[\"Marco Geocentrico Nacional de Referencia\", ELLIPSOID[\"GRS 1980\",6378137,298.257222101, LENGTHUNIT[\"metre\",1]]], PRIMEM[\"Greenwich\",0, ANGLEUNIT[\"degree\",0.0174532925199433]], ID[\"EPSG\",4686]], CONVERSION[\"Colombia Transverse Mercator\", METHOD[\"Transverse Mercator\", ID[\"EPSG\",9807]], PARAMETER[\"Latitude of natural origin\",4, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8801]], PARAMETER[\"Longitude of natural origin\",-73, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8802]], PARAMETER[\"Scale factor at natural origin\",0.9992, SCALEUNIT[\"unity\",1], ID[\"EPSG\",8805]], PARAMETER[\"False easting\",5000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8806]], PARAMETER[\"False northing\",2000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8807]]], CS[Cartesian,2], AXIS[\"northing (N)\",north, ORDER[1], LENGTHUNIT[\"metre\",1]], AXIS[\"easting (E)\",east, ORDER[2], LENGTHUNIT[\"metre\",1]], USAGE[ SCOPE[\"unknown\"], AREA[\"Colombia\"], BBOX[-4.23,-84.77,15.51,-66.87]], ID[\"EPSG\",9377]]'\r\n" +
-                        "  ) ON CONFLICT (srid) DO NOTHING;";
+                String dataFile = "INSERT into spatial_ref_sys (\r\n"
+                        + "  srid, auth_name, auth_srid, proj4text, srtext\r\n" + ")\r\n" + "values\r\n" + "  (\r\n"
+                        + "    9377,\r\n" + "    'EPSG',\r\n" + "    9377,\r\n"
+                        + "    '+proj=tmerc +lat_0=4.0 +lon_0=-73.0 +k=0.9992 +x_0=5000000 +y_0=2000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs ',\r\n"
+                        + "    'PROJCRS[\"MAGNA-SIRGAS / Origen-Nacional\", BASEGEOGCRS[\"MAGNA-SIRGAS\", DATUM[\"Marco Geocentrico Nacional de Referencia\", ELLIPSOID[\"GRS 1980\",6378137,298.257222101, LENGTHUNIT[\"metre\",1]]], PRIMEM[\"Greenwich\",0, ANGLEUNIT[\"degree\",0.0174532925199433]], ID[\"EPSG\",4686]], CONVERSION[\"Colombia Transverse Mercator\", METHOD[\"Transverse Mercator\", ID[\"EPSG\",9807]], PARAMETER[\"Latitude of natural origin\",4, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8801]], PARAMETER[\"Longitude of natural origin\",-73, ANGLEUNIT[\"degree\",0.0174532925199433], ID[\"EPSG\",8802]], PARAMETER[\"Scale factor at natural origin\",0.9992, SCALEUNIT[\"unity\",1], ID[\"EPSG\",8805]], PARAMETER[\"False easting\",5000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8806]], PARAMETER[\"False northing\",2000000, LENGTHUNIT[\"metre\",1], ID[\"EPSG\",8807]]], CS[Cartesian,2], AXIS[\"northing (N)\",north, ORDER[1], LENGTHUNIT[\"metre\",1]], AXIS[\"easting (E)\",east, ORDER[2], LENGTHUNIT[\"metre\",1]], USAGE[ SCOPE[\"unknown\"], AREA[\"Colombia\"], BBOX[-4.23,-84.77,15.51,-66.87]], ID[\"EPSG\",9377]]'\r\n"
+                        + "  ) ON CONFLICT (srid) DO NOTHING;";
 
                 // Writing data here
                 byte[] buf = dataFile.getBytes();
@@ -105,9 +99,10 @@ public class Ili2pgService {
                 config.setPreScript(path.toFile().getAbsolutePath());
 
             } catch (IOException e) {
-                log.error("Error executing pre script: " + e.getMessage());
+                String messageError = String.format("Error ejecutando el pre-script : %s", e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
             }
-
 
             config.setDburl("jdbc:postgresql://" + databaseHost + ":" + databasePort + "/" + databaseName);
             config.setDbschema(databaseSchema);
@@ -119,7 +114,9 @@ public class Ili2pgService {
             Ili2db.run(config, null);
             result = true;
         } catch (Exception e) {
-            log.error("ERROR generating schema: " + e.getMessage());
+            String messageError = String.format("Error realizando la función FC_SCHEMAIMPORT : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             result = false;
         }
 
@@ -127,8 +124,8 @@ public class Ili2pgService {
     }
 
     public Boolean import2pg(String fileXTF, String logFileSchemaImport, String logFileImport, String iliDirectory,
-                             String srsCode, String models, String databaseHost, String databasePort, String databaseName,
-                             String databaseSchema, String databaseUsername, String databasePassword) {
+            String srsCode, String models, String databaseHost, String databasePort, String databaseName,
+            String databaseSchema, String databaseUsername, String databasePassword) {
 
         boolean result = false;
 
@@ -164,7 +161,9 @@ public class Ili2pgService {
                 Ili2db.run(config, null);
                 result = true;
             } catch (Exception e) {
-                log.error(e.getMessage());
+                String messageError = String.format("Error realizando la función FC_IMPORT : %s", e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
             }
         }
 
@@ -172,10 +171,10 @@ public class Ili2pgService {
     }
 
     public IntegrationStatDto integration(String cadastreFileXTF, String cadastreLogFileSchemaImport,
-                                          String cadastreLogFileImport, String registrationFileXTF, String registrationLogFileSchemaImport,
-                                          String registrationLogFileImport, String iliDirectory, String srsCode, String models, String databaseHost,
-                                          String databasePort, String databaseName, String databaseSchema, String databaseUsername,
-                                          String databasePassword, String modelVersion) {
+            String cadastreLogFileImport, String registrationFileXTF, String registrationLogFileSchemaImport,
+            String registrationLogFileImport, String iliDirectory, String srsCode, String models, String databaseHost,
+            String databasePort, String databaseName, String databaseSchema, String databaseUsername,
+            String databasePassword, String modelVersion) {
 
         IntegrationStatDto integrationStat = new IntegrationStatDto();
 
@@ -217,7 +216,7 @@ public class Ili2pgService {
             try {
 
                 QueryEntity queryGetPairingTypeIntegrationEntity = versionConcept.getQuerys().stream().filter(
-                                q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION))
+                        q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_GET_PAIRING_TYPE_INTEGRATION))
                         .findAny().orElse(null);
                 String sqlObjects = queryGetPairingTypeIntegrationEntity.getQuery()
                         .replace("{pairingTypeCode}", String.valueOf(4)).replace("{dbschema}", databaseSchema);
@@ -229,26 +228,31 @@ public class Ili2pgService {
                 }
 
             } catch (SQLException e) {
-                log.error("Error getting pairing type I: " + e.getMessage());
+                String messageError = String.format("Error de SQL al obtener el tipo de emparejamiento : %s",
+                        e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
                 pairingTypeId = null;
             } catch (Exception e) {
-                log.error("Error getting pairing type II: " + e.getMessage());
+                String messageError = String.format("Error al obtener el tipo de emparejamiento : %s", e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
                 pairingTypeId = null;
             }
 
             log.info("EMPAREJAMIENTO: " + pairingTypeId);
 
             String sqlObjects = queryMatchIntegrationEntity.getQuery().replace("{dbschema}", databaseSchema);
-            ResultSet resultsetObjects = connection.getResultSetFromSql(sqlObjects);
+            ResultSet resultSetObjects = connection.getResultSetFromSql(sqlObjects);
             try {
 
-                while (resultsetObjects.next()) {
+                while (resultSetObjects.next()) {
 
-                    String snr = resultsetObjects.getString("snr_predio_juridico");
-                    String gc = resultsetObjects.getString("gc_predio_catastro");
+                    String snr = resultSetObjects.getString("snr_predio_juridico");
+                    String gc = resultSetObjects.getString("gc_predio_catastro");
 
                     QueryEntity queryInsertEntity = versionConcept.getQuerys().stream().filter(
-                                    q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
+                            q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_INSERT_INTEGRATION_))
                             .findAny().orElse(null);
 
                     String sqlInsert = queryInsertEntity.getQuery().replace("{dbschema}", databaseSchema)
@@ -264,6 +268,10 @@ public class Ili2pgService {
                 integrationStat.setStatus(true);
 
             } catch (SQLException e) {
+                String messageError = String.format("Error de SQL insertar los predios integrados : %s",
+                        e.getMessage());
+                SCMTracing.sendError(messageError);
+                log.error(messageError);
                 integrationStat.setStatus(false);
                 connection.disconnect();
             }
@@ -276,12 +284,12 @@ public class Ili2pgService {
     }
 
     public IntegrationStatDto getIntegrationStats(String databaseHost, String databasePort, String databaseName,
-                                                  String databaseUsername, String databasePassword, String databaseSchema, String modelVersion) {
+            String databaseUsername, String databasePassword, String databaseSchema, String modelVersion) {
 
         IntegrationStatDto integrationStat = new IntegrationStatDto();
 
         VersionEntity versionEntity = versionService.getVersionByName(modelVersion);
-        if (versionEntity instanceof VersionEntity) {
+        if (versionEntity != null) {
 
             VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
                     .filter(vC -> vC.getConcept().getId().equals(ConceptBusiness.CONCEPT_INTEGRATION)).findAny()
@@ -299,7 +307,7 @@ public class Ili2pgService {
             long countSNR = connection.count(sqlCountSNR);
 
             QueryEntity queryCountCadastreEntity = versionConcept.getQuerys().stream().filter(
-                            q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
+                    q -> q.getQueryType().getId().equals(QueryTypeBusiness.QUERY_TYPE_COUNT_CADASTRE_INTEGRATION))
                     .findAny().orElse(null);
             String sqlCountGC = queryCountCadastreEntity.getQuery().replace("{dbschema}", databaseSchema);
             long countGC = connection.count(sqlCountGC);
@@ -330,8 +338,8 @@ public class Ili2pgService {
     }
 
     public Boolean exportToXtf(String filePath, String logFileExport, String iliDirectory, String srsCode,
-                               String models, String databaseHost, String databasePort, String databaseName, String databaseSchema,
-                               String databaseUsername, String databasePassword) {
+            String models, String databaseHost, String databasePort, String databaseName, String databaseSchema,
+            String databaseUsername, String databasePassword) {
 
         boolean result;
 
@@ -360,7 +368,9 @@ public class Ili2pgService {
 
             result = true;
         } catch (Exception e) {
-            log.error("Error export to xtf: " + e.getMessage());
+            String messageError = String.format("Error realizando la función FC_EXPORT : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             result = false;
         }
 

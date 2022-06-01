@@ -6,35 +6,35 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "ImportModel", description = "Response import")
 public class ResponseImportDto {
 
-	private Boolean imported;
-	private String message;
+    private Boolean imported;
+    private String message;
 
-	public ResponseImportDto() {
+    public ResponseImportDto() {
 
-	}
+    }
 
-	public ResponseImportDto(Boolean imported, String message) {
-		super();
-		this.imported = imported;
-		this.message = message;
-	}
+    public ResponseImportDto(Boolean imported, String message) {
+        super();
+        this.imported = imported;
+        this.message = message;
+    }
 
-	@ApiModelProperty(required = true, notes = "Was the information imported?")
-	public Boolean getImported() {
-		return imported;
-	}
+    @ApiModelProperty(required = true, notes = "Was the information imported?")
+    public Boolean getImported() {
+        return imported;
+    }
 
-	public void setImported(Boolean imported) {
-		this.imported = imported;
-	}
+    public void setImported(Boolean imported) {
+        this.imported = imported;
+    }
 
-	@ApiModelProperty(required = true, notes = "Process message")
-	public String getMessage() {
-		return message;
-	}
+    @ApiModelProperty(required = true, notes = "Process message")
+    public String getMessage() {
+        return message;
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
 }

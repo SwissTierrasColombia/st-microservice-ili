@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.services;
+package com.ai.st.microservice.ili.services.rabbitmq;
 
 import com.ai.st.microservice.ili.dto.*;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -66,7 +66,6 @@ public class RabbitMQSenderService {
     @Value("${st.rabbitmq.queueResultProcessSinicFiles.routingkey}")
     public String queueResultProcessSinicFilesRoutingKey;
 
-
     public void sendStats(IntegrationStatDto integrationStats) {
         rabbitTemplate.convertSendAndReceive(exchangeUpdateIntegrationsName, routingkeyUpdateIntegrationsName,
                 integrationStats);
@@ -85,7 +84,8 @@ public class RabbitMQSenderService {
     }
 
     public void sendStatsValidationQueueSinicFiles(ValidationDto data) {
-        rabbitTemplate.convertAndSend(exchangeResultValidationSinicFilesName, routingKeyResultValidationSinicFilesName, data);
+        rabbitTemplate.convertAndSend(exchangeResultValidationSinicFilesName, routingKeyResultValidationSinicFilesName,
+                data);
     }
 
     public void sendDataToIliProcess(IliProcessQueueDto data) {
@@ -101,7 +101,8 @@ public class RabbitMQSenderService {
     }
 
     public void sendResultImportSinicFile(ResultSinicImportFile data) {
-        rabbitTemplate.convertAndSend(queueResultProcessSinicFilesExchange, queueResultProcessSinicFilesRoutingKey, data);
+        rabbitTemplate.convertAndSend(queueResultProcessSinicFilesExchange, queueResultProcessSinicFilesRoutingKey,
+                data);
     }
 
 }

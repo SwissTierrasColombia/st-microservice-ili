@@ -26,6 +26,5 @@ server:
     max-threads: 0
 
 iliProcesses:
-  srs: "3116"
-  ogrPath: /usr/bin
+  srs: "9377"
   
