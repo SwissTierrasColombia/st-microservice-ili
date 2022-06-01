@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.services;
+package com.ai.st.microservice.ili.models.services;
 
 import javax.transaction.Transactional;
 
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ai.st.microservice.ili.entities.VersionConceptEntity;
-import com.ai.st.microservice.ili.repositories.VersionConceptRepository;
+import com.ai.st.microservice.ili.models.repositories.VersionConceptRepository;
 
 @Service
 public class VersionConceptService implements IVersionConceptService {

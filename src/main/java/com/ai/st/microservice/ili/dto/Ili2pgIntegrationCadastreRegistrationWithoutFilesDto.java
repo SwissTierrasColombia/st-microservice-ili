@@ -28,7 +28,7 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
     @ApiModelProperty(required = true, notes = "Database name")
     private String databaseName;
 
-    @ApiModelProperty(required = true, notes = "Cadastre - Path file XTF")
+    @ApiModelProperty(required = true, notes = "Cadastral - Path file XTF")
     private String cadastrePathXTF;
 
     @ApiModelProperty(required = true, notes = "Registration - Path file XTF")
@@ -37,7 +37,7 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
     @ApiModelProperty(required = true, notes = "Integration ID")
     private Long integrationId;
 
-    @ApiModelProperty(required = false, notes = "Model version")
+    @ApiModelProperty(notes = "Model version")
     private String versionModel;
 
     public Ili2pgIntegrationCadastreRegistrationWithoutFilesDto() {
@@ -124,4 +124,13 @@ public class Ili2pgIntegrationCadastreRegistrationWithoutFilesDto implements Ser
         this.versionModel = versionModel;
     }
 
+    @Override
+    public String toString() {
+        return "Ili2pgIntegrationCadastreRegistrationWithoutFilesDto{" + "databaseHost='" + databaseHost + '\''
+                + ", databasePort='" + databasePort + '\'' + ", databaseSchema='" + databaseSchema + '\''
+                + ", databaseUsername='" + databaseUsername + '\'' + ", databasePassword='" + databasePassword + '\''
+                + ", databaseName='" + databaseName + '\'' + ", cadastrePathXTF='" + cadastrePathXTF + '\''
+                + ", registrationPathXTF='" + registrationPathXTF + '\'' + ", integrationId=" + integrationId
+                + ", versionModel='" + versionModel + '\'' + '}';
+    }
 }

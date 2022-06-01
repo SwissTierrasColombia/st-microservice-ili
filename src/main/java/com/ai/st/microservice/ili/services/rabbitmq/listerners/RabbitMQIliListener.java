@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.rabbitmq.listerners;
+package com.ai.st.microservice.ili.services.rabbitmq.listerners;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.ai.st.microservice.ili.business.QueueResponse;
+import com.ai.st.microservice.ili.services.tracing.SCMTracing;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
@@ -36,12 +37,12 @@ import com.ai.st.microservice.ili.dto.ResultImportDto;
 import com.ai.st.microservice.ili.dto.ValidationDto;
 import com.ai.st.microservice.ili.dto.VersionDataDto;
 import com.ai.st.microservice.ili.services.Ili2pgService;
-import com.ai.st.microservice.ili.services.IlivalidatorService;
-import com.ai.st.microservice.ili.services.RabbitMQSenderService;
+import com.ai.st.microservice.ili.services.IliValidatorService;
+import com.ai.st.microservice.ili.services.rabbitmq.RabbitMQSenderService;
 import com.ai.st.microservice.ili.services.ZipService;
 
 @Component
-public class RabbitMQIliListerner {
+public class RabbitMQIliListener {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -61,7 +62,7 @@ public class RabbitMQIliListerner {
     private ZipService zipService;
 
     @Autowired
-    private IlivalidatorService ilivalidatorService;
+    private IliValidatorService ilivalidatorService;
 
     @Autowired
     private RabbitMQSenderService rabbitService;
@@ -158,7 +159,9 @@ public class RabbitMQIliListerner {
                             pathTomlFile = pathToml.toFile().getAbsolutePath();
 
                         } catch (IOException e) {
-                            log.error("Error creating toml file: " + e.getMessage());
+                            String messageError = String.format("Error creando archivo toml : %s", e.getMessage());
+                            SCMTracing.sendError(messageError);
+                            log.error(messageError);
                         }
 
                     }
@@ -175,14 +178,21 @@ public class RabbitMQIliListerner {
                         try {
                             FileUtils.deleteDirectory(tmpDirectoryLog.toFile());
                         } catch (Exception e) {
-                            log.error("It has not been possible delete the directory (log): " + e.getMessage());
+                            String messageError = String.format(
+                                    "Error eliminando el directorio de los logs durante la validación : %s",
+                                    e.getMessage());
+                            SCMTracing.sendError(messageError);
+                            log.error(messageError);
                         }
                     }
 
                     try {
                         FileUtils.deleteDirectory(tmpDirectory.toFile());
                     } catch (Exception e) {
-                        log.error("It has not been possible delete the directory: " + e.getMessage());
+                        String messageError = String.format("Error eliminando el directorio de la validación: %s",
+                                e.getMessage());
+                        SCMTracing.sendError(messageError);
+                        log.error(messageError);
                     }
 
                 }
@@ -190,7 +200,11 @@ public class RabbitMQIliListerner {
             }
 
         } catch (Exception e) {
-            log.error("validation failed # " + data.getRequestId() + " : " + e.getMessage());
+            String messageError = String.format(
+                    "Error realizando la validación del archivo xtf con referencia %s y solicitud %d: %s",
+                    data.getReferenceId(), data.getRequestId(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             validationDto.setErrors(new ArrayList<>(Collections.singletonList(e.getMessage())));
         }
 
@@ -268,15 +282,21 @@ public class RabbitMQIliListerner {
                 try {
                     FileUtils.deleteDirectory(tmpDirectory.toFile());
                 } catch (Exception e) {
-                    log.error("It has not been possible delete the directory: " + e.getMessage());
+                    String messageError = String.format("Error eliminando el directorio de la integración : %s",
+                            e.getMessage());
+                    SCMTracing.sendError(messageError);
+                    log.error(messageError);
                 }
 
                 log.info("Integration finished with result: " + integrationStatDto.isStatus());
             }
 
         } catch (Exception e) {
-            log.error("Integration failed # " + data.getIntegrationId());
-            log.error("Integration error  " + e.getMessage());
+            String messageError = String.format("Error realizando la integración %d : %s", data.getIntegrationId(),
+                    e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
+
             integrationStatDto.setErrors(new ArrayList<>(Collections.singletonList(e.getMessage())));
 
             integrationStatDto = new IntegrationStatDto();
@@ -336,7 +356,10 @@ public class RabbitMQIliListerner {
                     try {
                         FileUtils.deleteQuietly(new File(data.getPathFileXTF()));
                     } catch (Exception e) {
-                        log.error("It has not been possible delete the file exported: " + e.getMessage());
+                        String messageError = String.format(
+                                "Error eliminando el archivo exportado después de comprirmirlo : %s", e.getMessage());
+                        SCMTracing.sendError(messageError);
+                        log.error(messageError);
                     }
 
                 } else {
@@ -352,15 +375,19 @@ public class RabbitMQIliListerner {
                 try {
                     FileUtils.deleteDirectory(tmpDirectory.toFile());
                 } catch (Exception e) {
-                    log.error("It has not been possible delete the directory: " + e.getMessage());
+                    String messageError = String.format("Error eliminando el directorio de la exportación : %s",
+                            e.getMessage());
+                    SCMTracing.sendError(messageError);
+                    log.error(messageError);
                 }
 
             }
 
         } catch (Exception e) {
-            log.error("Export failed # " + data.getIntegrationId());
-            log.error("Export error  " + e.getMessage());
-
+            String messageError = String.format("Error realizando la exportación de la integración %d : %s",
+                    data.getIntegrationId(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             resultDto.setStatus(false);
         }
 
@@ -414,7 +441,10 @@ public class RabbitMQIliListerner {
                     try {
                         FileUtils.deleteDirectory(tmpDirectory.toFile());
                     } catch (Exception e) {
-                        log.error("It has not been possible delete the directory: " + e.getMessage());
+                        String messageError = String.format("Error eliminando el directorio de la importación : %s",
+                                e.getMessage());
+                        SCMTracing.sendError(messageError);
+                        log.error(messageError);
                     }
 
                     resultImportDto.setResult(importValid);
@@ -425,13 +455,17 @@ public class RabbitMQIliListerner {
 
         } catch (Exception e) {
             resultImportDto.setResult(false);
-            log.error("Import failed with error: " + e.getMessage());
+            String messageError = String.format("Error realizando la importación : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
         }
 
         try {
             rabbitService.sendResultToImport(resultImportDto);
         } catch (Exception e) {
-            log.error("Error sending result from import: " + e.getMessage());
+            String messageError = String.format("Error enviando el resultado de la importación : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
         }
 
     }
@@ -447,7 +481,7 @@ public class RabbitMQIliListerner {
         try {
 
             VersionDataDto versionData = versionBusiness.getDataVersion(data.getVersionModel(), data.getConceptId());
-            if (versionData instanceof VersionDataDto) {
+            if (versionData != null) {
 
                 String nameDirectory = "ili_process_export_" + RandomStringUtils.random(7, false, true);
                 Path tmpDirectory = Files.createTempDirectory(Paths.get(stTemporalDirectory), nameDirectory);
@@ -474,7 +508,11 @@ public class RabbitMQIliListerner {
                     try {
                         FileUtils.deleteQuietly(new File(data.getPathFileXTF()));
                     } catch (Exception e) {
-                        log.error("It has not been possible delete the file exported: " + e.getMessage());
+                        String messageError = String.format(
+                                "Error eliminando el archivo exportado después de comprimirlo [referencia] : %s",
+                                e.getMessage());
+                        SCMTracing.sendError(messageError);
+                        log.error(messageError);
                     }
 
                 } else {
@@ -488,20 +526,27 @@ public class RabbitMQIliListerner {
                 try {
                     FileUtils.deleteQuietly(new File(data.getPathFileXTF()));
                 } catch (Exception e) {
-                    log.error("It has not been possible delete the directory: " + e.getMessage());
+                    String messageError = String.format(
+                            "Error eliminando el directorio de la exportación [referencia] : %s", e.getMessage());
+                    SCMTracing.sendError(messageError);
+                    log.error(messageError);
                 }
 
             }
 
         } catch (Exception e) {
-            log.error("Export reference failed # " + data.getReference());
-            log.error("Export reference error  " + e.getMessage());
+            String messageError = String.format("Error realizando la exportación con referencia %s : %s",
+                    data.getReference(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
         }
 
         try {
             rabbitService.sendResultToExport(resultExportDto);
         } catch (Exception e) {
-            log.error("Error sending result from export: " + e.getMessage());
+            String messageError = String.format("Error enviando el resultado de la exportación : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
         }
 
     }

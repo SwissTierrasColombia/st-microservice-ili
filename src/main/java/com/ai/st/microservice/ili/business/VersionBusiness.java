@@ -17,8 +17,8 @@ import com.ai.st.microservice.ili.entities.QueryTypeEntity;
 import com.ai.st.microservice.ili.entities.VersionConceptEntity;
 import com.ai.st.microservice.ili.entities.VersionEntity;
 import com.ai.st.microservice.ili.exceptions.BusinessException;
-import com.ai.st.microservice.ili.services.IConceptService;
-import com.ai.st.microservice.ili.services.IVersionService;
+import com.ai.st.microservice.ili.models.services.IConceptService;
+import com.ai.st.microservice.ili.models.services.IVersionService;
 
 @Component
 public class VersionBusiness {
@@ -45,9 +45,9 @@ public class VersionBusiness {
             VersionConceptEntity versionConcept = versionEntity.getVersionsConcepts().stream()
                     .filter(vC -> vC.getConcept().getId().equals(conceptId)).findAny().orElse(null);
 
-            String models = "";
+            StringBuilder models = new StringBuilder();
             for (ModelEntity modelEntity : versionConcept.getModels()) {
-                models += modelEntity.getName() + ";";
+                models.append(modelEntity.getName()).append(";");
             }
 
             for (QueryEntity queryEntity : versionConcept.getQuerys()) {
@@ -60,7 +60,7 @@ public class VersionBusiness {
             }
 
             versionDataDto.setUrl(versionConcept.getUrl());
-            versionDataDto.setModels(models);
+            versionDataDto.setModels(models.toString());
 
         } else {
             throw new BusinessException("No se ha encontrado la versión");

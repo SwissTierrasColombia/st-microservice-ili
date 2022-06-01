@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.services;
+package com.ai.st.microservice.ili.models.services;
 
 import com.ai.st.microservice.ili.entities.VersionConceptEntity;
 

@@ -124,4 +124,12 @@ public class Ili2pgImportReferenceDto implements Serializable {
         this.reference = reference;
     }
 
+    @Override
+    public String toString() {
+        return "Ili2pgImportReferenceDto{" + "databaseHost='" + databaseHost + '\'' + ", databasePort='" + databasePort
+                + '\'' + ", databaseSchema='" + databaseSchema + '\'' + ", databaseUsername='" + databaseUsername + '\''
+                + ", databasePassword='" + databasePassword + '\'' + ", databaseName='" + databaseName + '\''
+                + ", pathXTF='" + pathXTF + '\'' + ", versionModel='" + versionModel + '\'' + ", conceptId=" + conceptId
+                + ", reference='" + reference + '\'' + '}';
+    }
 }

@@ -1,4 +1,4 @@
-package com.ai.st.microservice.ili.services;
+package com.ai.st.microservice.ili.models.services;
 
 import javax.transaction.Transactional;
 
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ai.st.microservice.ili.entities.QueryTypeEntity;
-import com.ai.st.microservice.ili.repositories.QueryTypeRepository;
+import com.ai.st.microservice.ili.models.repositories.QueryTypeRepository;
 
 @Service
 public class QueryTypeService implements IQueryTypeService {
