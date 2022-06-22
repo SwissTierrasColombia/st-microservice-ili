@@ -14,7 +14,7 @@ ENV NEW_RELIC_ENVIRONMENT=$NEW_RELIC_ENVIRONMENT
 
 VOLUME /tmp
 
-ADD ./target/st-microservice-ili-2.4.0.jar st-microservice-ili.jar
+ADD ./target/st-microservice-ili-2.4.2.jar st-microservice-ili.jar
 ADD ./target/newrelic.jar newrelic.jar
 ADD ./newrelic.yml newrelic.yml
 
