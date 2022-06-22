@@ -27,4 +27,7 @@ server:
 
 iliProcesses:
   srs: "9377"
-  
+
+st:
+  rabbitmq:
+    queueInstance: st.queue.ili

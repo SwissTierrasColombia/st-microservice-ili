@@ -250,10 +250,58 @@ public class RabbitMQConfig {
         return new DirectExchange(queueResultProcessSinicFilesExchange);
     }
 
+    // queue ili sinic large
+
+    @Value("${st.rabbitmq.queueIliSinicLarge.queue}")
+    public String queueIliSinicLargeName;
+
+    @Value("${st.rabbitmq.queueIliSinicLarge.exchange}")
+    public String exchangeIliSinicLargeName;
+
+    @Value("${st.rabbitmq.queueIliSinicLarge.routingkey}")
+    public String routingkeyIliSinicLargeName;
+
     @Bean
-    public Binding bindingResultProcessSinicFilesName() {
-        return BindingBuilder.bind(queueResultProcessSinicFilesName()).to(exchangeResultProcessSinicFilesName())
-                .with(queueResultProcessSinicFilesRoutingKey);
+    public Queue queueIliSinicLargeName() {
+        return new Queue(queueIliSinicLargeName, false);
+    }
+
+    @Bean
+    public DirectExchange exchangeIliSinicLargeName() {
+        return new DirectExchange(exchangeIliSinicLargeName);
+    }
+
+    @Bean
+    public Binding bindingIliSinicLargeName() {
+        return BindingBuilder.bind(queueIliSinicLargeName()).to(exchangeIliSinicLargeName())
+                .with(routingkeyIliSinicLargeName);
+    }
+
+    // queue ili sinic small
+
+    @Value("${st.rabbitmq.queueIliSinicSmall.queue}")
+    public String queueIliSinicSmallName;
+
+    @Value("${st.rabbitmq.queueIliSinicSmall.exchange}")
+    public String exchangeIliSinicSmallName;
+
+    @Value("${st.rabbitmq.queueIliSinicSmall.routingkey}")
+    public String routingkeyIliSinicSmallName;
+
+    @Bean
+    public Queue queueIliSinicSmallName() {
+        return new Queue(queueIliSinicSmallName, false);
+    }
+
+    @Bean
+    public DirectExchange exchangeIliSinicSmallName() {
+        return new DirectExchange(exchangeIliSinicSmallName);
+    }
+
+    @Bean
+    public Binding bindingIliSinicSmallName() {
+        return BindingBuilder.bind(queueIliSinicSmallName()).to(exchangeIliSinicSmallName())
+                .with(routingkeyIliSinicSmallName);
     }
 
     // Setup
