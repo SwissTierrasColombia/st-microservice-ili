@@ -70,7 +70,7 @@ public class RabbitMQIliListener {
     @Autowired
     private VersionBusiness versionBusiness;
 
-    @RabbitListener(queues = "${st.rabbitmq.queueIli.queue}", concurrency = "${st.rabbitmq.queueIli.concurrency}")
+    @RabbitListener(queues = "${st.rabbitmq.queueInstance}", concurrency = "1")
     public void iliProcess(IliProcessQueueDto data) {
 
         log.info("ili process started");
